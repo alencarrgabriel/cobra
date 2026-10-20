@@ -14,11 +14,11 @@ const documented = readFileSync(path.join(rootDir, ".env.example"), "utf8")
   .map((line) => /^([A-Z][A-Z0-9_]*)=/.exec(line)?.[1])
   .filter(Boolean);
 
-// Short or enum-like values (e.g. "production") would match by chance; only check distinctive ones.
+// Short or enum-like values (e.g. "development") match by chance; only check distinctive ones.
 const secrets = documented
   .filter((name) => !name.startsWith("NEXT_PUBLIC_"))
   .map((name) => [name, process.env[name]])
-  .filter(([, value]) => typeof value === "string" && value.length >= 8);
+  .filter(([, value]) => typeof value === "string" && value.length >= 16);
 
 function* files(dir) {
   for (const entry of readdirSync(dir, { withFileTypes: true })) {

@@ -1,12 +1,10 @@
-import path from "node:path";
-
-import { loadEnvConfig } from "@next/env";
 import type { NextConfig } from "next";
 
+import { loadRootEnv } from "./src/config/root-env";
 import { securityHeaders } from "./src/config/security-headers";
 
 // Site and collectors share a single `.env` at the repository root.
-loadEnvConfig(path.resolve(__dirname, ".."));
+loadRootEnv(__dirname);
 
 const nextConfig: NextConfig = {
   cacheComponents: true,
