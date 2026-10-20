@@ -46,6 +46,14 @@ docs: describe relevance criteria
 - Nunca chame APIs do governo a partir do site; isso é trabalho dos coletores.
 - Antes de integrar uma API externa, confira a documentação oficial atual e registre no design da change o que foi confirmado e quando.
 
+### Banco de dados
+
+- O esquema muda só por migrações SQL em `supabase/migrations/`, com nome `<AAAAMMDDHHMMSS>_<descricao>.sql`.
+- Nunca edite uma migração já aplicada em algum ambiente; corrija com uma migração nova.
+- Tabelas e colunas em inglês, `snake_case`, tabelas no plural.
+- Toda tabela de dado público segue a convenção de rastreabilidade de [docs/modelo-de-dados.md](docs/modelo-de-dados.md).
+- Migrações nunca têm senha nem criam papel com login.
+
 ### Segredos
 
 - Nada de credenciais no repositório. Configuração vai em variáveis de ambiente, documentadas no `.env.example`.
@@ -58,9 +66,10 @@ O CI roda as mesmas verificações que você pode rodar localmente:
 
 | Comando | O que faz |
 |---|---|
-| `pnpm check` | Tudo abaixo, menos a varredura de segredos |
+| `pnpm check` | Tudo abaixo, menos a varredura de segredos (precisa do banco local: `pnpm db:start`) |
 | `pnpm check:web` | Lint, formatação, tipos, testes de unidade, build, checagem do bundle e testes de navegador do site |
 | `pnpm check:collectors` | Lint, formatação, tipos e testes dos coletores |
+| `pnpm check:db` | Aplica as migrações num banco descartável e roda os testes de banco |
 | `pnpm check:secrets` | Procura credenciais expostas com o gitleaks (precisa de Docker) |
 
 Os testes de navegador usam o Playwright. Na primeira vez, instale o navegador com `pnpm --filter web exec playwright install chromium`.

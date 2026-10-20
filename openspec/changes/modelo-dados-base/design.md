@@ -60,7 +60,7 @@ core.politician_external_ids
                            id, politician_id, system(camara|senado|tse|cldf), external_id,
                            unique(system, external_id)
 restricted.politician_private_ids
-                           politician_id PK, cpf char(11) unique, check(somente dígitos)
+                           politician_id PK, cpf text unique, check(exatamente 11 dígitos)
 core.party_affiliations    id, politician_id, party_id, started_on, ended_on,
                            check(ended_on >= started_on),
                            unique parcial (politician_id) where ended_on is null

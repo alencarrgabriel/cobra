@@ -10,7 +10,7 @@ paths = [
   '''(^|/)\.next/''',
   '''(^|/)\.git/''',
   '''(^|/)\.(mypy|ruff|pytest)_cache/''',
-  '''^supabase/\.temp/''',
+  '''(^|/)supabase/\.temp/''',
   # Local, git-ignored files that are supposed to hold real credentials.
   '''(^|/)\.env$''',
   '''(^|/)\.env\.local$''',

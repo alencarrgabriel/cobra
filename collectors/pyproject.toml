@@ -6,6 +6,7 @@ readme = "README.md"
 license = "AGPL-3.0-only"
 requires-python = ">=3.13,<3.14"
 dependencies = [
+    "psycopg[binary]>=3.3.6",
     "pydantic-settings>=2.16.1",
     "structlog>=26.1.0",
     "typer>=0.27.3",
@@ -37,7 +38,7 @@ select = [
 ignore = []
 
 [tool.ruff.lint.per-file-ignores]
-"tests/**" = ["S101", "PLR2004"]
+"tests/**" = ["S101", "PLR2004", "PLR0913"]
 
 [tool.mypy]
 strict = true
@@ -46,5 +47,9 @@ plugins = ["pydantic.mypy"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-# Tests never reach the network (spec verificacao-continua); unix sockets stay allowed.
-addopts = "--disable-socket --allow-unix-socket --strict-markers"
+# Tests never reach external hosts (spec verificacao-continua). Only the local
+# Postgres used by the `db` tests is reachable. `db` tests run via `pnpm check:db`.
+addopts = "--allow-hosts=127.0.0.1,::1,localhost --allow-unix-socket --strict-markers -m 'not db'"
+markers = [
+  "db: needs a Postgres server at TEST_DATABASE_URL (run with `pytest -m db`)",
+]
