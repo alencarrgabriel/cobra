@@ -1,0 +1,17 @@
+# Secret scanning (spec verificacao-continua). Extends the default gitleaks rules.
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Generated, vendored and local-only paths"
+paths = [
+  '''(^|/)node_modules/''',
+  '''(^|/)\.venv/''',
+  '''(^|/)\.next/''',
+  '''(^|/)\.git/''',
+  '''(^|/)\.(mypy|ruff|pytest)_cache/''',
+  '''^supabase/\.temp/''',
+  # Local, git-ignored files that are supposed to hold real credentials.
+  '''(^|/)\.env$''',
+  '''(^|/)\.env\.local$''',
+]

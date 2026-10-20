@@ -1,0 +1,95 @@
+schema: spec-driven
+
+context: |
+  Language: pt-BR
+  All artifacts must be written in pt-BR.
+  Keep OpenSpec structural headings and SHALL/MUST keywords in English.
+
+  # Fonte da verdade
+  docs/ddr.md (Documento de Definição de Requisitos). Em conflito, o DDR prevalece.
+  Toda change cita os requisitos que cobre (RF-xx, RNF-xx, seções do DDR).
+  Ambiguidade ou conflito no DDR: perguntar ao responsável antes de decidir.
+
+  # Propósito
+  Cobra (nome provisório): plataforma cívica que mostra a qualquer brasileiro, a partir
+  de onde mora (CEP, cidade ou UF), o que fazem os políticos que o representam: votos,
+  projetos, presença, gastos, patrimônio e doadores; depois, obras e emendas.
+  Mostra fatos, nunca notas, rankings ou opinião. Público principal: eleitor comum no
+  celular, sem acompanhar política de perto. Piloto de divulgação no Distrito Federal.
+
+  # Escopo do MVP (Fase 1)
+  - 81 senadores e 513 deputados federais, Brasil inteiro, perfil completo.
+  - 24 deputados distritais (CLDF), perfil básico.
+  - Busca por CEP/cidade/UF sem cadastro; "seus representantes" por nível.
+  - Perfil: cadastro, votos nominais, projetos, presença, gastos da cota, patrimônio e doadores (TSE), histórico de partidos.
+  - Feed "O que aconteceu" com votações relevantes (critério §9.2) e projetos apresentados.
+  - Página da votação: placar por partido e UF, orientação das lideranças, critério de relevância.
+  - Resumos em linguagem simples rascunhados por IA, publicados só após revisão humana.
+  - Resumo semanal por e-mail (opt-in duplo); seguir políticos; cards compartilháveis.
+  - Metodologia pública, reporte de erro com correção pública, painel de saúde das integrações.
+  Fora do MVP, de propósito: obras, emendas, WhatsApp, estados/municípios, comparação,
+  notas/rankings, comentários abertos, previsão de voto, conteúdo de candidatura.
+
+  # Stack
+  - Web: Next.js (App Router) + TypeScript estrito, renderização no servidor, mobile first. Rotas do próprio Next.js como API pública somente leitura.
+  - Banco: PostgreSQL gerenciado (Supabase). Migrações SQL versionadas em supabase/migrations via Supabase CLI são a única fonte do esquema. Tipos TypeScript gerados do banco. Sem ORM.
+  - Coletores: Python, gerenciados com uv; acesso ao banco via psycopg; um adaptador isolado por fonte; fila no próprio Postgres (tabela + FOR UPDATE SKIP LOCKED); agendamento por cron do GitHub Actions.
+  - Camadas de dados: raw (resposta original) → normalized (entidades) → published (o que o site lê).
+  - E-mail transacional: Resend ou Amazon SES (decidir na change de alertas). WhatsApp só na fase 2.
+  - Hospedagem web com CDN (ex.: Vercel); monitoramento com Sentry.
+  - Pacotes Node com pnpm. Testes: Vitest (unidade), Playwright (páginas principais), pytest (coletores, com respostas gravadas das APIs, sem rede nos testes).
+  - Repositório público no GitHub, licença AGPL-3.0.
+
+  # Convenções
+  - Idioma: interface e textos ao usuário em pt-BR, linguagem simples (nível ensino fundamental II).
+    Código, identificadores, nomes de tabelas/colunas, logs e mensagens de commit em inglês.
+    Artefatos OpenSpec (proposta, design, specs, tarefas) em pt-BR.
+  - Banco: snake_case, tabelas no plural em inglês (politicians, mandates, votes...). Esquemas raw, core (normalizado) e public/published conforme design da change de modelo.
+  - Toda entidade de dado público tem: source (fonte oficial), source_id (identificador original), collected_at (data de coleta), source_updated_at quando a fonte informar.
+  - Commits: Conventional Commits em inglês.
+  - Nomes de change em kebab-case, pt-BR (ex.: ingestao-camara-deputados).
+  - Segredos só em variáveis de ambiente; .env.example documenta todas; nada de segredo no repositório.
+  - Antes de integrar uma API externa, conferir a documentação oficial atual (ver "Pontos a verificar" no anexo do DDR) e registrar no design o que foi confirmado e quando.
+
+  # Princípios inegociáveis
+  - Neutralidade: nenhuma nota, ranking, adjetivo de valor ou ordenação por "desempenho".
+    Listas de políticos em ordem alfabética ou critério objetivo declarado. Mesmos campos,
+    ordem e destaque para qualquer partido. Números (gastos, presença) com referência
+    (limite da cota, média da casa), sem rótulo de bom ou ruim.
+  - Todo dado exibido mostra fonte oficial e data de atualização.
+  - O site nunca consulta APIs do governo em tempo real; lê só o banco próprio.
+    Coletores guardam a resposta bruta, normalizam, validam e só então publicam.
+  - Respeitar limites de cada fonte (ex.: até 10 req/s no Senado; 400 req/min no Portal da
+    Transparência), com retentativa e espera exponencial para HTTP 429/503 e alerta após falhas seguidas.
+  - Resumos de votações e projetos podem ser rascunhados por IA, mas só são publicados após
+    aprovação humana registrada (quem e quando); rodapé indica uso de IA.
+  - Votações simbólicas nunca atribuem voto individual.
+  - LGPD: uso sem cadastro por padrão; coleta mínima (CEP convertido em município e descartado).
+    Políticos seguidos e preferências são dado sensível (opinião política): consentimento
+    específico, separado por finalidade, com data e versão do termo; criptografados em repouso.
+    Titular pode ver, exportar, corrigir e apagar seus dados. Nunca vender ou usar para perfilamento.
+  - Doadores pessoa física: sem busca aberta por nome de doador. Não publicar endereço, família ou vida privada de políticos.
+  - Acessibilidade WCAG 2.1 AA; LCP até 2,5 s em celular intermediário 4G.
+
+  # Plano de changes da Fase 1 (aprovado em 2026-10-20)
+  1 fundacao-projeto; 2 modelo-dados-base; 3 infra-coleta; 4 ingestao-camara-deputados;
+  5 ingestao-senado-senadores; 6 ingestao-cldf-distritais; 7 busca-geografica;
+  8 perfil-do-politico; 9 ingestao-camara-proposicoes; 10 ingestao-camara-votacoes;
+  11 ingestao-senado-proposicoes-votacoes; 12 ingestao-camara-despesas-presenca;
+  13 ingestao-senado-despesas-presenca; 14 ingestao-tse; 15 relevancia-e-eventos;
+  16 painel-editorial; 17 feed-e-pagina-votacao; 18 alertas-email; 19 seguir-politicos;
+  20 cards-compartilhaveis; 21 metodologia-e-reporte-de-erro; 22 saude-integracoes.
+  Decisões pendentes: base de CEP (licença/custo) decidida na change 7.
+
+rules:
+  proposal:
+    - Listar os requisitos do DDR cobertos (RF/RNF/seção) e o que fica fora de escopo.
+    - Mudança pequena, revisável em poucos minutos; se crescer, propor divisão.
+  design:
+    - Registrar decisões com alternativas consideradas e o motivo.
+    - Para APIs externas, citar a documentação oficial consultada e a data da consulta.
+  specs:
+    - Cenários testáveis; incluir cenários de neutralidade, rastreabilidade (fonte e data) e privacidade quando aplicável.
+  tasks:
+    - Tarefas de no máximo 2 horas, cada uma com verificação (teste ou comando).
+    - Última tarefa sempre roda a suíte de testes e lint.

@@ -1,0 +1,52 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Next.js / build output
+.next/
+out/
+build/
+dist/
+*.tsbuildinfo
+next-env.d.ts
+
+# Test output
+coverage/
+web/test-results/
+web/playwright-report/
+web/blob-report/
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+
+# Downloaded raw data (never committed)
+data/raw/
+
+# Environment files: only the documented example and fake test values are versioned
+.env
+.env.*
+!.env.example
+!.env.test
+**/.env
+**/.env.*
+!**/.env.example
+!**/.env.test
+
+# Supabase local
+supabase/.branches/
+supabase/.temp/
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# Original DDR in Word format; docs/ddr.md is the source of truth
+/*.docx
