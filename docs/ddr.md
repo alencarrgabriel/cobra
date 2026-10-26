@@ -2,6 +2,8 @@
 
 > Convertido de `Cobra — Documento de Definição de Requisitos (DDR).docx` em 2026-10-20. Este arquivo passa a ser a fonte da verdade; os diagramas foram transcritos em texto.
 >
+> **Versão 3.0 (2026-10-26).** Mudança de foco: com o Politicômetro (no ar desde 22/10/2026, cobrindo 70 mil eleitos) e o Apuração Brasil já entregando perfis e votações, o Cobra passa a se concentrar em **"dinheiro e promessas na sua cidade"**: obras com recurso federal, emendas e de onde veio cada real, e os planos de governo de quem governa. Obras e emendas entram no MVP; o perfil de parlamentar fica mais enxuto e ganha trajetória eleitoral, patrimônio por composição e perguntas frequentes. Planos de governo entram no MVP (presidente e governadores em exercício); o comparador de candidatos fica para 2028, depois de parecer jurídico.
+>
 > **Versão 2.2 (2026-10-26).** Perfil completo detalhado por seções e módulo de obras revisto com a API pública do Obrasgov verificada: resumo da cidade, mapa com pinos já na fase 2, filtros e card de obra.
 >
 > **Versão 2.1 (2026-10-26).** Compartilhamento como motor de crescimento: cards em formatos de redes, painel de compartilhar com WhatsApp em destaque, prévia de link e links que reproduzem o que a pessoa viu.
@@ -11,6 +13,8 @@
 ## 1. Visão geral do produto e objetivos estratégicos
 
 O Cobra (nome provisório) é uma plataforma cívica que mostra a qualquer brasileiro, a partir de onde ele mora, o que fazem os políticos que o representam: como votam, o que propõem, quanto gastam e que obras financiam. O princípio que guia todas as decisões é mostrar fatos, nunca notas, rankings ou opinião.
+
+**Foco (versão 3.0): dinheiro e promessas na sua cidade.** O centro do produto é o que chega ao lugar onde a pessoa mora: as obras pagas com dinheiro federal, as emendas que as financiaram e quem as indicou, e o que quem governa prometeu no plano de governo registrado no TSE. Perfis e votações continuam, como contexto e de forma enxuta, porque já são bem cobertos por outras iniciativas.
 
 Problema. Os dados sobre a atuação de políticos são públicos, mas estão espalhados em portais técnicos (Câmara, Senado, TSE, Portal da Transparência, Obrasgov) que poucos cidadãos conseguem usar. As iniciativas existentes cobrem quase só o Congresso, exigem que o usuário vá até elas e, em vários casos, embutem critérios próprios de avaliação.
 
@@ -48,6 +52,8 @@ Diferenciais frente às iniciativas existentes.
 |---|---|---|
 | Apuração Brasil (apuracaobrasil.com) — **concorrente direto** | Portal de transparência do Congresso: presença, votos, cota, emendas por cidade, alertas por e-mail, app e planos pagos | Busca por CEP com grade visual de "seus representantes"; votações explicadas em linguagem simples (não só a ementa); cobertura distrital e depois subnacional; sem ranking de presença; economia explicada |
 | seuimposto.com (Pandora) — referência visual | Apuração ao vivo das eleições 2026: mapa clicável, gaveta lateral, fotos e barras de placar | Mesmo nível visual, aplicado ao acompanhamento do mandato o ano todo, não só no dia da eleição |
+| Politicômetro (politicometro.org) — **concorrente direto mais amplo** | No ar desde 22/10/2026: 70.817 eleitos (de vereador a presidente), "Me representa" por cidade, perfis com salário, cota, presença e votos, Congresso, STF, governos, Impostômetro, comparador sem ranking, planos de governo lado a lado, canal no WhatsApp; também se declara sem nota nem ranking | Obras e emendas por cidade, com mapa, situação e vínculo emenda–obra; plano de governo de quem governa ao lado das obras da mesma área; visual centrado em mapa e celular; votações explicadas com revisão humana |
+| Sólon (solondata.com) | Plataforma paga para analistas: trajetória eleitoral, mapa do voto, patrimônio por composição, uso da cota com faixa de referência, emendas, redes sociais, dossiê; usa índices próprios (aproveitamento, retribuição eleitoral) | Gratuito e aberto; sem índices próprios; foco no cidadão |
 | Excelências (Transparência Brasil) | Perfis de congressistas, processos e patrimônio | Em 2026-10-26 o domínio exibia conteúdo sem relação com o projeto; aparenta estar desativado |
 | Radar do Congresso (Congresso em Foco) | Grade de fotos com a bandeira do estado, dados do Congresso e índices de governismo e transparência | Sem índices próprios; linguagem simples; cobertura subnacional |
 | Placar Congresso | Histórico de votações, idealizado por um deputado, com foco na posição em relação ao governo | Iniciativa apartidária, sem enquadramento governo × oposição como eixo |
@@ -88,11 +94,13 @@ Jornadas principais.
 
 ## 3. Escopo do MVP e matriz de funcionalidades
 
-O MVP cobre os 81 senadores e os 513 deputados federais para todo o Brasil, com o piloto de divulgação e a cobertura subnacional (24 deputados distritais da CLDF) concentrados no Distrito Federal. Alertas começam por e-mail; WhatsApp entra na fase 2.
+O MVP é o piloto **"dinheiro e promessas no DF"**: obras com recurso federal no Distrito Federal, as emendas que as financiam e quem as indicou, o plano de governo do governador e do presidente em exercício, e os representantes do DF (3 senadores, 8 deputados federais e 24 deputados distritais) com perfil enxuto. Os perfis de todos os 594 congressistas existem porque as emendas que chegam ao DF podem vir de parlamentares de outros estados. Alertas começam por e-mail; WhatsApp entra na fase 2.
 
 Fora do MVP, de propósito: notas, rankings, comparação ideológica, comentários abertos de usuários, previsão de voto e qualquer conteúdo sobre candidaturas durante o período eleitoral.
 
 Fora do produto em qualquer fase: cotação de ações individuais, análise ou recomendação de investimento, anúncios de apostas e chat aberto.
+
+Exceção prevista à regra de candidaturas: o comparador literal de planos de governo de candidatos (RF-84), a partir das eleições de 2028 e só depois de parecer jurídico.
 
 | Funcionalidade | MVP (fase 1) | Fase 2 | Fase 3 | Fase 4 |
 |---|---|---|---|---|
@@ -108,8 +116,11 @@ Fora do produto em qualquer fase: cotação de ações individuais, análise ou 
 | Perfil: votos, projetos, presença, gastos | Sim |  |  |  |
 | Perfil: patrimônio e doadores (TSE) | Sim |  |  |  |
 | Seguir políticos | Sim |  |  |  |
-| Obras federais na região (Obrasgov) |  | Sim |  |  |
-| Emendas ligadas a obras |  | Sim | Emendas Pix com plano de trabalho |  |
+| Obras federais na região (Obrasgov) | DF (piloto) | Todo o Brasil |  |  |
+| Emendas ligadas a obras | DF (piloto) | Todo o Brasil | Emendas Pix com plano de trabalho |  |
+| Plano de governo de quem governa (TSE) | Presidente e governadores | Prefeitos (eleição de 2024) |  |  |
+| Comparador de planos de candidatos |  |  | Eleições de 2028, após parecer |  |
+| Comparar políticos lado a lado, sem ranking |  | Sim |  |  |
 | Obras estaduais e municipais (TCEs) |  |  | Piloto (SP, DF) | Expansão |
 | Alertas por e-mail | Resumo semanal | Alertas por político seguido |  |  |
 | Alertas por WhatsApp |  | Resumo semanal | Alertas por político seguido |  |
@@ -164,28 +175,47 @@ Os requisitos estão agrupados em seis módulos. Prioridade: Alta = necessário 
 | RF-25 | Gastos da cota parlamentar por categoria e por mês, com acesso às notas | Alta | 1 |
 | RF-26 | Patrimônio declarado em cada eleição e doadores de campanha (TSE) | Alta | 1 |
 | RF-27 | Histórico de partidos e cargos | Média | 1 |
-| RF-28 | Emendas parlamentares enviadas, por município e situação | Média | 2 |
+| RF-28 | Emendas parlamentares enviadas, por município e situação | Alta | 1 |
 | RF-29 | Comparar 2 ou 3 políticos lado a lado, só com fatos | Baixa | 2 |
 | RF-30 | Botão "Seguir" (exige conta ou contato verificado) | Alta | 1 |
+| RF-59 | Link "É você nesta página?" em todo perfil, levando ao canal de contestação e direito de resposta (§10.5) | Alta | 1 |
+| RF-35 | Texto "Quem é" no topo do perfil, montado só com dados oficiais por um modelo de frase fixo (sem IA): cargo, partido, desde quando, eleições vencidas e votos | Média | 1 |
+| RF-36 | Trajetória eleitoral desde 1994 (TSE): cada disputa com ano, cargo, partido, votos e resultado, e a linha do tempo de partidos | Média | 1 |
+| RF-37 | Patrimônio por eleição com a composição por tipo de bem (imóveis, veículos, dinheiro, outros) e a variação entre declarações | Média | 1 |
+| RF-38 | Perguntas frequentes factuais e políticos relacionados (mesmo estado, mesmo partido, em ordem alfabética) em cada perfil, com dados estruturados para buscadores | Média | 1 |
 | RF-33 | Perfil organizado em seções, com um resumo no topo (presença com a mediana da casa, gastos com o limite da cota, projetos e patrimônio) e depois: como votou, projetos, gastos, patrimônio e doadores, histórico de partidos e cargos e, na fase 2, emendas e obras; cada número com a sua referência e nenhuma posição em ranking | Alta | 1 |
-| RF-34 | No perfil, as obras financiadas pelas emendas do parlamentar, por município e situação, com o grau de confiança do vínculo | Média | 2 |
+| RF-34 | No perfil, as obras financiadas pelas emendas do parlamentar, por município e situação, com o grau de confiança do vínculo | Alta | 1 |
 | RF-32 | Identificar todo político pela cor, sigla e logotipo do seu partido e pela bandeira da sua UF, com as mesmas regras para todos os partidos (§9.1) | Alta | 1 |
 
 ### 4.4 Obras e emendas
 
 | ID | Requisito | Prioridade | Fase |
 |---|---|---|---|
-| RF-40 | Listar obras com recurso federal no município do usuário: objeto, valor, início, previsão de término, situação e percentual de execução | Alta | 2 |
-| RF-41 | Destacar obras paralisadas e o tempo de paralisação | Alta | 2 |
-| RF-42 | Ligar obra à emenda e ao parlamentar autor quando houver vínculo confiável | Alta | 2 |
-| RF-43 | Indicar o grau de confiança do vínculo emenda–obra (direto, por convênio, por município) | Alta | 2 |
-| RF-44 | Exibir a data da última atualização da fonte em cada obra | Alta | 2 |
+| RF-40 | Listar obras com recurso federal no município do usuário: objeto, valor, início, previsão de término, situação e percentual de execução | Alta | 1 |
+| RF-41 | Destacar obras paralisadas e o tempo de paralisação | Alta | 1 |
+| RF-42 | Ligar obra à emenda e ao parlamentar autor quando houver vínculo confiável | Alta | 1 |
+| RF-43 | Indicar o grau de confiança do vínculo emenda–obra (direto, por convênio, por município) | Alta | 1 |
+| RF-44 | Exibir a data da última atualização da fonte em cada obra | Alta | 1 |
 | RF-45 | Mostrar as emendas Pix recebidas pelo município e o plano de trabalho, quando informado | Média | 3 |
-| RF-46 | Mapa das obras do município com pinos coloridos por situação (as coordenadas vêm da própria API do Obrasgov) | Média | 2 |
+| RF-46 | Mapa das obras do município com pinos coloridos por situação (as coordenadas vêm da própria API do Obrasgov) | Média | 1 |
 | RF-47 | Relato do cidadão sobre a situação real da obra, com foto e moderação | Baixa | 3 |
-| RF-48 | Resumo de obras do município: quantidade, valor previsto, valor pago, quantas estão concluídas, em execução e paralisadas | Alta | 2 |
-| RF-49 | Filtrar obras por situação, área (saúde, educação, saneamento, mobilidade e outras), valor e ano | Média | 2 |
-| RF-39 | Ficha da obra: nome, endereço, área, órgão que repassa, quem recebe e quem executa, valor previsto, empenhado e pago, contrato e empresa, prazos previstos e efetivos, % de execução física, fotos do gestor, histórico de paralisação com a justificativa oficial e a data em que o gestor informou | Alta | 2 |
+| RF-48 | Resumo de obras do município: quantidade, valor previsto, valor pago, quantas estão concluídas, em execução e paralisadas | Alta | 1 |
+| RF-49 | Filtrar obras por situação, área (saúde, educação, saneamento, mobilidade e outras), valor e ano | Média | 1 |
+| RF-39 | Ficha da obra: nome, endereço, área, órgão que repassa, quem recebe e quem executa, valor previsto, empenhado e pago, contrato e empresa, prazos previstos e efetivos, % de execução física, fotos do gestor, histórico de paralisação com a justificativa oficial e a data em que o gestor informou | Alta | 1 |
+
+### 4.4c Planos de governo
+
+Planos registrados no TSE pelos candidatos a cargos executivos (Lei 9.504/1997, art. 11). Os trechos são copiados do documento, nunca resumidos nem reescritos.
+
+| ID | Requisito | Prioridade | Fase |
+|---|---|---|---|
+| RF-80 | Plano de governo registrado pelo presidente e pelos governadores em exercício, organizado por tema, com trechos literais e link para a página exata do PDF oficial | Alta | 1 |
+| RF-81 | Busca por palavra dentro do plano de governo | Média | 1 |
+| RF-82 | Ao lado de cada tema do plano, as obras com recurso federal da mesma área na localidade, sem afirmar se a promessa foi cumprida | Média | 1 |
+| RF-83 | Plano de governo do prefeito em exercício de cada município (eleição de 2024) | Média | 2 |
+| RF-84 | Comparador de planos de candidatos da mesma disputa (todos os candidatos, ordem alfabética, mesmos temas, trecho literal), condicionado a parecer jurídico | Baixa | 3 |
+
+A classificação por tema usa uma regra pública e igual para todos os documentos (lista de palavras por tema), publicada na página de metodologia.
 
 ### 4.4b Economia e educação (fase 2)
 
@@ -262,7 +292,7 @@ Todos os dados vêm de fontes oficiais e são copiados para o banco próprio do 
 |---|---|---|---|---|
 | Câmara dos Deputados | Deputados, despesas da cota, proposições, tramitações, votações, votos, orientações, presença | API REST v2 (JSON/XML) + arquivos anuais (CSV/JSON); sem chave | Até 100 itens por página; votação nem sempre ligada a uma única proposição; limite de requisições não documentado | 1 |
 | Senado Federal | Senadores, mandatos, processos, votações de plenário e comissões, discursos | API REST (JSON/XML/CSV); sem chave | Acima de 10 req/s retorna HTTP 429; serviços legados em descontinuação, migrar para os novos endpoints | 1 |
-| TSE – Dados Abertos | Candidatos eleitos, bens declarados, receitas e doadores, resultados | Arquivos CSV/ZIP por eleição (CKAN); sem chave | Arquivos grandes; cruzamento por CPF/sequencial do candidato | 1 |
+| TSE – Dados Abertos | Candidatos eleitos e candidaturas desde 1994 (trajetória), bens declarados com tipo de bem, receitas e doadores, resultados por município e zona, **planos de governo em PDF** (um ZIP por UF e eleição em cdn.tse.jus.br/estatistica/sead/odsele/proposta_governo/, verificado em 2026-10-26, com séries desde 2010 e a eleição municipal de 2024) | Arquivos CSV/ZIP por eleição (CKAN); sem chave | Arquivos grandes; cruzamento por CPF/sequencial do candidato | 1 |
 | CLDF – Dados Abertos | Deputados distritais, proposições, votações | Portal CKAN com API | Estrutura e frequência a validar no início do projeto | 1 |
 | Portal da Transparência (CGU) | Emendas parlamentares, convênios, despesas | API REST com token gratuito por e-mail + downloads em massa | 400 req/min (06h–24h) e 700 req/min (00h–06h); preferir downloads para histórico | 2 |
 | Obrasgov.br | Obras com recurso federal: identificação, endereço, coordenadas, área, valor previsto, empenhos, contratos, prazos previstos e efetivos, % de execução física, histórico de paralisação e cancelamento com justificativa, fotos | API pública REST sem chave, com documentação OpenAPI (api-publica.obrasgov.gestao.gov.br/obras/docs); recursos /projeto-investimento, /execucao-fisica, /empenho, /contrato, /geometria, /historico-situacao-cancelada-paralisada, /estudo-viabilidade e /data-atualizacao; paginação de até 200 itens (verificado em 2026-10-26) | Dados preenchidos pelos gestores, com inconsistências (ex.: obra com prazo vencido há anos ainda "Cadastrada"); mostrar sempre "informado pelo gestor em [data]" e o canal de reportar erro | 2 |
@@ -387,6 +417,8 @@ O Cobra descreve o que aconteceu e deixa o julgamento para o usuário: nenhuma n
 
 - Correção pública. Erros corrigidos com registro visível do que mudou e quando.
 
+- Dado indisponível aparece como "—" e nunca como zero, com a explicação do motivo.
+
 - Contexto mínimo para números. Gastos e presença sempre com referência (limite da cota, média da casa), sem rotular como bom ou ruim.
 
 - Economia sem causalidade. Indicadores econômicos se ligam a votações só pelo assunto; nenhum texto ou gráfico afirma que uma votação, um político ou um partido causou uma variação de mercado ou de indicador.
@@ -502,6 +534,7 @@ Os maiores riscos não são técnicos: são a acusação de parcialidade, que de
 | Ataques ou pressão de políticos e apoiadores | Reputação | Média | Médio | Canal de contestação com prazo, registro público de correções, assessoria jurídica |
 | Cobertura subnacional mais lenta que o esperado | Produto | Alta | Baixo | Expansão por maturidade dos dados; avisar com clareza o que ainda não é coberto |
 | Dependência de uma só pessoa para o conhecimento técnico | Operacional | Média | Médio | Código aberto, documentação, comunidade de voluntários |
+| Politicômetro já cobre perfis, votações e planos de governo para 70 mil eleitos | Produto | Alta | Alto | Foco em obras, emendas e promessas na cidade (versão 3.0); avaliar colaboração em vez de duplicar perfis |
 | Concorrente direto já no ar (Apuração Brasil) com dados do Congresso, emendas e app | Produto | Alta | Alto | Diferenciar em busca por CEP com grade visual, linguagem simples, cobertura distrital e economia explicada; lançar o piloto do DF rápido |
 | Uso de cor e marca de partido ser lido como favorecimento | Reputação | Média | Médio | Regra pública e idêntica para todos os partidos (§9.1); auditoria de destaque por partido |
 | Custo ou recusa da licença da B3 | Financeiro | Média | Baixo | Ibovespa só na fase 3 e opcional; indicadores oficiais gratuitos cobrem a fase 2 |
@@ -528,8 +561,8 @@ O MVP é um sucesso se, em 3 meses, as pessoas voltarem sozinhas: a métrica pri
 
 | Fase | Período | Entregas |
 |---|---|---|
-| 1. MVP federal | Meses 1 a 3 | Senado e Câmara; feed e perfis; alertas por e-mail; piloto no DF |
-| 2. Obras e economia | Meses 4 a 6 | Obras federais; emendas e obras; resumo no WhatsApp; distritais completos; economia em números e trilhas educativas |
+| 1. Dinheiro e promessas no DF | Meses 1 a 3 | Obras e emendas no DF; planos de governo do presidente e do governador; representantes do DF e perfis enxutos dos congressistas; votações relevantes; alertas por e-mail |
+| 2. Brasil e economia | Meses 4 a 6 | Obras e emendas em todo o Brasil; planos dos prefeitos; resumo no WhatsApp; distritais completos; comparador de políticos; economia em números e trilhas educativas |
 | 3. Estados | Meses 7 a 12 | ALs de MG, PR, PE, MT; prefeitos e vereadores; emendas Pix; relatos de obras; Ibovespa diário se houver licença |
 | 4. Escala nacional | Ano 2 | Demais estados; câmaras municipais; API pública; exportação de dados |
 
@@ -589,6 +622,8 @@ As decisões abaixo já têm uma recomendação para não travar o desenvolvimen
 | Deputados distritais no DF | Um bloco "Seus deputados distritais" explicando que fazem o papel de deputado estadual e de vereador | O DF não tem prefeito nem vereadores |
 | Forma jurídica | Começar como projeto pessoal com código aberto; formalizar associação sem fins lucrativos ao buscar editais | Editais e doações exigem CNPJ; uma OSC transmite independência |
 | Nome definitivo | Decidir antes do lançamento público e registrar no INPI | "Cobra" é provisório |
+| Foco do produto (decidido em 2026-10-26) | "Dinheiro e promessas na sua cidade": obras, emendas e planos de governo no centro; perfis enxutos | Lacuna real frente a Politicômetro, Apuração Brasil e Sólon; aproveita o que já foi construído (banco, rastreabilidade, design system, mapa) |
+| Planos de governo (decidido em 2026-10-26) | Plano de quem governa no MVP; comparador de candidatos só em 2028, após parecer | O plano do eleito é material do mandato; o comparador em campanha toca a regra eleitoral do cap. 3 |
 | Cores e marcas de partido (decidido em 2026-10-26) | Usar cor, sigla e logotipo do partido e bandeira da UF como identificação, iguais para todos | Facilita reconhecer o político, segue a prática do TSE e das casas; a neutralidade está em não dar nota, ranking nem adjetivo |
 | Economia e bolsa (decidido em 2026-10-26) | Economia em números e trilhas educativas na fase 2; Ibovespa diário na fase 3, se houver licença; nunca ações individuais | Fontes oficiais gratuitas para indicadores; licença da B3 e regras da CVM para ações |
 | Referência visual (decidido em 2026-10-26) | seuimposto.com (Pandora), com identidade própria | Melhor experiência visual entre as referências pesquisadas |
@@ -632,6 +667,7 @@ As decisões abaixo já têm uma recomendação para não travar o desenvolvimen
 | Versão | Data | Mudanças |
 |---|---|---|
 | 1 | 2026-10-20 | Conversão do documento original (.docx) |
+| 3.0 | 2026-10-26 | Foco "dinheiro e promessas na sua cidade"; Politicômetro e Sólon nos concorrentes; obras e emendas (RF-28, RF-34, RF-39 a RF-44, RF-46, RF-48, RF-49) no MVP; planos de governo (RF-80 a RF-84); perfil com RF-35 a RF-38; RF-59 (direito de resposta); regra do "—"; fonte TSE de planos de governo; roadmap e riscos |
 | 2.2 | 2026-10-26 | RF-33 e RF-34 (perfil por seções e obras no perfil); RF-46 passa para a fase 2; RF-48, RF-49 e RF-39 (resumo, filtros e ficha da obra); fonte Obrasgov detalhada com a API verificada |
 | 2.1 | 2026-10-26 | Compartilhamento: RF-60 e RF-61 revistos (RF-61 passa a Alta), RF-67 a RF-69, jornada de compartilhamento, §13.3; decisão em aberto sobre o teste "Quem vota como você?" |
 | 2 | 2026-10-26 | Concorrentes atualizados; RF-09, RF-31, RF-32 (grade visual, mapa, identidade de partido); módulo 4.4b de economia e educação (RF-70 a RF-74, fases 2 e 3); RNF-20; novas fontes de dados; regras de identidade de partido, economia sem causalidade e sem recomendação de investimento (§9.1); riscos novos; roadmap; cap. 13 de identidade visual |

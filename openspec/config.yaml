@@ -17,7 +17,9 @@ context: |
   Mostra fatos, nunca notas, rankings ou opinião. Público principal: eleitor comum no
   celular, sem acompanhar política de perto. Piloto de divulgação no Distrito Federal.
 
-  # Escopo do MVP (Fase 1)
+  # Escopo do MVP (Fase 1) — DDR 3.0: foco "dinheiro e promessas na sua cidade", piloto no DF
+  - Obras com recurso federal no DF (Obrasgov), emendas que as financiam e quem indicou, com grau de confiança do vínculo.
+  - Plano de governo do presidente e do governador em exercício (TSE), por tema, trecho literal, link para a página do PDF.
   - 81 senadores e 513 deputados federais, Brasil inteiro, perfil completo.
   - 24 deputados distritais (CLDF), perfil básico.
   - Busca por CEP/cidade/UF sem cadastro; grade "seus representantes" com foto, bandeira da UF
@@ -87,19 +89,22 @@ context: |
   - Doadores pessoa física: sem busca aberta por nome de doador. Não publicar endereço, família ou vida privada de políticos.
   - Acessibilidade WCAG 2.1 AA; LCP até 2,5 s em celular intermediário 4G.
 
-  # Plano de changes da Fase 1 (revisado em 2026-10-26, DDR v2.1)
-  Feitas: 1 fundacao-projeto; 2 modelo-dados-base.
-  Próximas: 3 identidade-visual (protótipo com dados fictícios, depois design system);
-  4 infra-coleta; 5 ingestao-camara-deputados; 6 ingestao-senado-senadores;
-  7 ingestao-cldf-distritais; 8 identidade-de-partidos-e-ufs (cores, logotipos, bandeiras);
-  9 busca-geografica (CEP → grade + gaveta); 10 compartilhamento (painel, cards 9:16/4:5/1,91:1,
-  prévia de link, links reproduzíveis; cada página nova já nasce compartilhável);
-  11 mapa-do-brasil; 12 perfil-do-politico; 13 ingestao-camara-proposicoes;
-  14 ingestao-camara-votacoes; 15 ingestao-senado-proposicoes-votacoes;
-  16 ingestao-camara-despesas-presenca; 17 ingestao-senado-despesas-presenca; 18 ingestao-tse;
-  19 relevancia-e-eventos; 20 painel-editorial; 21 feed-e-pagina-votacao; 22 alertas-email;
-  23 seguir-politicos; 24 metodologia-e-reporte-de-erro; 25 saude-integracoes.
-  Fase 2 (depois do MVP): economia-em-numeros; trilhas-educativas.
+  # Plano de changes da Fase 1 (revisado em 2026-10-26, DDR 3.0: foco "dinheiro e promessas no DF")
+  Feitas: 1 fundacao-projeto; 2 modelo-dados-base; 3 identidade-visual.
+  Próximas: 4 infra-coleta; 5 ingestao-camara-deputados; 6 ingestao-senado-senadores;
+  7 ingestao-cldf-distritais; 8 identidade-de-partidos-e-ufs; 9 ingestao-obrasgov;
+  10 ingestao-emendas (vínculo emenda–obra com grau de confiança); 11 ingestao-planos-de-governo
+  (PDFs do TSE, texto por página, temas); 12 busca-geografica (CEP → cidade, representantes e obras);
+  13 obras-na-cidade (resumo, mapa de pinos, filtros, ficha); 14 compartilhamento;
+  15 perfil-do-politico (enxuto: "Quem é", emendas e obras, FAQ, relacionados);
+  16 plano-de-governo (por tema, trecho literal, página do PDF, obras da mesma área);
+  17 mapa-do-brasil; 18 ingestao-tse (trajetória, patrimônio por composição, doadores);
+  19 ingestao-camara-votacoes; 20 ingestao-senado-votacoes; 21 ingestao-despesas-presenca;
+  22 relevancia-e-eventos; 23 painel-editorial; 24 feed-e-pagina-votacao; 25 alertas-email;
+  26 seguir-politicos; 27 metodologia-e-reporte-de-erro (com "É você nesta página?");
+  28 saude-integracoes.
+  Fase 2: obras e emendas em todo o Brasil; planos dos prefeitos (2024); comparador de políticos;
+  economia-em-numeros; trilhas-educativas. Fase 3: comparador de planos de candidatos (2028, após parecer).
   Decisões pendentes: base de CEP (licença/custo) decidida em busca-geografica.
 
 rules:
