@@ -39,7 +39,7 @@ core.work_localities     work_id, locality_code → localities, + rastreabilidad
 - Repassador, tomador e executor ficam em `jsonb` (lista de `{name, cnpj}`): são só exibidos, sem consulta própria no MVP. Quando as emendas precisarem cruzar órgãos, viram tabelas.
 - `planned_value` é a soma de `investimentos_previstos` (a fonte informa o valor por fonte de recurso; no DF todas são "Federal").
 - `physical_progress` e `progress_updated_on` repetem o registro de execução mais recente, para a lista de obras não precisar de agregação.
-- `latitude` e `longitude` vêm do primeiro pino; sem pino, ficam nulas.
+- `latitude` e `longitude` vêm do primeiro pino, lidas do texto WKT (`POINT (lon lat)`): os campos `latitude`/`longitude` da própria API às vezes vêm cortados quando falta o espaço depois de `POINT` (ex.: longitude `"15.8002630106667)"`, observado em 2026-10-26). Pontos fora de uma caixa ampla do território brasileiro são descartados. Sem pino válido, ficam nulas.
 - `source_url` aponta para a consulta da obra na API (`/projeto-investimento?id_projeto_investimento=X`), que qualquer pessoa pode abrir.
 - Município de Brasília (5300108) entra na migração. Geometria de município ainda não cadastrado é ignorada com registro no log, sem falhar a tarefa.
 
@@ -57,9 +57,12 @@ Volume diário no DF: cerca de 7 + 7 + 2 × 1.147 ≈ 2.300 requisições; a 2 r
 ### D3. Ordem entre tarefas
 Execução, histórico e geometria referenciam a obra. Como as tarefas `detail` só são criadas depois que a página da obra é publicada, a obra sempre existe. Na `geometry`, uma obra ainda não coletada é ignorada com registro no log, e a próxima coleta completa a ligação.
 
-### D4. Validação
-Por obra: id no formato `^\d+\.\d{2}-\d{2}$`, situação na lista conhecida, UF principal igual à pedida, valores ≥ 0, percentual entre 0 e 100, término previsto ≥ início previsto quando ambos existirem. Uma obra reprovada reprova a página inteira (a validação é por tarefa). O erro cita o id. A tarefa volta para a fila; se o erro persistir, fica como falha definitiva e aparece em `cobra-collect status`.
-- Alternativa: publicar as válidas e pular as inválidas. Rejeitada por ora: a spec de coleta exige que nada da tarefa seja publicado. Se uma obra problemática travar uma página toda com frequência, reavaliar com uma quarentena por obra.
+### D4. Validação: estrutura bloqueia, qualidade vira nota
+A primeira carga real (2026-10-26) mostrou obras com término previsto anterior ao início, como a fonte informa (`4644.53-15`, `4652.53-69`). Com a regra original, isso barrava a página inteira e, como a próxima página só era enfileirada depois da publicação, as páginas seguintes nunca eram coletadas (400 de 1.147 obras). Regra revista:
+- **Estrutura (bloqueia a página):** id no formato `^\d+\.\d{2}-\d{2}$`, situação na lista conhecida, UF principal igual à pedida, nome presente, valores ≥ 0, percentual entre 0 e 100.
+- **Qualidade (publica com nota):** término previsto antes do início previsto. A obra é publicada com as datas da fonte e `quality_notes` recebe a descrição. O banco não tem mais a restrição de datas em `core.works`.
+- **Paginação independente:** a próxima página é enfileirada por `ctx.enqueue(..., independent=True)`, que grava fora da transação da tarefa. Uma página reprovada não impede as seguintes.
+- Uma página reprovada por estrutura volta para a fila e, se persistir, fica como falha definitiva visível em `cobra-collect status`.
 
 ### D5. Limite de taxa
 2 req/s com rajada de 2: a fonte não documenta limite e responde por Azure Front Door; o valor é conservador.
@@ -73,3 +76,18 @@ Por obra: id no formato `^\d+\.\d{2}-\d{2}$`, situação na lista conhecida, UF 
 ## Migration Plan
 
 Migração aditiva. Primeira carga: `cobra-collect enqueue obrasgov` e `cobra-collect work --source obrasgov` (cerca de 20 minutos).
+
+## Resultado da primeira carga real (2026-10-26, banco local)
+
+| Item | Valor |
+|---|---|
+| Obras do DF | 1.147 (igual ao total da API) |
+| Situação | 628 cadastradas, 182 em execução, 302 concluídas, 6 paralisadas, 3 inacabadas, 26 canceladas |
+| Valor previsto somado | R$ 78,9 bilhões |
+| Com coordenadas válidas | 1.136 |
+| Com execução física | 521 |
+| Eventos de paralisação/cancelamento (distintos) | 6 |
+| Com nota de qualidade (término antes do início) | 5 |
+| Ligadas a município pela geometria | 638 (a fonte só tem geometria para parte das obras) |
+| Tarefas | 1.160 concluídas; 1 HTTP 500 temporário da fonte, resolvido na segunda tentativa da fila |
+| Duração | cerca de 20 minutos a 2 req/s |

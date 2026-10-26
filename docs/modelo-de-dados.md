@@ -17,7 +17,7 @@ Um dado só entra em `core` dentro de uma transação que já passou pelas valid
 
 | Coluna | Tipo | Obrigatória | Significado |
 |---|---|---|---|
-| `source` | `core.data_source` | sim | Fonte oficial: `camara`, `senado`, `tse`, `cldf`, `ibge` ou `cobra` (curadoria do projeto) |
+| `source` | `core.data_source` | sim | Fonte oficial: `camara`, `senado`, `tse`, `cldf`, `ibge`, `obrasgov` ou `cobra` (curadoria do projeto) |
 | `source_id` | `text` | não | Identificador do registro na fonte |
 | `source_url` | `text` | não | Link para conferir na fonte |
 | `collected_at` | `timestamptz` | sim | Quando o Cobra coletou o dado |
@@ -31,7 +31,7 @@ O teste `collectors/tests/db/test_provenance.py` reprova qualquer tabela desses 
 
 | Tabela | Conteúdo | Regras principais |
 |---|---|---|
-| `core.localities` | UFs (código IBGE de 2 dígitos) e municípios (7 dígitos) | As 27 UFs vêm na migração; o código do município começa pelo da UF |
+| `core.localities` | UFs (código IBGE de 2 dígitos) e municípios (7 dígitos) | As 27 UFs e Brasília (5300108) vêm nas migrações; o código do município começa pelo da UF |
 | `core.legislative_houses` | Câmara, Senado e CLDF | `slug` único; a CLDF é `district` e ligada à UF `53` |
 | `core.parties` | Partidos | `acronym` único; `electoral_number` pode repetir (números são reaproveitados) |
 | `core.politicians` | Uma linha por pessoa, qualquer que seja o número de fontes | — |
@@ -39,6 +39,10 @@ O teste `collectors/tests/db/test_provenance.py` reprova qualquer tabela desses 
 | `restricted.politician_private_ids` | CPF do político, para cruzar fontes | 11 dígitos; o site não tem acesso |
 | `core.party_affiliations` | Histórico de filiações | No máximo uma filiação aberta (`ended_on is null`) por político |
 | `core.mandates` | Mandatos: político, casa, cargo (`office`), localidade, período e situação (`status`) | Sem sobreposição de períodos do mesmo cargo para a mesma pessoa |
+| `core.works` | Obras com recurso federal (Obrasgov.br): nome, endereço, área, situação, quem repassa, recebe e executa, valor previsto, prazos, coordenadas, percentual de execução mais recente | Situação em `core.work_status`; percentual entre 0 e 100; término previsto não antes do início |
+| `core.work_progress` | Registros de execução física de cada obra | Percentual entre 0 e 100 |
+| `core.work_status_events` | Histórico de paralisação e cancelamento, com a justificativa oficial | Um evento por (obra, situação, data, justificativa): a fonte repete eventos com ids diferentes |
+| `core.work_localities` | Municípios de cada obra (geometria do Obrasgov) | Chave (obra, município) |
 
 Chaves: `id bigint generated always as identity`, exceto `core.localities` (chave = `ibge_code`) e `restricted.politician_private_ids` (chave = `politician_id`). Chaves estrangeiras usam `on delete restrict`: dado oficial não some em cascata.
 

@@ -21,7 +21,7 @@ def test_check_config_accepts_valid_configuration() -> None:
 
 
 @pytest.mark.usefixtures("valid_environment")
-def test_sources_is_empty_for_now() -> None:
+def test_sources_lists_registered_adapters() -> None:
     result = runner.invoke(app, ["sources"])
     assert result.exit_code == 0
-    assert "Nenhuma fonte registrada ainda." in result.stdout
+    assert "obrasgov" in result.stdout

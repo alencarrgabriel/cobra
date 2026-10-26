@@ -36,6 +36,16 @@ Limites iniciais (conservadores; cada change de fonte confirma na documentação
 | TSE (arquivos) | — | 1 req/s |
 | Obrasgov | não documentado | 2 req/s |
 
+## Fontes ativas
+
+### Obrasgov.br (`obrasgov`)
+
+- API: `https://api-publica.obrasgov.gestao.gov.br/obras` (OpenAPI verificado em 2026-10-26), sem chave.
+- Escopo: obras com UF principal DF (piloto). Tarefas: `projects` (páginas de 200 obras), `detail` (execução física e histórico de cada obra, criada quando a obra é publicada) e `geometry` (município de cada obra).
+- A data da base (`/data-atualizacao`) vira `source_updated_at` de todas as linhas.
+- Qualidade da fonte, tratada na normalização: coordenadas lidas do texto do ponto (os campos `latitude`/`longitude` da API às vezes vêm cortados) e descartadas fora do Brasil; eventos de paralisação repetidos guardados uma vez; fotos só indicadas (a API não traz as imagens).
+- Volume no DF: cerca de 2.300 requisições por atualização completa, ~20 minutos a 2 req/s.
+
 ## Comandos
 
 ```bash

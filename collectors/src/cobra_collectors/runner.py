@@ -79,7 +79,7 @@ def work(
                 )
                 # Any failure marks the job as failed and the worker moves on.
                 try:
-                    run_job(source, job, job_conn, http, raw)
+                    run_job(source, job, job_conn, http, raw, ops_conn)
                 except Exception as error:
                     retried = queue.fail(ops_conn, job, f"{type(error).__name__}: {error}")
                     log.warning(

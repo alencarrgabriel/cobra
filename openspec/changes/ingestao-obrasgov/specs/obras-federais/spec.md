@@ -40,11 +40,22 @@ Toda obra e todo registro ligado a ela SHALL guardar a data da última atualiza�
 - **THEN** as obras coletadas têm data de atualização na fonte 23/10/2026
 
 ### Requirement: Validação antes de publicar
-Uma página de obras SHALL ser publicada só se todas as obras dela passarem nas regras: identificador no formato do Obrasgov, situação conhecida, UF principal igual à pedida, valores não negativos, percentual de execução entre 0 e 100 e término previsto não anterior ao início previsto quando ambos existirem.
+Uma página de obras SHALL ser publicada só se todas as obras dela passarem nas regras de estrutura: identificador no formato do Obrasgov, situação conhecida, UF principal igual à pedida, nome presente, valores não negativos e percentual de execução entre 0 e 100. Uma página reprovada SHALL não impedir a coleta das páginas seguintes.
 
 #### Scenario: Percentual impossível
 - **WHEN** a fonte informa execução física de 140%
 - **THEN** nada daquela tarefa é publicado e o erro fica registrado com o identificador da obra
+
+#### Scenario: Página reprovada não trava as outras
+- **WHEN** a página 3 de obras é reprovada na validação
+- **THEN** as páginas 4 em diante continuam sendo coletadas
+
+### Requirement: Dado incoerente publicado como informado, com nota
+Incoerências de conteúdo informadas pela fonte, como término previsto anterior ao início previsto, SHALL ser publicadas exatamente como a fonte informa, acompanhadas de uma nota de qualidade que descreve a incoerência; o Cobra SHALL não corrigir nem descartar o dado.
+
+#### Scenario: Término antes do início
+- **WHEN** a fonte informa início previsto em 10/01/2025 e término previsto em 10/01/2024
+- **THEN** a obra é publicada com essas datas e com a nota "término previsto anterior ao início previsto, informado assim pela fonte"
 
 ### Requirement: Atualização sem duplicar
 Coletas repetidas SHALL atualizar as obras já guardadas, sem criar duplicatas, e SHALL refletir mudanças de situação informadas pela fonte.
