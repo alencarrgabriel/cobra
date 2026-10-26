@@ -18,7 +18,7 @@
 
 ## 3. Estrutura e interação
 
-- [ ] 3.1 `AppShell` com barra superior e barra inferior (Início, Representantes, Votações, Obras; "em breve" nas indisponíveis) aplicado ao layout; teste Playwright a 360 px e a 1440 px
+- [x] 3.1 `AppShell` com barra superior e barra inferior (Início, Representantes, Votações, Obras; "em breve" nas indisponíveis) aplicado ao layout; teste Playwright a 360 px e a 1440 px
 - [x] 3.2 `SidePanel` com `<dialog>` (painel lateral ≥ 1080 px, gaveta no celular, Esc, retorno de foco) e `Toast`; testes Playwright de teclado e de posição da gaveta
 - [x] 3.3 Página inicial no novo visual (manchete serifada, explicação, campo de busca inativo com "em breve", texto sobre eleição pelo estado inteiro); atualizar os testes de `aplicacao-web-base` se algum seletor mudar e verificar que continuam passando
 
