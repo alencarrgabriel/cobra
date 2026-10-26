@@ -87,17 +87,18 @@ context: |
   - Doadores pessoa física: sem busca aberta por nome de doador. Não publicar endereço, família ou vida privada de políticos.
   - Acessibilidade WCAG 2.1 AA; LCP até 2,5 s em celular intermediário 4G.
 
-  # Plano de changes da Fase 1 (revisado em 2026-10-26, DDR v2)
+  # Plano de changes da Fase 1 (revisado em 2026-10-26, DDR v2.1)
   Feitas: 1 fundacao-projeto; 2 modelo-dados-base.
   Próximas: 3 identidade-visual (protótipo com dados fictícios, depois design system);
   4 infra-coleta; 5 ingestao-camara-deputados; 6 ingestao-senado-senadores;
   7 ingestao-cldf-distritais; 8 identidade-de-partidos-e-ufs (cores, logotipos, bandeiras);
-  9 busca-geografica (CEP → grade + gaveta); 10 mapa-do-brasil; 11 perfil-do-politico;
-  12 ingestao-camara-proposicoes; 13 ingestao-camara-votacoes;
-  14 ingestao-senado-proposicoes-votacoes; 15 ingestao-camara-despesas-presenca;
-  16 ingestao-senado-despesas-presenca; 17 ingestao-tse; 18 relevancia-e-eventos;
-  19 painel-editorial; 20 feed-e-pagina-votacao; 21 alertas-email; 22 seguir-politicos;
-  23 cards-compartilhaveis; 24 metodologia-e-reporte-de-erro; 25 saude-integracoes.
+  9 busca-geografica (CEP → grade + gaveta); 10 compartilhamento (painel, cards 9:16/4:5/1,91:1,
+  prévia de link, links reproduzíveis; cada página nova já nasce compartilhável);
+  11 mapa-do-brasil; 12 perfil-do-politico; 13 ingestao-camara-proposicoes;
+  14 ingestao-camara-votacoes; 15 ingestao-senado-proposicoes-votacoes;
+  16 ingestao-camara-despesas-presenca; 17 ingestao-senado-despesas-presenca; 18 ingestao-tse;
+  19 relevancia-e-eventos; 20 painel-editorial; 21 feed-e-pagina-votacao; 22 alertas-email;
+  23 seguir-politicos; 24 metodologia-e-reporte-de-erro; 25 saude-integracoes.
   Fase 2 (depois do MVP): economia-em-numeros; trilhas-educativas.
   Decisões pendentes: base de CEP (licença/custo) decidida em busca-geografica.
 

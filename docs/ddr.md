@@ -2,6 +2,8 @@
 
 > Convertido de `Cobra — Documento de Definição de Requisitos (DDR).docx` em 2026-10-20. Este arquivo passa a ser a fonte da verdade; os diagramas foram transcritos em texto.
 >
+> **Versão 2.1 (2026-10-26).** Compartilhamento como motor de crescimento: cards em formatos de redes, painel de compartilhar com WhatsApp em destaque, prévia de link e links que reproduzem o que a pessoa viu.
+>
 > **Versão 2 (2026-10-26).** Decisões incorporadas após pesquisa de referências e concorrentes: identidade visual inspirada no seuimposto.com (Pandora), cores e marcas de partido como identificação, jornada "CEP → grade de representantes → gaveta", módulo de economia e educação na fase 2, Ibovespa só na fase 3 e sem cotação de ações individuais, Apuração Brasil como concorrente direto. O histórico está no fim do documento.
 
 ## 1. Visão geral do produto e objetivos estratégicos
@@ -79,6 +81,8 @@ Jornadas principais.
 - Obra parada no bairro (Ana ou Marcos). Abre "Obras e dinheiro na sua região" → encontra uma escola paralisada → vê qual emenda e qual parlamentar enviaram o recurso, o valor e a data da última atualização → compartilha ou reporta a situação real com foto.
 
 - Pesquisa (Júlia ou Marcos). Busca um projeto ou votação → vê o placar por partido e por estado → copia o link permanente da página para citar a fonte.
+
+- Compartilhar (Ana, Carlos ou Júlia). Em "Seus representantes", numa votação ou num perfil, toca em "Compartilhar" → vê a prévia do card → envia pelo WhatsApp, posta nos stories ou copia o link → quem recebe o link vê a mesma página e o card aparece como prévia na conversa → toca e cai no Cobra já com o conteúdo, sem precisar informar CEP.
 
 ## 3. Escopo do MVP e matriz de funcionalidades
 
@@ -203,8 +207,11 @@ Os requisitos estão agrupados em seis módulos. Prioridade: Alta = necessário 
 
 | ID | Requisito | Prioridade | Fase |
 |---|---|---|---|
-| RF-60 | Link permanente para cada votação, perfil e obra | Alta | 1 |
-| RF-61 | Gerar card de imagem para redes sociais com fato e fonte | Média | 1 |
+| RF-60 | Link permanente para cada votação, perfil e obra; o link de "seus representantes" usa o código IBGE do município, nunca o CEP | Alta | 1 |
+| RF-61 | Gerar card de imagem com fato, fonte, data de atualização e endereço do Cobra para "seus representantes", votação e perfil, nos formatos stories (9:16), feed (4:5) e prévia de link (1,91:1), com o mesmo modelo para qualquer partido | Alta | 1 |
+| RF-67 | Painel "Compartilhar" com prévia do card e as opções: enviar no WhatsApp (em destaque), compartilhar pelo menu nativo do celular, baixar imagem, copiar imagem, postar no X e copiar link | Alta | 1 |
+| RF-68 | Prévia de link (Open Graph) em toda página compartilhável, para que o card apareça ao colar o link no WhatsApp e nas redes | Alta | 1 |
+| RF-69 | Página inicial com exemplos de cards antes de pedir o CEP | Média | 1 |
 | RF-62 | Painel editorial para revisar, editar e publicar resumos de votações e projetos | Alta | 1 |
 | RF-63 | Registro de quem aprovou cada resumo e quando (trilha de auditoria) | Alta | 1 |
 | RF-64 | Canal para reportar erro em qualquer dado, com fila de correção pública | Alta | 1 |
@@ -550,7 +557,15 @@ A referência principal é o seuimposto.com, a apuração ao vivo das eleições
 
 Chat aberto (excluído no cap. 3), anúncios de apostas, contador de "pessoas acompanhando" e projeções de resultado.
 
-### 13.3 Entrega
+### 13.3 Compartilhamento
+
+Referências: o painel de compartilhar do seuimposto.com (prévia do card, WhatsApp em destaque, copiar e baixar imagem, X, copiar link, menu nativo no celular) e o card vertical do 12axes (1080×1920, foto grande, números, rodapé com o endereço do site). Regras:
+
+- Todo card traz a fonte oficial e a data de atualização, como qualquer dado do Cobra (RF-17).
+- Cards e links não contêm dado pessoal do usuário: nada de CEP, e-mail ou políticos seguidos.
+- O mesmo modelo de card vale para qualquer partido ou político (§9.1).
+
+### 13.4 Entrega
 
 A identidade é definida numa change própria (`identidade-visual`), validada antes com um protótipo navegável com dados fictícios, e implementada como design system no código (tokens de cor e tipografia, componentes reutilizáveis), com contraste WCAG AA em modo claro e escuro (RNF-13, RNF-20).
 
@@ -570,6 +585,8 @@ As decisões abaixo já têm uma recomendação para não travar o desenvolvimen
 | Cores e marcas de partido (decidido em 2026-10-26) | Usar cor, sigla e logotipo do partido e bandeira da UF como identificação, iguais para todos | Facilita reconhecer o político, segue a prática do TSE e das casas; a neutralidade está em não dar nota, ranking nem adjetivo |
 | Economia e bolsa (decidido em 2026-10-26) | Economia em números e trilhas educativas na fase 2; Ibovespa diário na fase 3, se houver licença; nunca ações individuais | Fontes oficiais gratuitas para indicadores; licença da B3 e regras da CVM para ações |
 | Referência visual (decidido em 2026-10-26) | seuimposto.com (Pandora), com identidade própria | Melhor experiência visual entre as referências pesquisadas |
+| Compartilhamento (decidido em 2026-10-26) | Cards e painel de compartilhar no MVP, com prioridade Alta, desde o design system | Distribuição por WhatsApp e redes é o principal canal de crescimento (cap. 11, risco de pouca adoção) |
+| Teste "Quem vota como você?" (em aberto) | Avaliar na fase 2 ou 3, após parecer jurídico; respostas ficariam só no aparelho e no link | Gera engajamento como o 12axes, mas é comparação de afinidade política, que o cap. 3 exclui do MVP, e as respostas são dado sensível (§10.2) |
 
 ### Pontos a verificar
 
@@ -604,4 +621,5 @@ As decisões abaixo já têm uma recomendação para não travar o desenvolvimen
 | Versão | Data | Mudanças |
 |---|---|---|
 | 1 | 2026-10-20 | Conversão do documento original (.docx) |
+| 2.1 | 2026-10-26 | Compartilhamento: RF-60 e RF-61 revistos (RF-61 passa a Alta), RF-67 a RF-69, jornada de compartilhamento, §13.3; decisão em aberto sobre o teste "Quem vota como você?" |
 | 2 | 2026-10-26 | Concorrentes atualizados; RF-09, RF-31, RF-32 (grade visual, mapa, identidade de partido); módulo 4.4b de economia e educação (RF-70 a RF-74, fases 2 e 3); RNF-20; novas fontes de dados; regras de identidade de partido, economia sem causalidade e sem recomendação de investimento (§9.1); riscos novos; roadmap; cap. 13 de identidade visual |
