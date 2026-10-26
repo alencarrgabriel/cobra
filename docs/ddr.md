@@ -2,6 +2,8 @@
 
 > Convertido de `Cobra — Documento de Definição de Requisitos (DDR).docx` em 2026-10-20. Este arquivo passa a ser a fonte da verdade; os diagramas foram transcritos em texto.
 >
+> **Versão 2.2 (2026-10-26).** Perfil completo detalhado por seções e módulo de obras revisto com a API pública do Obrasgov verificada: resumo da cidade, mapa com pinos já na fase 2, filtros e card de obra.
+>
 > **Versão 2.1 (2026-10-26).** Compartilhamento como motor de crescimento: cards em formatos de redes, painel de compartilhar com WhatsApp em destaque, prévia de link e links que reproduzem o que a pessoa viu.
 >
 > **Versão 2 (2026-10-26).** Decisões incorporadas após pesquisa de referências e concorrentes: identidade visual inspirada no seuimposto.com (Pandora), cores e marcas de partido como identificação, jornada "CEP → grade de representantes → gaveta", módulo de economia e educação na fase 2, Ibovespa só na fase 3 e sem cotação de ações individuais, Apuração Brasil como concorrente direto. O histórico está no fim do documento.
@@ -165,6 +167,8 @@ Os requisitos estão agrupados em seis módulos. Prioridade: Alta = necessário 
 | RF-28 | Emendas parlamentares enviadas, por município e situação | Média | 2 |
 | RF-29 | Comparar 2 ou 3 políticos lado a lado, só com fatos | Baixa | 2 |
 | RF-30 | Botão "Seguir" (exige conta ou contato verificado) | Alta | 1 |
+| RF-33 | Perfil organizado em seções, com um resumo no topo (presença com a mediana da casa, gastos com o limite da cota, projetos e patrimônio) e depois: como votou, projetos, gastos, patrimônio e doadores, histórico de partidos e cargos e, na fase 2, emendas e obras; cada número com a sua referência e nenhuma posição em ranking | Alta | 1 |
+| RF-34 | No perfil, as obras financiadas pelas emendas do parlamentar, por município e situação, com o grau de confiança do vínculo | Média | 2 |
 | RF-32 | Identificar todo político pela cor, sigla e logotipo do seu partido e pela bandeira da sua UF, com as mesmas regras para todos os partidos (§9.1) | Alta | 1 |
 
 ### 4.4 Obras e emendas
@@ -177,8 +181,11 @@ Os requisitos estão agrupados em seis módulos. Prioridade: Alta = necessário 
 | RF-43 | Indicar o grau de confiança do vínculo emenda–obra (direto, por convênio, por município) | Alta | 2 |
 | RF-44 | Exibir a data da última atualização da fonte em cada obra | Alta | 2 |
 | RF-45 | Mostrar as emendas Pix recebidas pelo município e o plano de trabalho, quando informado | Média | 3 |
-| RF-46 | Mapa das obras do município | Média | 3 |
+| RF-46 | Mapa das obras do município com pinos coloridos por situação (as coordenadas vêm da própria API do Obrasgov) | Média | 2 |
 | RF-47 | Relato do cidadão sobre a situação real da obra, com foto e moderação | Baixa | 3 |
+| RF-48 | Resumo de obras do município: quantidade, valor previsto, valor pago, quantas estão concluídas, em execução e paralisadas | Alta | 2 |
+| RF-49 | Filtrar obras por situação, área (saúde, educação, saneamento, mobilidade e outras), valor e ano | Média | 2 |
+| RF-39 | Ficha da obra: nome, endereço, área, órgão que repassa, quem recebe e quem executa, valor previsto, empenhado e pago, contrato e empresa, prazos previstos e efetivos, % de execução física, fotos do gestor, histórico de paralisação com a justificativa oficial e a data em que o gestor informou | Alta | 2 |
 
 ### 4.4b Economia e educação (fase 2)
 
@@ -258,7 +265,7 @@ Todos os dados vêm de fontes oficiais e são copiados para o banco próprio do 
 | TSE – Dados Abertos | Candidatos eleitos, bens declarados, receitas e doadores, resultados | Arquivos CSV/ZIP por eleição (CKAN); sem chave | Arquivos grandes; cruzamento por CPF/sequencial do candidato | 1 |
 | CLDF – Dados Abertos | Deputados distritais, proposições, votações | Portal CKAN com API | Estrutura e frequência a validar no início do projeto | 1 |
 | Portal da Transparência (CGU) | Emendas parlamentares, convênios, despesas | API REST com token gratuito por e-mail + downloads em massa | 400 req/min (06h–24h) e 700 req/min (00h–06h); preferir downloads para histórico | 2 |
-| Obrasgov.br | Obras com recurso federal: valor, situação, execução, município | API pública (api-publica.obrasgov.gestao.gov.br) + ZIP | Situação depende da atualização pelos gestores; mostrar data de atualização | 2 |
+| Obrasgov.br | Obras com recurso federal: identificação, endereço, coordenadas, área, valor previsto, empenhos, contratos, prazos previstos e efetivos, % de execução física, histórico de paralisação e cancelamento com justificativa, fotos | API pública REST sem chave, com documentação OpenAPI (api-publica.obrasgov.gestao.gov.br/obras/docs); recursos /projeto-investimento, /execucao-fisica, /empenho, /contrato, /geometria, /historico-situacao-cancelada-paralisada, /estudo-viabilidade e /data-atualizacao; paginação de até 200 itens (verificado em 2026-10-26) | Dados preenchidos pelos gestores, com inconsistências (ex.: obra com prazo vencido há anos ainda "Cadastrada"); mostrar sempre "informado pelo gestor em [data]" e o canal de reportar erro | 2 |
 | Transferegov – Transferências Especiais | Emendas Pix: planos de ação, empenhos, planos de trabalho, relatórios de gestão | API PostgREST (api.transferegov.gestao.gov.br/transferenciasespeciais) | Limites e autenticação não confirmados; vínculo com obra depende do plano de trabalho | 3 |
 | TCU – Painel de Obras Paralisadas | Obras paralisadas consolidadas | Painel público; API não identificada | Usar como referência e checagem, não como fonte automática | 2 |
 | Tribunais de Contas estaduais (ex.: TCE-SP) | Obras estaduais e municipais | Varia por estado | Integração caso a caso | 3 |
@@ -600,6 +607,10 @@ As decisões abaixo já têm uma recomendação para não travar o desenvolvimen
 
 - ☐ Existência de API ou exportação no Painel de Obras Paralisadas do TCU
 
+- ☑ API pública do Obrasgov (verificado em 2026-10-26): REST sem chave, OpenAPI publicado, dados atualizados até 23/10/2026; o filtro por UF é `uf_principal`
+
+- ☐ Como ligar empenhos e contratos do Obrasgov às emendas (código da emenda no Portal da Transparência e no Transferegov)
+
 - ☐ Números e vigência das resoluções do TSE citadas na pesquisa
 
 - ☐ Licença e custo da base de CEP
@@ -621,5 +632,6 @@ As decisões abaixo já têm uma recomendação para não travar o desenvolvimen
 | Versão | Data | Mudanças |
 |---|---|---|
 | 1 | 2026-10-20 | Conversão do documento original (.docx) |
+| 2.2 | 2026-10-26 | RF-33 e RF-34 (perfil por seções e obras no perfil); RF-46 passa para a fase 2; RF-48, RF-49 e RF-39 (resumo, filtros e ficha da obra); fonte Obrasgov detalhada com a API verificada |
 | 2.1 | 2026-10-26 | Compartilhamento: RF-60 e RF-61 revistos (RF-61 passa a Alta), RF-67 a RF-69, jornada de compartilhamento, §13.3; decisão em aberto sobre o teste "Quem vota como você?" |
 | 2 | 2026-10-26 | Concorrentes atualizados; RF-09, RF-31, RF-32 (grade visual, mapa, identidade de partido); módulo 4.4b de economia e educação (RF-70 a RF-74, fases 2 e 3); RNF-20; novas fontes de dados; regras de identidade de partido, economia sem causalidade e sem recomendação de investimento (§9.1); riscos novos; roadmap; cap. 13 de identidade visual |
