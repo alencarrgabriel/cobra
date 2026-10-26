@@ -4,11 +4,12 @@ import os
 import secrets
 from collections.abc import Iterator
 from pathlib import Path
+from urllib.parse import urlsplit, urlunsplit
 
 import psycopg
 import pytest
 from psycopg import sql
-from psycopg.conninfo import conninfo_to_dict, make_conninfo
+from psycopg.conninfo import conninfo_to_dict
 
 from cobra_collectors.config import REPO_ROOT
 
@@ -50,7 +51,7 @@ def test_database_url(admin_url: str) -> Iterator[str]:
         )
     with admin:
         admin.execute(sql.SQL("create database {}").format(sql.Identifier(name)))
-        url = make_conninfo(admin_url, dbname=name)
+        url = urlunsplit(urlsplit(admin_url)._replace(path=f"/{name}"))
         try:
             with psycopg.connect(url, autocommit=True) as conn:
                 for migration in migration_files():
@@ -76,3 +77,10 @@ def db(session_conn: psycopg.Connection) -> Iterator[psycopg.Connection]:
     """Connection inside a transaction that is always rolled back after the test."""
     with session_conn.transaction(force_rollback=True):
         yield session_conn
+
+
+@pytest.fixture
+def autocommit_conn(test_database_url: str) -> Iterator[psycopg.Connection]:
+    """Separate autocommit connection, as used by the raw store and the queue."""
+    with psycopg.connect(test_database_url, autocommit=True) as conn:
+        yield conn

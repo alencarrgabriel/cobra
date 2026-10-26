@@ -13,11 +13,14 @@ ENV_FILE = REPO_ROOT / ".env"
 class Settings(BaseSettings):
     """Every field must also be documented in the repository root `.env.example`."""
 
-    model_config = SettingsConfigDict(env_file_encoding="utf-8", extra="ignore", frozen=True)
+    model_config = SettingsConfigDict(
+        env_file_encoding="utf-8", extra="ignore", frozen=True, env_ignore_empty=True
+    )
 
     app_env: Literal["development", "test", "production"]
     log_level: Literal["debug", "info", "warn", "error"] = "info"
     database_url: PostgresDsn
+    raw_data_dir: Path = REPO_ROOT / "data" / "raw"
 
 
 class ConfigError(Exception):
