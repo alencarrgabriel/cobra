@@ -1,0 +1,150 @@
+.top {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 20;
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+}
+
+.topInner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  height: 60px;
+  max-width: var(--max-width);
+  margin: 0 auto;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: 800;
+  font-size: 1.25rem;
+  letter-spacing: -0.02em;
+  text-decoration: none;
+}
+
+.brand svg {
+  width: 26px;
+  height: 26px;
+}
+
+.actions {
+  margin-left: auto;
+  display: flex;
+  gap: var(--space-2);
+}
+
+.topNav {
+  margin-left: var(--space-3);
+}
+
+.topList {
+  display: flex;
+  gap: 2px;
+  list-style: none;
+  margin: 0;
+  padding: 3px;
+  background: var(--surface-2);
+  border-radius: var(--radius-pill);
+}
+
+.item {
+  text-decoration: none;
+}
+
+.topList .item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.topList .item[aria-current="page"] {
+  background: var(--surface);
+  color: var(--fg);
+}
+
+.soon {
+  cursor: default;
+}
+
+.soon small {
+  font-size: 0.625rem;
+  font-weight: 600;
+  margin-left: 2px;
+}
+
+.content {
+  min-height: calc(100vh - 61px);
+}
+
+.tabbar {
+  display: none;
+}
+
+@media (max-width: 820px) {
+  .topNav {
+    display: none;
+  }
+
+  .content {
+    padding-bottom: calc(
+      var(--tabbar-height) + env(safe-area-inset-bottom, 0px) + var(--space-4)
+    );
+  }
+
+  .tabbar {
+    display: block;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 25;
+    background: var(--surface);
+    border-top: 1px solid var(--line);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    padding-left: max(8px, env(safe-area-inset-left, 0px));
+    padding-right: max(8px, env(safe-area-inset-right, 0px));
+  }
+
+  .tabList {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    height: var(--tabbar-height);
+  }
+
+  .tabList .item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    height: 100%;
+    font-size: var(--text-xs);
+    color: var(--muted);
+    font-weight: 500;
+  }
+
+  .tabList .item svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .tabList .item[aria-current="page"] {
+    color: var(--fg);
+    font-weight: 650;
+  }
+
+  .tabList .soon small {
+    margin: 0;
+    font-size: 0.5625rem;
+  }
+}

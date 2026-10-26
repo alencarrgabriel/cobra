@@ -1,0 +1,63 @@
+.portrait {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  max-width: 100%;
+  aspect-ratio: 4 / 4.2;
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+}
+
+.sm {
+  border-radius: var(--radius-sm);
+}
+
+.lg {
+  border-radius: var(--radius-card);
+}
+
+.photo {
+  object-fit: cover;
+}
+
+.placeholder {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.bgShape {
+  fill: var(--surface-2);
+}
+
+.shape {
+  fill: var(--line);
+}
+
+.initials {
+  font: 700 18px var(--font-ui);
+  fill: var(--muted);
+}
+
+.band {
+  position: absolute;
+  inset: auto 0 0;
+  height: 18%;
+}
+
+.flag {
+  position: absolute;
+  left: 8px;
+  top: 8px;
+  width: 28px;
+  height: 20px;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 0 0 1.5px var(--surface);
+}
+
+.flag :global(svg) {
+  width: 100%;
+  height: 100%;
+  display: block;
+}

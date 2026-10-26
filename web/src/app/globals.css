@@ -1,20 +1,107 @@
+/*
+ * Cobra design tokens (DDR cap. 13, change identidade-visual).
+ * This is the only file allowed to contain literal colors: components use tokens
+ * (enforced by src/styles/no-literal-colors.test.ts).
+ */
 :root {
-  --background: #ffffff;
-  --foreground: #1a1a1a;
-  --muted: #4a4a4a;
-  --link: #0b57d0;
-  --space: 1rem;
-  --max-width: 40rem;
-  color-scheme: light dark;
+  /* Surfaces and text */
+  --bg: #efeee9;
+  --surface: #f8f7f3;
+  --surface-2: #e6e4dd;
+  --line: #d8d5cc;
+  --fg: #1b1c1a;
+  --muted: #5c5e58;
+  --accent: #1f2b24;
+  --accent-fg: #f8f7f3;
+  --focus: #2a6df4;
+  --overlay: rgb(10 10 8 / 45%);
+  --shadow: 0 1px 2px rgb(30 30 20 / 6%), 0 8px 24px rgb(30 30 20 / 8%);
+  --whatsapp: #1fae5b;
+  --on-color-light: #ffffff;
+  --on-color-dark: #141512;
+
+  /* Vote options: never reused as party colors (DDR §9.1) */
+  --vote-yes: #0d7276;
+  --vote-no: #9a5d12;
+  --vote-other: #6f706a;
+
+  /* Work status (phase 2) */
+  --work-done: #2e7d4f;
+  --work-exec: #0d7276;
+  --work-stop: #b42346;
+  --work-idle: #6f706a;
+
+  /* Type */
+  --font-display: var(--font-newsreader), Georgia, "Times New Roman", serif;
+  --font-ui:
+    var(--font-onest), system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --text-xs: 0.75rem;
+  --text-sm: 0.8125rem;
+  --text-md: 0.9375rem;
+  --text-lg: 1.0625rem;
+  --text-xl: 1.375rem;
+  --text-2xl: 1.75rem;
+  --text-display: clamp(2rem, 4.4vw, 3.25rem);
+
+  /* Space, radius */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 28px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-card: 18px;
+  --radius-pill: 999px;
+  --max-width: 1360px;
+  --tabbar-height: 64px;
+
+  color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #121212;
-    --foreground: #ededed;
-    --muted: #b8b8b8;
-    --link: #8ab4f8;
+  :root:not([data-theme="light"]) {
+    --bg: #121311;
+    --surface: #1b1c1a;
+    --surface-2: #262724;
+    --line: #3a3c36;
+    --fg: #ecebe6;
+    --muted: #a8aaa2;
+    --accent: #e9ece6;
+    --accent-fg: #141512;
+    --focus: #7aa5ff;
+    --shadow: 0 1px 2px rgb(0 0 0 / 40%), 0 8px 24px rgb(0 0 0 / 35%);
+    --vote-yes: #4cc3c5;
+    --vote-no: #e7a654;
+    --vote-other: #a0a29a;
+    --work-done: #5cbf83;
+    --work-exec: #4cc3c5;
+    --work-stop: #f0708d;
+    --work-idle: #a0a29a;
+    color-scheme: dark;
   }
+}
+
+:root[data-theme="dark"] {
+  --bg: #121311;
+  --surface: #1b1c1a;
+  --surface-2: #262724;
+  --line: #3a3c36;
+  --fg: #ecebe6;
+  --muted: #a8aaa2;
+  --accent: #e9ece6;
+  --accent-fg: #141512;
+  --focus: #7aa5ff;
+  --shadow: 0 1px 2px rgb(0 0 0 / 40%), 0 8px 24px rgb(0 0 0 / 35%);
+  --vote-yes: #4cc3c5;
+  --vote-no: #e7a654;
+  --vote-other: #a0a29a;
+  --work-done: #5cbf83;
+  --work-exec: #4cc3c5;
+  --work-stop: #f0708d;
+  --work-idle: #a0a29a;
+  color-scheme: dark;
 }
 
 *,
@@ -29,37 +116,87 @@ html {
 
 body {
   margin: 0;
-  color: var(--foreground);
-  background: var(--background);
-  font-family:
-    system-ui,
-    -apple-system,
-    "Segoe UI",
-    Roboto,
-    "Helvetica Neue",
-    Arial,
-    sans-serif;
-  font-size: 1.0625rem;
-  line-height: 1.6;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-ui);
+  font-size: var(--text-md);
+  line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
   overflow-wrap: break-word;
 }
 
-a {
-  color: var(--link);
+h1,
+h2,
+h3 {
+  margin: 0;
+  text-wrap: balance;
 }
 
-a:focus-visible {
-  outline: 3px solid var(--link);
+p {
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-underline-offset: 3px;
+}
+
+button,
+input {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 3px solid var(--focus);
   outline-offset: 2px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Page gutter shared by every section (16px minimum, clears phone side bars). */
+.gutter {
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
 }
 
 .container {
   max-width: var(--max-width);
   margin: 0 auto;
-  padding: calc(var(--space) * 2) var(--space);
 }
 
-.lead {
-  font-size: 1.2rem;
+.display {
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  line-height: 1.05;
+}
+
+.eyebrow {
+  font-size: var(--text-xs);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 600;
   color: var(--muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+  }
 }

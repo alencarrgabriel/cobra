@@ -1,5 +1,9 @@
 import type { Metadata, Viewport } from "next";
 
+import { AppShell } from "@/components/AppShell";
+import { themeScript } from "@/components/ThemeToggle";
+
+import { newsreader, onest } from "./fonts";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -18,8 +22,18 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="pt-BR">
-      <body>{children}</body>
+    <html
+      lang="pt-BR"
+      className={`${newsreader.variable} ${onest.variable}`}
+      suppressHydrationWarning
+    >
+      <head>
+        {/* Applies the saved theme before the first paint (no flash). */}
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
+      <body>
+        <AppShell>{children}</AppShell>
+      </body>
     </html>
   );
 }

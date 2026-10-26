@@ -36,7 +36,13 @@ test.describe("renderização no servidor", () => {
   test("o conteúdo principal aparece sem JavaScript", async ({ page }) => {
     await page.goto("/");
     await expect(
-      page.getByRole("heading", { level: 1, name: "Cobra" }),
+      page.getByRole("link", { name: "Cobra, página inicial" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("heading", {
+        level: 1,
+        name: "O que fazem os políticos que representam você",
+      }),
     ).toBeVisible();
     await expect(
       page.getByText("Veja o que fazem os políticos que representam você"),

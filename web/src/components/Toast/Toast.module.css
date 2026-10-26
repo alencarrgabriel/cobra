@@ -1,0 +1,20 @@
+.region {
+  position: fixed;
+  left: 50%;
+  bottom: calc(
+    var(--tabbar-height) + env(safe-area-inset-bottom, 0px) + var(--space-5)
+  );
+  transform: translateX(-50%);
+  z-index: 60;
+  pointer-events: none;
+}
+
+.toast {
+  background: var(--fg);
+  color: var(--bg);
+  padding: 10px 16px;
+  border-radius: var(--radius-pill);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  white-space: nowrap;
+}

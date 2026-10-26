@@ -1,0 +1,969 @@
+<title>Cobra Protótipo</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=Onest:wght@400;500;600;700;800&display=swap">
+<style>
+/* Layout: app shell — top bar, content column + sticky side panel (desktop) / bottom sheet + tab bar (phone). Reference: seuimposto.com, own identity. */
+:root {
+  --done: #2e7d4f;
+  --exec: #0f7f83;
+  --stop: #b42346;
+  --idle: #8a8b84;
+  --bg: #efeee9;
+  --surface: #f8f7f3;
+  --surface-2: #e6e4dd;
+  --line: #d8d5cc;
+  --fg: #1b1c1a;
+  --muted: #62645e;
+  --accent: #1f2b24;
+  --accent-fg: #f8f7f3;
+  --yes: #0f7f83;
+  --no: #b8711a;
+  --other: #a3a39b;
+  --wa: #1fae5b;
+  --focus: #2a6df4;
+  --shadow: 0 1px 2px rgb(30 30 20 / 6%), 0 8px 24px rgb(30 30 20 / 8%);
+  --f-display: "Newsreader", Georgia, "Times New Roman", serif;
+  --f-ui: "Onest", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --r-card: 18px;
+  --r-pill: 999px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121311; --surface: #1b1c1a; --surface-2: #262724; --line: #33352f;
+    --fg: #ecebe6; --muted: #a2a49c; --accent: #e9ece6; --accent-fg: #141512;
+    --yes: #3cb6b8; --no: #e0a04a; --other: #6d6f68; --wa: #2bc46b; --focus: #7aa5ff;
+    --shadow: 0 1px 2px rgb(0 0 0 / 40%), 0 8px 24px rgb(0 0 0 / 35%);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121311; --surface: #1b1c1a; --surface-2: #262724; --line: #33352f;
+  --fg: #ecebe6; --muted: #a2a49c; --accent: #e9ece6; --accent-fg: #141512;
+  --yes: #3cb6b8; --no: #e0a04a; --other: #6d6f68; --wa: #2bc46b; --focus: #7aa5ff;
+  --shadow: 0 1px 2px rgb(0 0 0 / 40%), 0 8px 24px rgb(0 0 0 / 35%);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { min-height: 100%; }
+body {
+  background: var(--bg); color: var(--fg); font-family: var(--f-ui); font-size: 15px; line-height: 1.45;
+  -webkit-font-smoothing: antialiased; font-variant-numeric: tabular-nums;
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 30; background: var(--bg); }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+h1, h2, h3 { margin: 0; text-wrap: balance; }
+p { margin: 0; }
+.wrap { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+/* Top bar */
+.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+.top-in { display: flex; align-items: center; gap: 12px; height: 60px; max-width: 1360px; margin: 0 auto; }
+.brand { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 20px; letter-spacing: -0.02em; background: none; border: 0; padding: 0; }
+.brand svg { width: 26px; height: 26px; }
+.brand small { font-weight: 500; font-size: 11px; color: var(--muted); letter-spacing: 0.02em; border: 1px solid var(--line); border-radius: var(--r-pill); padding: 1px 7px; }
+.seg { display: flex; gap: 2px; background: var(--surface-2); border-radius: var(--r-pill); padding: 3px; margin-left: 12px; }
+.seg button { border: 0; background: none; padding: 6px 14px; border-radius: var(--r-pill); font-weight: 500; color: var(--muted); }
+.seg button[aria-current="page"] { background: var(--surface); color: var(--fg); box-shadow: 0 1px 2px rgb(0 0 0 / 10%); }
+.seg button .soon { font-size: 10px; margin-left: 4px; opacity: .7; }
+.top-actions { margin-left: auto; display: flex; gap: 8px; }
+.icon-btn { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 50%; border: 1px solid var(--line); background: var(--surface); }
+.icon-btn svg { width: 18px; height: 18px; }
+a.btn { text-decoration: none; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border-radius: var(--r-pill); border: 1px solid var(--line); background: var(--surface); padding: 9px 16px; font-weight: 600; }
+.btn svg { width: 17px; height: 17px; }
+.btn.primary { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
+.btn.wa { background: var(--wa); color: #fff; border-color: var(--wa); }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+
+.notice { max-width: 1360px; margin: 10px auto 0; font-size: 12.5px; color: var(--muted); display: flex; gap: 8px; align-items: center; }
+.notice b { color: var(--fg); font-weight: 600; }
+.dot { width: 7px; height: 7px; border-radius: 50%; background: var(--no); flex: none; }
+
+/* Shell */
+.shell { max-width: 1360px; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1fr) 400px; gap: 20px; padding-block: 16px 110px; }
+.main { min-width: 0; display: flex; flex-direction: column; gap: 20px; }
+.panel { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 76px); align-self: start; max-height: calc(100vh - 96px); overflow: auto; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-card); box-shadow: var(--shadow); }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-card); padding: 20px; }
+
+/* Home */
+.hero { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 24px; align-items: center; padding: 28px; }
+.eyebrow { font-size: 11.5px; letter-spacing: .12em; text-transform: uppercase; font-weight: 600; color: var(--muted); }
+.hero h1 { font-family: var(--f-display); font-weight: 500; font-size: clamp(32px, 4.4vw, 52px); line-height: 1.04; letter-spacing: -0.015em; margin-top: 10px; }
+.hero h1 em { font-style: normal; color: var(--yes); }
+.hero p.lead { color: var(--muted); font-size: 16.5px; margin-top: 14px; max-width: 46ch; }
+.search { margin-top: 22px; display: flex; gap: 8px; background: var(--surface); border: 1.5px solid var(--fg); border-radius: var(--r-pill); padding: 6px 6px 6px 18px; max-width: 520px; }
+.search input { flex: 1; min-width: 0; border: 0; background: none; font-size: 16px; outline: none; }
+.search label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.hint { margin-top: 10px; font-size: 13px; color: var(--muted); }
+.hint button { border: 0; background: none; padding: 0; color: var(--fg); text-decoration: underline; text-underline-offset: 3px; }
+.examples { position: relative; height: 340px; overflow: hidden; }
+.ex { position: absolute; width: 189px; height: 336px; }
+.ex > .sc { transform: scale(.7); transform-origin: top left; }
+.ex:nth-child(1) { left: 2%; top: 18px; transform: rotate(-6deg); }
+.ex:nth-child(2) { left: calc(50% - 95px); top: 0; z-index: 2; }
+.ex:nth-child(3) { right: 2%; top: 20px; transform: rotate(6deg); }
+
+.section-h { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.section-h h2 { font-family: var(--f-display); font-weight: 500; font-size: 28px; letter-spacing: -0.01em; }
+.section-h p { color: var(--muted); font-size: 13.5px; }
+
+/* Map (IBGE state boundaries) */
+.mapbox { position: relative; }
+.map-tools { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.crumbs { display: flex; align-items: center; gap: 6px; background: var(--surface-2); border-radius: var(--r-pill); padding: 4px 6px; font-size: 13px; }
+.crumbs button { border: 0; background: none; padding: 3px 8px; border-radius: var(--r-pill); color: var(--muted); }
+.crumbs button:hover { color: var(--fg); }
+.crumbs b { padding: 3px 8px 3px 2px; }
+.crumbs svg { width: 12px; height: 12px; color: var(--muted); }
+.modes { margin-left: auto; display: flex; gap: 2px; background: var(--surface-2); border-radius: var(--r-pill); padding: 3px; }
+.modes button { border: 0; background: none; border-radius: var(--r-pill); padding: 5px 12px; font-size: 12.5px; font-weight: 600; color: var(--muted); }
+.modes button[aria-pressed="true"] { background: var(--surface); color: var(--fg); box-shadow: 0 1px 2px rgb(0 0 0 / 10%); }
+.map { width: 100%; height: auto; aspect-ratio: 1110 / 971; max-height: 72vh; display: block; touch-action: manipulation; }
+.map .uf { stroke: var(--surface); stroke-width: 1.2; vector-effect: non-scaling-stroke; cursor: pointer; transition: opacity .25s ease, filter .15s ease; }
+.map .uf:hover { filter: brightness(.93) saturate(1.1); }
+.map .uf.sel { stroke: var(--fg); stroke-width: 2.4; }
+.map.zoomed .uf:not(.sel) { opacity: .28; }
+.map .lab { font: 700 17px var(--f-ui); pointer-events: none; paint-order: stroke; stroke: var(--surface); stroke-width: 3.5px; fill: var(--fg); }
+.map .lab .pc { font-size: 13px; font-weight: 600; }
+.map .call rect { fill: var(--surface); stroke: var(--line); }
+.map .call { cursor: pointer; }
+.map .call text { font: 700 15px var(--f-ui); fill: var(--fg); }
+.map .call line { stroke: var(--muted); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.map.zoomed .lab, .map.zoomed .call { display: none; }
+.map.zoomed .lab.sel-lab { display: inline; }
+.zoombtns { position: absolute; right: 10px; bottom: 10px; display: flex; flex-direction: column; gap: 6px; }
+.zoombtns button { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--line); background: var(--surface); font-size: 18px; line-height: 1; }
+.tip { position: absolute; pointer-events: none; background: var(--fg); color: var(--bg); font-size: 12.5px; padding: 6px 10px; border-radius: 10px; white-space: nowrap; transform: translate(-50%, calc(-100% - 12px)); z-index: 5; }
+.tip b { font-weight: 700; }
+.legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12.5px; color: var(--muted); margin-top: 12px; }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+.ramp { display: flex; height: 8px; border-radius: 4px; overflow: hidden; width: 140px; }
+
+/* Representatives grid */
+.group h3 { font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); font-weight: 600; display: flex; gap: 10px; align-items: center; }
+.group h3 span { letter-spacing: 0; text-transform: none; font-weight: 500; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; margin-top: 12px; }
+.rep { text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 12px; display: flex; flex-direction: column; gap: 10px; position: relative; overflow: hidden; }
+.rep:hover { border-color: var(--fg); }
+.rep[aria-pressed="true"] { border-color: var(--fg); box-shadow: inset 0 0 0 1.5px var(--fg); }
+.rep .who { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.rep .name { font-weight: 650; font-size: 14.5px; line-height: 1.2; }
+.rep .meta { display: flex; gap: 6px; align-items: center; font-size: 12px; color: var(--muted); }
+.photo { width: 100%; aspect-ratio: 4 / 4.2; border-radius: 12px; position: relative; overflow: hidden; }
+.photo svg { width: 100%; height: 100%; display: block; }
+.flag { position: absolute; left: 8px; top: 8px; width: 28px; height: 20px; border-radius: 4px; overflow: hidden; box-shadow: 0 0 0 1.5px rgb(255 255 255 / 85%); }
+.flag svg { width: 100%; height: 100%; display: block; }
+.party { display: inline-flex; align-items: center; gap: 5px; font-weight: 700; font-size: 11.5px; border-radius: 6px; padding: 2px 7px; color: #fff; letter-spacing: .02em; }
+.where { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.explain { font-size: 13.5px; color: var(--muted); background: var(--surface-2); border-radius: 12px; padding: 10px 12px; }
+
+/* Panel content */
+.p-head { padding: 18px 18px 14px; border-bottom: 1px solid var(--line); display: flex; gap: 14px; align-items: center; }
+.p-head .avatar { width: 64px; height: 64px; border-radius: 14px; overflow: hidden; flex: none; position: relative; }
+.p-head .avatar svg { width: 100%; height: 100%; }
+.p-head h2 { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; }
+.p-head .sub { font-size: 13px; color: var(--muted); display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-top: 4px; }
+.p-close { margin-left: auto; align-self: start; }
+.p-body { padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 18px; }
+.kpis { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.kpi { background: var(--bg); border-radius: 12px; padding: 12px; }
+.kpi .v { font-size: 26px; font-weight: 750; letter-spacing: -0.02em; line-height: 1.05; }
+.kpi .v small { font-size: 14px; font-weight: 600; }
+.kpi .l { font-size: 12px; color: var(--muted); margin-top: 4px; }
+.bar { position: relative; height: 6px; border-radius: 3px; background: var(--surface-2); margin-top: 8px; }
+.bar > span { position: absolute; inset: 0 auto 0 0; border-radius: 3px; background: var(--fg); }
+.bar > i { position: absolute; top: -3px; width: 2px; height: 12px; background: var(--muted); }
+.lbl { font-size: 11.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.vote-row { display: flex; gap: 10px; align-items: flex-start; padding: 10px 0; border-top: 1px solid var(--line); }
+.vote-row:first-of-type { border-top: 0; }
+.vote-row .t { font-size: 13.5px; font-weight: 550; line-height: 1.3; }
+.vote-row .d { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.chip { flex: none; font-size: 11.5px; font-weight: 700; padding: 3px 9px; border-radius: var(--r-pill); border: 1.5px solid currentColor; }
+.chip.yes { color: var(--yes); } .chip.no { color: var(--no); } .chip.other { color: var(--muted); }
+.src { font-size: 11.5px; color: var(--muted); }
+.p-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.p-empty { padding: 28px 22px; display: flex; flex-direction: column; gap: 10px; color: var(--muted); }
+.p-empty h2 { font-family: var(--f-display); font-weight: 500; font-size: 24px; color: var(--fg); }
+.partybars { display: flex; flex-direction: column; gap: 7px; }
+.p-nav { display: flex; gap: 6px; margin-left: auto; align-self: start; }
+.back { border: 0; background: none; padding: 0; font-size: 13px; color: var(--muted); display: inline-flex; gap: 4px; align-items: center; }
+.back:hover { color: var(--fg); }
+.peoplegrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 10px; }
+.person { border: 1px solid var(--line); background: var(--bg); border-radius: 12px; padding: 6px; text-align: left; display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.person:hover { border-color: var(--fg); }
+.person .ph { aspect-ratio: 1; border-radius: 8px; overflow: hidden; }
+.person .ph svg { width: 100%; height: 100%; display: block; }
+.person .nm { font-size: 11.5px; font-weight: 600; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.person .party { font-size: 9.5px; padding: 1px 5px; align-self: flex-start; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+.statrow { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.pb { display: grid; grid-template-columns: 90px minmax(0, 1fr) 30px; gap: 8px; align-items: center; font-size: 12.5px; }
+.pb .track { height: 10px; border-radius: 5px; background: var(--surface-2); overflow: hidden; }
+.pb .track span { display: block; height: 100%; border-radius: 5px; }
+
+/* Votes */
+.votelist { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.vcard { text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+.vcard:hover { border-color: var(--fg); }
+.vcard .house { font-size: 12px; color: var(--muted); display: flex; justify-content: space-between; gap: 8px; }
+.status { font-weight: 700; font-size: 11.5px; }
+.status.ok { color: var(--yes); } .status.ko { color: var(--no); }
+.vcard h3 { font-family: var(--f-display); font-weight: 500; font-size: 20px; line-height: 1.15; }
+.split { display: flex; height: 10px; border-radius: 5px; overflow: hidden; background: var(--surface-2); }
+.split span { display: block; height: 100%; }
+.counts { display: flex; gap: 12px; font-size: 12.5px; color: var(--muted); }
+.counts b { color: var(--fg); }
+
+.vote-hero { display: flex; flex-direction: column; gap: 14px; }
+.vote-hero h1 { font-family: var(--f-display); font-weight: 500; font-size: clamp(28px, 3.6vw, 42px); line-height: 1.08; letter-spacing: -0.01em; }
+.bigsplit { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 14px; align-items: center; }
+.bigsplit .n { font-size: 34px; font-weight: 800; letter-spacing: -0.03em; line-height: 1; }
+.bigsplit .n small { display: block; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; margin-top: 4px; }
+.bigsplit .yes { color: var(--yes); } .bigsplit .no { color: var(--no); text-align: right; }
+.bigbar { position: relative; display: flex; height: 22px; border-radius: 11px; overflow: hidden; background: var(--surface-2); }
+.bigbar span { height: 100%; }
+.bigbar i { position: absolute; left: 50%; top: -4px; bottom: -4px; width: 2px; background: var(--fg); }
+.summary { font-size: 15.5px; max-width: 68ch; }
+.badge-ai { display: inline-flex; gap: 6px; align-items: center; font-size: 12px; color: var(--muted); border: 1px solid var(--line); border-radius: var(--r-pill); padding: 3px 10px; }
+.myvotes { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 8px; }
+.myvote { display: flex; gap: 10px; align-items: center; background: var(--bg); border-radius: 12px; padding: 8px; text-align: left; border: 1px solid transparent; }
+.myvote:hover { border-color: var(--line); }
+.myvote .mini { width: 40px; height: 40px; border-radius: 10px; overflow: hidden; flex: none; }
+.myvote .mini svg { width: 100%; height: 100%; }
+.myvote .nm { font-size: 13px; font-weight: 600; line-height: 1.2; }
+.myvote .pt { font-size: 11.5px; color: var(--muted); }
+.myvote .chip { margin-left: auto; }
+.two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; }
+
+/* Bottom tab bar (phone) */
+.tabbar { display: none; position: fixed; left: 0; right: 0; bottom: 0; z-index: 25; background: var(--surface); border-top: 1px solid var(--line); padding-bottom: env(safe-area-inset-bottom, 0px); padding-left: max(8px, env(safe-area-inset-left, 0px)); padding-right: max(8px, env(safe-area-inset-right, 0px)); }
+.tabbar-in { display: grid; grid-template-columns: repeat(4, 1fr); }
+.tabbar button { border: 0; background: none; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 9px 0 10px; font-size: 11.5px; color: var(--muted); font-weight: 500; }
+.tabbar button svg { width: 22px; height: 22px; }
+.tabbar button[aria-current="page"] { color: var(--fg); font-weight: 650; }
+
+/* Sheet / modal */
+.scrim { position: fixed; inset: 0; background: rgb(10 10 8 / 45%); z-index: 40; }
+.sheet { position: fixed; z-index: 41; background: var(--surface); box-shadow: var(--shadow); display: flex; flex-direction: column; }
+.sheet.share { right: max(20px, env(safe-area-inset-right, 0px)); top: calc(env(safe-area-inset-top, 0px) + 70px); width: 400px; max-height: calc(100vh - 90px); border-radius: 20px; border: 1px solid var(--line); overflow: auto; }
+.sheet-h { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px 6px; }
+.sheet-h h2 { font-size: 16px; font-weight: 700; }
+.handle { display: none; width: 44px; height: 5px; border-radius: 3px; background: var(--line); margin: 8px auto 0; }
+.formats { display: flex; gap: 4px; margin: 4px 16px 10px; background: var(--surface-2); border-radius: var(--r-pill); padding: 3px; }
+.formats button { flex: 1; border: 0; background: none; border-radius: var(--r-pill); padding: 6px 0; font-size: 12.5px; font-weight: 600; color: var(--muted); }
+.formats button[aria-pressed="true"] { background: var(--surface); color: var(--fg); }
+.preview { margin: 0 16px; display: grid; place-items: center; background: var(--bg); border-radius: 14px; padding: 14px; }
+.share-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 14px 16px 18px; }
+.share-actions .wa { grid-column: 1 / -1; padding: 13px; font-size: 15px; }
+.toast { position: fixed; left: 50%; bottom: calc(90px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--fg); color: var(--bg); padding: 10px 16px; border-radius: var(--r-pill); font-size: 13.5px; font-weight: 600; z-index: 60; }
+
+/* Share card (rendered at design size, scaled in preview) */
+.sc { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; box-shadow: var(--shadow); overflow: hidden; color: var(--fg); }
+.sc-in { padding: 18px; display: flex; flex-direction: column; gap: 12px; height: 100%; }
+.sc-top { display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--muted); }
+.sc-top b { font-size: 15px; color: var(--fg); font-weight: 800; letter-spacing: -0.02em; }
+.sc h4 { margin: 0; font-family: var(--f-display); font-weight: 500; font-size: 22px; line-height: 1.08; }
+.sc .faces { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.sc .faces .f { aspect-ratio: 1; border-radius: 10px; overflow: hidden; position: relative; }
+.sc .faces .f svg { width: 100%; height: 100%; }
+.sc .faces .f span { position: absolute; left: 4px; bottom: 4px; max-width: calc(100% - 8px); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 8.5px; font-weight: 800; color: #fff; padding: 1px 4px; border-radius: 4px; }
+.sc-foot { margin-top: auto; display: flex; justify-content: space-between; gap: 8px; font-size: 10px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 8px; }
+.sc-foot b { color: var(--fg); }
+.sc .big { font-size: 40px; font-weight: 800; letter-spacing: -0.03em; line-height: 1; }
+
+/* Profile */
+body.nopanel .shell { grid-template-columns: minmax(0, 1fr); }
+body.nopanel .panel { display: none !important; }
+.profile-head { display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: 22px; align-items: center; }
+.bigphoto { border-radius: 18px; overflow: hidden; position: relative; aspect-ratio: 4 / 4.2; max-width: 100%; }
+.bigphoto svg { width: 100%; height: 100%; display: block; }
+.bigphoto .flag { width: 38px; height: 26px; left: 10px; top: 10px; }
+.profile-head h1 { font-family: var(--f-display); font-weight: 500; font-size: clamp(30px, 4vw, 46px); line-height: 1.05; letter-spacing: -0.01em; }
+.facts { display: flex; flex-wrap: wrap; gap: 6px 14px; color: var(--muted); font-size: 13.5px; margin-top: 10px; }
+.kstrip { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.tabs { display: flex; gap: 2px; overflow-x: auto; border-bottom: 1px solid var(--line); scrollbar-width: none; }
+.tabs button { border: 0; background: none; padding: 11px 14px; font-weight: 600; color: var(--muted); border-bottom: 2.5px solid transparent; white-space: nowrap; }
+.tabs button[aria-selected="true"] { color: var(--fg); border-color: var(--fg); }
+.tabs button small { font-size: 10px; font-weight: 600; opacity: .7; margin-left: 4px; }
+.filters { display: flex; gap: 6px; flex-wrap: wrap; }
+.fchip { border: 1px solid var(--line); background: var(--surface); border-radius: var(--r-pill); padding: 5px 12px; font-size: 13px; font-weight: 500; }
+.fchip[aria-pressed="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+.row { display: flex; gap: 12px; align-items: flex-start; padding: 13px 0; border-top: 1px solid var(--line); }
+.row:first-child { border-top: 0; }
+.row .t { font-weight: 600; line-height: 1.3; }
+.row .d { font-size: 12.5px; color: var(--muted); margin-top: 3px; }
+.row .right { margin-left: auto; text-align: right; flex: none; }
+.tag { font-size: 11px; font-weight: 700; border-radius: 6px; padding: 2px 7px; background: var(--surface-2); color: var(--fg); flex: none; }
+.months { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 6px; align-items: end; height: 170px; margin-top: 12px; }
+.months .m { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 5px; height: 100%; font-size: 10.5px; color: var(--muted); min-width: 0; }
+.months .m b { width: 100%; background: var(--fg); border-radius: 6px 6px 2px 2px; opacity: .82; }
+.hbars { display: flex; flex-direction: column; gap: 9px; margin-top: 12px; }
+.hb { display: grid; grid-template-columns: minmax(0, 1fr) 110px; gap: 4px 10px; font-size: 13px; }
+.hb .track { grid-column: 1 / -1; height: 8px; border-radius: 4px; background: var(--surface-2); overflow: hidden; }
+.hb .track span { display: block; height: 100%; background: var(--fg); border-radius: 4px; }
+.hb .val { text-align: right; font-weight: 600; }
+.tl { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 12px; padding: 11px 0; border-top: 1px solid var(--line); align-items: center; }
+.tl:first-child { border-top: 0; }
+.tl .y { font-weight: 700; font-size: 13px; }
+
+/* Works */
+.sumstrip { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+.obras-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+.pinmap { width: 100%; height: auto; display: block; border-radius: 14px; background: var(--bg); }
+.pinmap .pin { cursor: pointer; stroke: var(--surface); stroke-width: 2; vector-effect: non-scaling-stroke; }
+.pinmap .pin.sel { stroke: var(--fg); stroke-width: 3; }
+.olist { display: flex; flex-direction: column; gap: 8px; max-height: 620px; overflow: auto; padding-right: 4px; }
+.ocard { text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; }
+.ocard:hover, .ocard[aria-pressed="true"] { border-color: var(--fg); }
+.ocard .n { font-weight: 650; line-height: 1.25; }
+.ocard .a { font-size: 12.5px; color: var(--muted); grid-column: 1; }
+.ocard .v { font-weight: 750; font-size: 15px; text-align: right; }
+.ocard .pbar { grid-column: 1 / -1; height: 6px; border-radius: 3px; background: var(--surface-2); overflow: hidden; margin-top: 4px; }
+.ocard .pbar span { display: block; height: 100%; }
+.st { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 700; border-radius: var(--r-pill); padding: 2px 9px; color: #fff; white-space: nowrap; }
+.dates { display: grid; grid-template-columns: auto 1fr 1fr; gap: 6px 12px; font-size: 13px; }
+.dates .h { color: var(--muted); font-size: 11.5px; text-transform: uppercase; letter-spacing: .08em; font-weight: 600; }
+.warnbox { border-radius: 12px; padding: 12px; background: color-mix(in srgb, var(--stop) 12%, var(--surface)); border: 1px solid color-mix(in srgb, var(--stop) 35%, var(--surface)); font-size: 13.5px; }
+.conf { display: inline-flex; gap: 6px; align-items: center; font-size: 12px; font-weight: 700; border: 1.5px solid currentColor; border-radius: var(--r-pill); padding: 2px 9px; }
+.photos { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.photos div { aspect-ratio: 4 / 3; border-radius: 10px; background: repeating-linear-gradient(135deg, var(--surface-2) 0 10px, var(--bg) 10px 20px); display: grid; place-items: center; font-size: 11px; color: var(--muted); text-align: center; padding: 4px; }
+
+@media (max-width: 1080px) {
+  .shell { grid-template-columns: minmax(0, 1fr); }
+  .panel { display: none; }
+  .panel.open { display: block; position: fixed; left: 0; right: 0; bottom: 0; top: auto; max-height: 82vh; z-index: 41; border-radius: 22px 22px 0 0; padding-bottom: env(safe-area-inset-bottom, 0px); }
+  .panel.open .handle { display: block; }
+}
+@media (max-width: 820px) {
+  .seg, .top-actions .btn span { display: none; }
+  .hero { grid-template-columns: minmax(0, 1fr); padding: 20px; }
+  .examples { height: 340px; }
+  .two, .obras-layout { grid-template-columns: minmax(0, 1fr); }
+  .profile-head { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  .profile-head .bigphoto { width: 120px; }
+  .kstrip, .sumstrip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .olist { max-height: none; }
+  .map .lab { font-size: 22px; } .map .call text { font-size: 19px; }
+  .tabbar { display: block; }
+  .sheet.share { left: 0; right: 0; bottom: 0; top: auto; width: auto; border-radius: 22px 22px 0 0; max-height: 92vh; padding-bottom: env(safe-area-inset-bottom, 0px); }
+  .sheet.share .handle { display: block; }
+  .grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+}
+@media (max-width: 420px) {
+  .grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .ex:nth-child(1), .ex:nth-child(3) { display: none; }
+  .search { flex-wrap: wrap; border-radius: 18px; padding: 8px; }
+  .search input { flex-basis: 100%; padding: 6px 8px; }
+  .search .btn { flex: 1; }
+  .bigsplit .n { font-size: 26px; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<header class="top wrap">
+  <div class="top-in">
+    <button class="brand" id="brand" aria-label="Cobra, página inicial">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="9" fill="var(--accent)"/><path d="M21.5 11.5a6.5 6.5 0 1 0 0 9" fill="none" stroke="var(--accent-fg)" stroke-width="3.4" stroke-linecap="round"/><circle cx="22.4" cy="11.4" r="1.6" fill="var(--yes)"/></svg>
+      Cobra <small>protótipo</small>
+    </button>
+    <nav class="seg" aria-label="Seções">
+      <button data-go="inicio">Início</button>
+      <button data-go="representantes">Seus representantes</button>
+      <button data-go="votacao">Votações</button>
+      <button data-go="obras">Obras<span class="soon">fase 2</span></button>
+      <button disabled title="Fase 2">Economia<span class="soon">fase 2</span></button>
+    </nav>
+    <div class="top-actions">
+      <button class="icon-btn" id="theme" aria-label="Alternar modo escuro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg></button>
+      <button class="btn primary" id="shareTop"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15V3m0 0L7.5 7.5M12 3l4.5 4.5M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg><span>Compartilhar</span></button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap"><p class="notice"><span class="dot"></span><span><b>Protótipo com dados fictícios.</b> Nomes, fotos, votos e valores são inventados para avaliar o visual; cores de partido provisórias.</span></p></div>
+
+<div class="shell wrap">
+  <main class="main" id="main"></main>
+  <aside class="panel" id="panel" aria-label="Detalhes"></aside>
+</div>
+
+<nav class="tabbar" aria-label="Seções">
+  <div class="tabbar-in">
+    <button data-go="inicio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Início</button>
+    <button data-go="representantes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3.2"/><circle cx="17" cy="9.5" r="2.5"/><path d="M3 19c.8-3.3 3.2-5 6-5s5.2 1.7 6 5M15 14.4c2.6-.4 4.7.9 5.6 3.6"/></svg>Representantes</button>
+    <button data-go="votacao"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Votações</button>
+    <button data-go="obras"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg>Obras</button>
+  </div>
+</nav>
+
+<div id="layer"></div>
+
+<script>
+(() => {
+  // ---------------------------------------------------------------- data
+  const PARTIES = {
+    PT: ["Partido dos Trabalhadores", "#c8102e"], PL: ["Partido Liberal", "#1e3a8a"], UNIAO: ["União Brasil", "#0284c7"],
+    PP: ["Progressistas", "#2563eb"], PSD: ["Partido Social Democrático", "#d97706"], MDB: ["Movimento Democrático Brasileiro", "#15803d"],
+    PSB: ["Partido Socialista Brasileiro", "#ea580c"], PSOL: ["Partido Socialismo e Liberdade", "#a16207"], NOVO: ["Partido Novo", "#f97316"],
+    REPUBLICANOS: ["Republicanos", "#1d4ed8"], PDT: ["Partido Democrático Trabalhista", "#b91c1c"], PSDB: ["Partido da Social Democracia Brasileira", "#0369a1"],
+  };
+  const pLabel = (k) => (k === "UNIAO" ? "UNIÃO" : k);
+  const UF_TILES = [
+    ["RR",0,2],["AP",0,3],["AM",1,1],["PA",1,2],["MA",1,3],["CE",1,4],["RN",1,5],
+    ["AC",2,0],["RO",2,1],["TO",2,2],["PI",2,3],["PE",2,4],["PB",2,5],
+    ["MT",3,1],["GO",3,2],["DF",3,3],["BA",3,4],["AL",3,5],
+    ["MS",4,1],["SP",4,2],["MG",4,3],["ES",4,4],["SE",4,5],
+    ["PR",5,2],["RJ",5,3],["SC",6,2],["RS",7,2],
+  ];
+  const UF_NAMES = { AC:"Acre",AL:"Alagoas",AP:"Amapá",AM:"Amazonas",BA:"Bahia",CE:"Ceará",DF:"Distrito Federal",ES:"Espírito Santo",GO:"Goiás",MA:"Maranhão",MT:"Mato Grosso",MS:"Mato Grosso do Sul",MG:"Minas Gerais",PA:"Pará",PB:"Paraíba",PR:"Paraná",PE:"Pernambuco",PI:"Piauí",RJ:"Rio de Janeiro",RN:"Rio Grande do Norte",RS:"Rio Grande do Sul",RO:"Rondônia",RR:"Roraima",SC:"Santa Catarina",SP:"São Paulo",SE:"Sergipe",TO:"Tocantins" };
+  const SEATS = { AC:8,AL:9,AP:8,AM:8,BA:39,CE:22,DF:8,ES:10,GO:17,MA:18,MT:8,MS:8,MG:53,PA:17,PB:12,PR:30,PE:25,PI:10,RJ:46,RN:8,RS:31,RO:8,RR:8,SC:16,SP:70,SE:8,TO:8 };
+
+  let seed = 20261026;
+  const rnd = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
+  const pick = (a) => a[Math.floor(rnd() * a.length)];
+  const FIRST = ["Ana","Bruno","Carla","Diego","Elaine","Fábio","Gisele","Heitor","Íris","João","Kátia","Lucas","Marta","Nelson","Olívia","Paulo","Quitéria","Rafael","Sônia","Tiago","Úrsula","Vítor","Wanda","Yara","Zélia","Caio","Denise","Ruy","Lia","Otávio","Bianca","Mauro","Renata","Hugo","Celina","Arthur"];
+  const LAST = ["Andrade","Barbosa","Campos","Duarte","Esteves","Falcão","Guerra","Holanda","Inácio","Jardim","Lacerda","Macedo","Nogueira","Oliva","Prado","Queiroz","Rangel","Salgado","Tavares","Uchoa","Valente","Xavier","Zanetti","Moura","Brandão","Cordeiro"];
+  const usedNames = new Set();
+  const newName = () => { let n; do { n = `${pick(FIRST)} ${pick(LAST)}`; } while (usedNames.has(n)); usedNames.add(n); return n; };
+  const partyKeys = Object.keys(PARTIES);
+
+  const VOTES = [
+    { id: "v1", house: "Câmara", date: "22 out 2026", title: "Câmara aprova limite maior de faturamento para microempreendedor", status: "Aprovada", yes: 312, no: 141, other: 9,
+      summary: "O projeto fictício sobe o limite de faturamento anual do MEI e cria uma faixa de transição para quem passar do teto. A favor, defensores dizem que mais pessoas saem da informalidade; contra, críticos apontam perda de arrecadação.", criterion: "Placar disputado: diferença entre Sim e Não menor que 20% dos votantes? Não. Tipo de matéria: projeto de lei complementar.", theme: "Economia" },
+    { id: "v2", house: "Senado", date: "21 out 2026", title: "Senado rejeita mudança no prazo de pagamento do Imposto de Renda", status: "Rejeitada", yes: 30, no: 41, other: 4,
+      summary: "A proposta fictícia permitiria parcelar o IR devido em até 12 vezes sem juros. A favor: alívio no orçamento das famílias. Contra: impacto no caixa do governo no curto prazo.", criterion: "Placar disputado: diferença menor que 20% dos votantes.", theme: "Impostos" },
+    { id: "v3", house: "Câmara", date: "15 out 2026", title: "Câmara aprova regras para uso de celular nas escolas", status: "Aprovada", yes: 398, no: 52, other: 12,
+      summary: "O texto fictício limita o uso de celulares em sala de aula na educação básica, com exceções para fins pedagógicos e de acessibilidade.", criterion: "Divergência entre orientações de governo e oposição.", theme: "Educação" },
+  ];
+  const optFor = (vote, party) => {
+    const bias = { v1: { PT:-.4, PSOL:-.6, PL:.4, NOVO:.6, PP:.3 }, v2: { PT:.5, PSOL:.6, PL:-.3, NOVO:-.6 }, v3: { NOVO:-.5, PL:-.1 } }[vote.id][party] || 0;
+    const pYes = vote.yes / (vote.yes + vote.no + vote.other) + bias * .5;
+    const r = rnd();
+    return r < .06 ? "other" : r < pYes ? "yes" : "no";
+  };
+  const makeRep = (office, uf, partyArg) => {
+    const party = partyArg || pick(partyKeys);
+    const limit = office === "Senador(a)" ? 38000 : office === "Deputado(a) federal" ? 45612 : 25322;
+    const spent = Math.round(limit * (0.45 + rnd() * 0.5)) * 10;
+    return {
+      id: "r" + Math.floor(rnd() * 1e9).toString(36), name: newName(), party, office, uf,
+      presence: Math.round(70 + rnd() * 29), houseMedian: office === "Senador(a)" ? 90 : office === "Deputado(a) federal" ? 81 : 85,
+      spent, limit: limit * 10, assets: Math.round(200 + rnd() * 4800) * 1000, hue: Math.floor(rnd() * 360),
+      votes: Object.fromEntries(VOTES.map((v) => [v.id, office === "Deputado(a) distrital" ? null : optFor(v, party)])),
+    };
+  };
+  const byName = (a, b) => a.name.localeCompare(b.name, "pt-BR");
+  const ufYes = Object.fromEntries(UF_TILES.map(([uf]) => [uf, Object.fromEntries(VOTES.map((v) => [v.id, Math.round(30 + rnd() * 55)]))]));
+  const ufParties = Object.fromEntries(UF_TILES.map(([uf]) => {
+    let left = SEATS[uf]; const rows = [];
+    partyKeys.slice().sort(() => rnd() - .5).forEach((k, i) => { if (left <= 0) return; const n = i === 11 ? left : Math.min(left, Math.round(rnd() * SEATS[uf] * .35)); if (n > 0) { rows.push([k, n]); left -= n; } });
+    if (left > 0) rows.push(["PSD", left]);
+    return [uf, rows.sort((a, b) => pLabel(a[0]).localeCompare(pLabel(b[0])))];
+  }));
+  // Every state gets 3 senators and its real number of federal seats, split by the fictional party mix above.
+  const REPS = Object.fromEntries(UF_TILES.map(([uf]) => [uf, {
+    senators: Array.from({ length: 3 }, () => makeRep("Senador(a)", uf)).sort(byName),
+    federal: ufParties[uf].flatMap(([k, n]) => Array.from({ length: n }, () => makeRep("Deputado(a) federal", uf, k))).sort(byName),
+  }]));
+  const DF = { senators: REPS.DF.senators, federal: REPS.DF.federal, district: Array.from({ length: 24 }, () => makeRep("Deputado(a) distrital", "DF")).sort(byName) };
+  const ALL = [...Object.values(REPS).flatMap((g) => [...g.senators, ...g.federal]), ...DF.district];
+  const topParty = (uf) => ufParties[uf].reduce((a, b) => (b[1] > a[1] ? b : a));
+  const UF_ORDER = Object.keys(UF_NAMES).sort((a, b) => UF_NAMES[a].localeCompare(UF_NAMES[b], "pt-BR"));
+  const GEO = {"w":1000.0,"h":971.4,"uf":{"RO":{"d":"M278.3,457.9L281.2,458.7L283.2,457.7L285.6,459.0L285.6,461.3L291.1,465.9L291.5,468.1L298.3,467.4L301.1,468.7L312.0,467.0L312.3,468.6L314.3,468.6L315.3,470.3L319.4,472.2L321.4,469.1L327.1,466.2L329.6,457.0L334.5,452.0L335.0,446.6L337.7,444.9L341.8,438.5L339.2,436.1L336.8,427.9L334.0,425.5L333.7,419.8L338.4,415.0L336.6,408.8L329.2,406.5L328.0,407.8L325.4,404.9L299.2,404.8L300.9,399.8L301.3,390.7L297.9,384.0L300.2,376.8L298.6,373.2L300.9,371.0L298.4,366.8L299.0,364.9L297.3,364.1L298.0,361.7L299.8,361.4L299.0,357.6L301.1,353.3L297.3,348.6L295.2,347.6L293.8,349.1L292.2,348.8L291.7,351.7L289.8,352.4L287.6,350.3L285.3,350.4L283.9,345.3L280.3,345.6L279.7,340.3L277.2,338.9L275.9,340.0L272.6,336.1L271.7,332.7L267.5,329.8L249.4,329.8L245.7,338.4L243.4,337.6L241.6,338.7L240.9,342.3L242.1,344.8L236.8,348.9L236.8,354.0L234.6,355.1L232.8,355.2L232.5,353.6L225.6,355.7L219.3,355.6L217.1,362.6L212.8,366.4L210.3,361.7L205.6,363.1L205.8,366.7L202.1,365.6L197.0,369.9L192.9,365.6L183.1,365.9L180.1,371.1L173.5,374.1L172.7,375.7L178.0,377.7L188.5,374.9L192.5,375.4L194.1,374.1L195.7,375.1L199.7,374.0L202.5,376.2L205.5,372.0L206.8,372.4L209.3,376.2L208.2,378.8L209.3,385.7L205.9,392.2L206.2,395.6L207.6,396.6L207.5,400.2L209.6,401.9L210.2,404.7L207.5,408.8L207.6,411.5L209.0,413.0L208.1,414.0L208.9,417.6L211.1,418.3L210.2,423.1L214.0,422.7L215.5,430.0L220.1,430.3L221.8,433.6L223.5,432.6L223.1,434.3L227.9,435.6L228.2,439.2L230.5,441.1L233.2,441.4L233.4,442.5L234.6,441.4L241.1,443.2L245.4,440.7L253.8,444.1L255.1,446.3L257.1,447.0L262.1,445.8L264.1,450.9L266.9,451.4L269.6,455.2L272.5,454.2L273.6,455.9Z","c":[268.1,403.0],"b":[172.7,329.8,169.1,142.3]},"AC":{"d":"M164.9,372.2L155.7,369.3L128.5,356.6L94.6,326.6L33.8,319.3L4.5,308.3L6.7,311.4L6.5,313.7L2.7,315.0L0.6,314.3L1.7,317.1L0.0,318.9L4.1,323.4L7.4,325.2L5.9,329.2L8.7,331.0L10.9,339.0L15.8,342.3L15.5,345.4L20.4,348.4L22.5,353.0L24.6,354.8L24.7,359.0L18.7,365.6L30.6,365.6L35.3,367.5L39.1,367.5L41.1,369.0L41.4,373.9L44.2,375.2L43.5,380.2L66.8,379.4L68.0,377.1L72.0,375.7L81.0,367.0L84.1,365.9L81.6,370.4L83.0,374.4L81.0,376.0L81.0,405.1L83.2,403.5L88.6,406.9L97.2,403.2L102.7,404.5L109.8,403.3L122.1,405.7L124.5,405.0L126.1,405.6L126.8,408.7L131.0,407.9L138.3,404.1L142.2,397.3L146.8,396.1L150.6,398.0L151.9,395.3L157.6,391.4L157.9,390.0L160.4,389.7L160.5,388.2L164.0,388.6L167.9,386.5L171.2,382.2L176.9,378.8L177.1,377.7Z","c":[84.6,360.6],"b":[0.0,308.3,177.1,100.4]},"AM":{"d":"M381.0,314.1L380.2,310.1L374.1,303.3L373.0,298.1L378.1,292.5L423.0,192.4L421.5,191.8L422.7,189.1L427.7,185.6L430.3,181.7L422.7,185.4L420.0,184.5L416.3,186.3L414.3,185.4L414.7,181.3L412.0,181.4L407.9,179.0L406.7,176.1L403.7,173.9L400.1,174.5L395.5,171.4L392.0,170.8L391.3,168.7L385.5,166.0L384.6,164.4L385.3,160.2L384.1,158.7L380.6,161.9L378.4,159.4L376.9,159.8L374.2,156.8L374.1,153.5L367.6,148.2L367.1,142.2L363.6,139.9L363.0,124.7L335.5,124.7L327.2,142.8L327.3,145.9L329.1,147.8L328.1,149.7L325.0,150.2L323.6,152.9L320.5,153.2L318.1,152.4L317.9,150.0L314.0,144.9L307.0,143.7L306.8,145.2L301.4,147.6L298.5,153.9L299.3,157.7L297.5,166.0L299.2,166.8L301.0,170.6L297.9,167.3L290.8,166.0L287.9,159.7L276.3,150.7L276.7,148.2L279.3,148.9L281.5,147.0L281.0,143.9L283.8,139.3L282.6,138.8L282.5,135.5L280.7,133.6L280.5,131.3L278.5,129.4L277.1,124.6L277.6,121.8L275.5,118.6L275.5,113.8L277.2,111.9L277.7,107.4L277.0,104.2L275.2,103.3L273.0,95.4L269.0,91.6L270.8,88.9L271.4,83.1L268.2,81.0L263.7,81.1L260.8,77.1L257.7,77.6L255.4,76.2L253.6,78.3L249.5,78.8L248.2,81.0L247.4,80.3L244.4,82.2L240.8,81.7L238.8,83.2L238.7,89.5L232.0,96.8L230.6,96.5L231.8,93.5L230.7,93.2L222.9,100.4L220.5,99.4L216.9,100.9L215.7,103.5L213.7,102.5L212.6,103.5L212.2,107.6L208.3,108.1L206.0,113.6L203.4,114.6L202.0,113.3L204.0,108.5L202.1,106.1L198.4,106.4L190.0,112.4L187.0,111.8L184.5,112.9L171.6,100.6L166.0,102.2L165.8,88.1L164.3,85.2L161.4,84.6L158.7,75.4L155.6,77.2L153.2,80.9L149.4,80.7L145.5,85.7L139.7,82.0L137.6,85.8L140.3,88.1L110.6,88.2L107.2,87.0L99.7,88.7L99.7,104.4L103.1,103.4L103.0,104.4L113.7,105.0L116.7,109.6L115.5,112.7L117.2,115.2L111.6,116.0L108.4,113.0L100.7,117.0L94.8,117.3L94.6,135.9L97.8,139.5L105.3,144.0L106.2,147.4L105.3,150.4L110.4,159.7L110.4,165.4L96.6,238.9L92.2,237.7L91.1,239.7L88.6,237.0L88.0,234.5L85.5,234.1L84.8,235.2L83.4,234.3L81.1,235.7L80.4,234.0L79.8,235.7L77.7,234.8L73.2,240.2L60.5,241.6L57.1,244.0L50.1,243.7L49.0,246.0L42.6,250.0L39.1,250.8L38.2,252.9L33.3,256.4L28.3,258.3L26.5,259.9L26.9,263.2L24.9,267.3L24.0,273.3L18.1,281.4L17.8,284.2L21.2,290.8L20.5,293.0L18.7,295.0L15.3,295.4L8.4,299.6L4.5,308.3L33.8,319.3L94.6,326.6L128.5,356.6L155.7,369.3L160.3,370.1L172.7,375.7L173.5,374.1L180.1,371.1L183.1,365.9L192.9,365.6L197.0,369.9L202.1,365.6L205.8,366.7L205.6,363.1L210.3,361.7L212.8,366.4L217.1,362.6L219.3,355.6L225.6,355.7L232.5,353.6L232.8,355.2L234.6,355.1L236.8,354.0L236.8,348.9L242.1,344.8L240.9,342.3L241.6,338.7L243.4,337.6L245.7,338.4L249.4,329.8L267.5,329.8L271.7,332.7L272.6,336.1L275.9,340.0L277.2,338.9L279.7,340.3L280.3,345.6L283.9,345.3L285.3,350.4L287.6,350.3L289.8,352.4L291.7,351.7L292.2,348.8L293.8,349.1L295.2,347.6L298.4,350.3L373.9,350.3L376.6,348.2L374.0,347.9L375.2,345.2L374.5,342.6L377.0,338.5L377.6,333.8L375.5,326.1L379.7,321.0L379.4,316.9Z","c":[224.5,234.7],"b":[4.5,75.4,425.7,300.3]},"RR":{"d":"M235.8,44.4L237.5,48.2L235.1,54.3L239.9,61.2L239.7,69.9L244.2,69.2L246.3,70.5L255.4,70.8L255.2,75.7L256.8,77.3L260.8,77.1L263.7,81.1L268.2,81.0L271.4,83.1L270.8,88.9L269.0,91.6L273.0,95.4L275.2,103.3L277.0,104.2L277.7,107.4L277.2,111.9L275.5,113.8L275.5,118.6L277.6,121.8L277.1,124.6L278.5,129.4L280.5,131.3L280.7,133.6L282.5,135.5L282.6,138.8L283.8,139.3L281.0,143.9L281.5,147.0L279.3,148.9L276.7,148.2L276.3,150.7L287.9,159.7L290.8,166.0L297.9,167.3L301.0,170.6L299.2,166.8L297.5,166.0L299.3,157.7L298.5,153.9L301.4,147.6L306.8,145.2L307.0,143.7L314.0,144.9L317.9,150.0L318.1,152.4L320.5,153.2L323.6,152.9L325.0,150.2L328.1,149.7L329.1,147.8L327.3,145.9L327.2,142.8L335.5,124.7L363.0,124.7L362.5,98.5L354.4,96.7L347.7,88.5L343.9,87.5L344.7,85.9L342.2,83.9L343.2,75.6L342.7,74.2L338.9,72.4L338.9,69.4L336.7,64.5L337.5,54.5L341.1,47.7L340.3,46.0L341.1,43.9L339.5,42.5L344.4,39.0L344.5,37.1L346.2,36.8L348.1,33.0L344.8,29.9L345.5,28.4L342.9,27.2L342.9,24.5L344.2,23.0L342.8,21.1L337.1,19.0L332.6,18.8L335.8,14.1L337.1,4.9L334.1,3.3L333.3,1.2L331.3,0.0L328.6,1.7L319.7,1.1L322.4,7.9L319.1,12.3L314.8,13.8L312.5,18.8L308.9,19.7L304.6,18.3L305.7,19.8L299.9,22.1L298.9,25.4L294.4,25.3L292.7,27.5L290.2,27.8L290.0,29.1L288.5,27.3L284.8,29.7L277.8,27.1L275.3,28.9L274.5,31.3L272.8,30.5L269.9,31.4L269.4,34.3L270.8,38.9L270.3,39.8L268.2,38.2L265.4,41.3L262.5,39.5L261.3,36.5L258.9,35.8L259.4,32.9L254.0,32.2L254.4,33.9L252.0,35.5L247.8,31.4L247.5,33.1L243.9,32.9L241.0,34.7L236.1,28.5L226.8,29.1L221.5,24.5L220.8,27.3L228.7,37.1L233.3,39.1Z","c":[303.0,79.4],"b":[220.8,0.0,142.2,170.6]},"PA":{"d":"M620.4,253.5L630.0,245.4L632.7,246.0L635.0,243.9L637.5,239.0L640.1,236.9L641.4,232.0L647.0,227.3L648.2,220.0L656.9,207.6L656.9,203.3L659.0,202.1L657.0,198.6L662.8,194.4L662.7,188.5L666.3,184.9L668.1,176.8L665.7,176.2L665.5,174.6L668.9,173.6L669.9,170.6L668.9,168.0L670.4,164.9L669.2,163.2L671.6,158.8L670.9,156.7L669.7,157.6L669.3,156.3L668.7,157.5L667.9,156.8L668.3,153.3L666.8,154.0L666.2,156.1L661.8,156.8L661.6,154.3L662.9,152.8L661.2,153.0L659.3,155.7L657.8,155.4L658.8,152.2L657.1,151.0L654.0,152.9L652.4,149.7L650.5,152.6L649.7,148.8L647.5,151.0L646.9,148.0L645.2,150.2L645.0,148.1L644.0,148.6L643.8,147.0L641.5,146.0L638.8,147.6L638.9,145.8L637.7,146.0L637.0,148.9L634.9,145.6L633.9,148.8L633.9,146.2L632.2,144.6L630.5,145.3L630.9,146.3L629.6,145.8L628.6,147.9L628.2,145.2L625.6,148.3L623.8,147.7L618.0,154.1L615.2,153.8L613.6,153.0L612.9,149.9L615.5,137.5L603.0,137.0L600.6,135.2L596.3,134.5L591.9,136.0L590.4,134.4L592.4,131.9L592.1,130.3L585.8,129.4L584.2,127.5L589.2,122.9L588.9,122.0L587.0,120.8L581.6,123.0L572.9,122.8L572.8,121.4L576.3,117.1L575.2,115.4L573.7,115.8L571.5,113.9L566.4,116.3L563.6,123.5L560.9,126.6L554.8,129.4L551.2,133.2L547.2,134.8L536.4,151.1L536.0,157.7L533.4,160.1L530.7,159.5L527.5,160.6L527.1,162.0L525.9,159.8L520.8,159.0L518.8,156.8L518.9,152.7L515.8,152.1L516.9,149.0L516.0,145.5L513.4,145.8L512.1,143.6L512.4,139.1L508.4,135.0L506.4,134.8L500.6,121.7L502.2,114.3L494.9,108.1L493.7,103.0L495.1,102.5L494.5,100.7L491.7,100.7L491.8,97.9L483.4,96.2L483.2,95.0L479.1,93.9L477.3,90.4L472.3,87.6L462.8,87.0L462.6,82.1L461.4,80.8L462.4,76.4L457.8,66.9L449.0,68.6L447.4,71.0L439.4,71.4L433.2,68.3L432.1,72.8L430.5,72.2L429.5,74.9L431.6,75.8L431.3,76.7L435.0,80.7L435.0,84.2L432.7,85.7L422.1,82.7L418.7,83.8L417.7,82.8L415.4,83.3L413.4,84.6L410.5,83.2L408.6,83.8L406.5,80.8L402.5,82.7L400.3,81.9L395.7,88.7L393.0,89.4L389.5,88.3L385.0,89.9L383.9,93.7L381.4,93.9L380.7,92.4L376.6,91.6L375.3,94.7L372.4,94.8L372.6,99.7L367.5,99.1L364.8,102.1L363.0,100.7L363.6,139.9L367.1,142.2L367.6,148.2L374.1,153.5L374.2,156.8L380.6,161.9L384.1,158.7L385.3,160.2L384.6,164.4L385.5,166.0L391.3,168.7L392.0,170.8L395.5,171.4L400.1,174.5L403.7,173.9L406.7,176.1L407.9,179.0L412.0,181.4L414.7,181.3L414.3,185.4L416.3,186.3L420.0,184.5L422.7,185.4L430.3,181.7L427.7,185.6L422.7,189.1L421.5,191.8L423.0,192.4L378.1,292.5L373.0,298.1L374.1,303.3L380.2,310.1L380.5,313.3L384.5,317.7L387.0,322.4L388.6,329.5L393.2,335.9L392.1,340.6L394.3,349.3L398.6,350.2L399.4,352.3L403.7,353.4L407.7,357.8L407.2,359.9L408.7,361.1L412.9,361.5L414.5,365.4L416.5,364.5L571.5,376.3L574.8,368.9L576.0,362.5L579.2,359.5L582.5,353.7L586.7,351.3L592.6,340.8L594.2,339.9L595.7,335.5L597.4,325.7L591.8,319.7L591.9,317.9L596.5,311.4L595.9,303.7L600.5,300.2L605.2,299.4L609.0,297.2L609.8,292.9L613.0,289.4L615.8,290.1L614.6,285.0L618.1,283.1L617.0,280.7L619.5,278.7L618.1,274.2L620.9,273.4L621.7,270.7L618.3,269.2L615.6,265.6L610.7,266.3L606.9,264.4ZM585.9,126.5L584.7,127.4L586.2,127.4ZM604.0,135.8L602.7,135.2L602.2,136.4Z","c":[503.1,230.3],"b":[363.0,66.9,308.6,309.3]},"AP":{"d":"M560.5,77.9L551.8,53.2L550.3,45.3L550.9,34.5L548.6,33.7L548.4,29.7L546.1,25.4L537.6,19.0L536.6,22.5L537.9,26.0L537.1,30.3L534.1,32.6L524.3,49.0L520.9,52.4L519.5,59.1L515.5,65.5L515.2,68.6L513.0,72.1L508.6,74.2L507.1,76.8L498.1,76.8L499.3,74.9L497.0,72.8L491.6,75.0L486.8,73.7L487.0,72.1L481.3,75.7L476.2,77.0L470.2,76.2L466.3,73.1L464.8,73.3L464.3,70.3L462.8,69.7L459.7,71.1L462.4,76.4L461.4,80.8L462.6,82.1L462.8,87.0L472.3,87.6L477.3,90.4L479.1,93.9L483.2,95.0L483.4,96.2L491.8,97.9L491.7,100.7L494.5,100.7L495.1,102.5L493.7,103.0L494.9,108.1L502.2,114.3L500.6,121.7L506.4,134.8L508.4,135.0L512.4,139.1L512.1,143.6L513.4,145.8L516.0,145.5L516.9,149.0L515.8,152.1L518.9,152.7L518.8,156.8L520.8,159.0L525.9,159.8L527.1,162.0L527.5,160.6L530.7,159.5L533.4,160.1L536.0,157.7L536.4,151.1L547.2,134.8L551.2,133.2L554.8,129.4L560.9,126.6L563.6,123.5L566.4,116.3L571.5,113.9L571.6,112.8L574.6,112.2L579.6,106.0L578.8,89.2L573.1,86.2L566.7,86.3ZM564.7,76.8L563.7,77.7L564.7,79.0L566.8,78.5ZM566.1,78.7L564.8,79.1L564.4,81.3L566.7,84.8L569.3,82.8L568.3,80.0Z","c":[529.6,95.4],"b":[459.7,19.0,119.9,143.0]},"TO":{"d":"M638.7,291.2L639.9,286.9L637.5,269.8L635.6,267.3L629.2,265.4L626.5,261.7L620.6,262.1L616.3,259.9L612.5,260.5L610.5,264.1L609.2,263.4L606.9,264.4L610.7,266.3L615.6,265.6L618.3,269.2L621.7,270.7L620.9,273.4L618.1,274.2L619.5,278.7L617.0,280.7L618.1,283.1L614.6,285.0L615.8,290.1L613.0,289.4L609.8,292.9L609.0,297.2L605.2,299.4L600.5,300.2L595.9,303.7L596.5,311.4L591.9,317.9L592.8,321.9L597.4,325.7L594.2,339.9L592.6,340.8L586.7,351.3L582.5,353.7L579.2,359.5L576.0,362.5L574.4,370.1L567.4,384.1L566.9,389.0L562.4,396.6L563.2,399.0L561.7,403.4L562.3,406.8L559.1,416.6L559.2,418.7L561.1,419.9L559.6,423.5L561.6,427.1L560.4,430.9L561.9,441.4L560.1,446.0L561.2,446.1L561.9,449.9L564.6,451.4L565.4,447.8L568.0,443.9L573.5,439.9L569.8,447.7L570.1,450.9L577.5,453.4L592.1,461.7L592.9,456.5L595.3,452.0L598.2,449.7L598.9,452.2L601.6,453.8L604.7,450.2L607.8,454.9L610.6,456.4L611.1,462.7L612.6,458.4L613.8,458.9L613.9,461.8L621.6,458.7L620.9,462.4L623.1,462.0L623.5,460.8L625.8,462.7L629.3,462.7L632.7,466.6L634.1,464.3L633.0,460.1L634.2,457.5L639.0,461.7L639.9,460.7L642.3,461.5L643.7,459.7L645.4,460.1L652.6,456.6L655.1,454.1L662.2,454.2L663.1,450.5L664.3,451.5L664.2,454.6L670.4,452.9L665.7,453.5L666.7,446.2L665.7,445.9L668.4,442.6L666.7,442.4L665.9,439.1L664.2,438.7L664.2,432.5L663.0,430.7L667.2,428.0L664.0,426.7L665.7,422.2L664.9,420.3L671.2,420.7L664.7,417.7L662.6,418.1L659.3,413.6L664.9,403.6L666.7,403.5L666.9,400.4L668.2,400.1L669.3,396.6L677.5,391.6L678.0,388.3L680.4,386.7L680.3,384.7L678.1,386.9L675.6,386.8L675.3,389.5L672.5,387.1L672.4,384.6L669.2,385.5L668.1,384.4L664.3,384.4L662.4,382.1L660.8,375.2L657.6,373.8L660.2,369.3L659.3,367.2L652.8,362.6L653.4,360.6L651.2,357.4L647.7,356.6L649.8,353.2L649.3,352.3L651.1,351.8L651.1,346.6L652.7,342.2L654.4,339.6L660.0,338.3L661.9,332.2L661.1,329.8L658.6,327.9L648.0,331.7L637.0,316.5L634.9,316.5L637.2,314.9L637.1,312.8L634.8,312.1L633.4,313.1L631.3,310.9L631.2,309.6L633.2,309.3L635.9,305.9Z","c":[617.1,383.9],"b":[559.1,259.9,121.3,206.6]},"MA":{"d":"M624.4,250.2L606.9,264.4L609.2,263.4L610.5,264.1L612.5,260.5L616.3,259.9L620.6,262.1L627.8,262.2L629.2,265.4L631.2,265.2L637.1,268.8L640.0,287.4L635.9,305.9L633.2,309.3L631.2,309.6L631.3,310.9L633.4,313.1L634.8,312.1L637.1,312.8L637.2,314.9L634.9,316.5L637.0,316.5L648.0,331.7L658.6,327.9L661.7,330.8L660.0,338.3L654.4,339.6L652.7,342.2L651.1,346.6L651.1,351.8L649.3,352.3L649.8,353.2L647.7,356.6L651.2,357.4L653.4,360.6L652.8,362.6L659.3,367.2L660.2,369.3L657.6,373.8L660.8,375.2L662.4,382.1L664.3,384.4L668.1,384.4L669.2,385.5L672.4,384.6L673.8,386.4L676.1,383.0L677.4,374.6L676.9,369.3L678.2,367.3L675.4,362.7L675.6,359.9L673.2,353.5L674.1,350.7L677.0,348.2L681.2,336.7L683.1,334.3L686.2,322.2L689.1,319.9L699.0,317.2L701.6,314.5L704.6,315.4L707.6,311.2L713.7,308.5L719.9,299.8L728.1,298.0L731.8,299.3L734.3,301.7L739.3,299.7L745.4,299.3L747.3,296.8L749.4,289.1L748.8,286.9L744.1,283.2L742.8,274.6L743.0,271.0L749.5,264.4L750.1,260.5L748.8,254.2L746.5,250.0L748.9,243.2L746.1,239.8L745.6,236.3L751.5,229.0L753.1,222.7L757.4,217.0L758.0,218.0L764.5,216.7L766.4,212.6L769.0,212.1L773.6,206.4L774.2,205.0L772.5,202.7L774.0,199.2L763.2,197.9L763.0,199.9L761.2,199.7L737.8,189.5L734.2,189.8L734.2,193.2L732.4,191.5L731.9,193.0L728.5,193.9L727.0,192.6L729.8,191.0L731.0,188.1L730.2,187.3L728.0,188.3L727.8,190.7L726.1,192.0L726.0,190.8L725.1,191.4L724.8,193.7L717.7,200.2L714.8,200.0L720.4,194.7L720.5,191.2L713.9,193.2L712.1,195.1L710.4,205.5L708.0,207.1L705.3,206.3L706.1,198.6L712.6,189.4L710.1,184.7L704.9,188.0L709.3,182.3L707.3,181.8L709.6,180.8L706.8,174.6L705.5,174.0L705.7,175.0L703.1,175.8L704.4,174.3L702.5,173.1L705.9,171.5L704.3,169.9L701.1,170.4L700.7,171.5L699.3,170.9L700.9,168.1L700.5,166.4L697.8,168.6L698.3,170.1L697.0,168.2L693.4,168.0L690.7,171.1L689.4,171.0L689.6,168.3L688.0,167.8L690.0,166.9L689.8,164.5L689.0,164.0L685.7,168.1L685.8,165.4L687.3,163.7L685.0,165.5L684.7,164.1L681.7,162.9L682.4,160.1L680.6,163.0L679.5,162.0L680.6,159.9L679.8,159.3L678.7,161.1L676.8,161.5L676.2,157.5L674.1,161.0L673.7,157.8L669.2,163.2L670.4,164.9L668.9,168.0L669.4,173.0L665.5,174.6L665.7,176.2L668.1,176.8L666.3,184.9L662.7,188.5L662.8,194.4L657.0,198.6L659.0,202.1L656.9,203.3L656.9,207.6L655.1,209.0L655.8,209.9L653.5,213.7L650.8,215.3L648.2,220.0L647.0,227.3L641.4,232.0L640.1,236.9L637.5,239.0L634.3,244.8L632.7,246.0L630.0,245.4ZM709.6,199.1L707.1,201.3L706.0,205.6L707.0,206.3L709.7,204.9ZM698.0,162.9L696.5,164.1L697.1,166.1L700.4,164.3ZM703.1,167.8L702.2,168.9L703.2,169.0ZM732.2,190.0L730.5,190.5L731.3,191.6Z","c":[690.2,257.6],"b":[606.9,157.5,167.3,228.9]},"PI":{"d":"M799.0,336.5L803.2,333.9L804.3,329.5L804.1,325.9L801.2,324.5L802.5,321.9L800.2,317.5L804.2,315.3L807.1,306.4L807.1,302.2L808.5,300.6L807.0,300.9L806.0,298.9L799.8,296.9L798.5,293.7L798.5,288.2L795.6,281.8L796.4,280.0L794.8,272.5L795.7,270.9L795.1,260.0L791.4,257.9L787.4,252.5L788.3,250.1L787.4,249.7L789.0,247.6L787.6,245.1L791.0,235.3L790.5,231.7L787.6,231.3L788.1,229.4L786.4,226.4L787.6,223.7L785.3,223.0L784.5,219.9L786.1,218.2L785.6,215.6L783.4,214.7L787.2,208.1L786.8,205.2L783.8,203.6L778.6,203.4L773.5,199.9L772.5,202.7L774.2,205.0L769.8,211.3L766.4,212.6L764.5,216.7L758.0,218.0L757.4,217.0L753.1,222.7L751.5,229.0L745.6,236.3L746.1,239.8L748.9,243.2L746.5,250.0L748.8,254.2L750.1,260.5L749.5,264.4L743.0,271.0L742.8,274.6L744.1,283.2L748.8,286.9L749.4,289.1L747.3,296.8L745.4,299.3L739.3,299.7L734.3,301.7L731.8,299.3L728.1,298.0L719.9,299.8L713.7,308.5L707.6,311.2L704.6,315.4L701.6,314.5L699.0,317.2L689.1,319.9L686.2,322.2L683.1,334.3L681.2,336.7L677.0,348.2L674.1,350.7L673.2,353.5L675.6,359.9L675.4,362.7L678.2,367.3L676.9,369.3L677.4,374.6L676.1,383.0L672.5,387.1L675.3,389.5L675.6,386.8L678.1,386.9L679.8,384.1L682.7,382.9L687.7,391.3L686.4,392.9L686.7,395.5L688.6,398.5L691.3,400.7L695.2,401.1L698.8,403.3L705.2,399.1L705.1,397.3L707.3,395.8L709.2,396.4L712.9,393.9L714.8,395.7L717.9,396.2L719.5,394.7L720.6,390.5L722.7,391.1L727.0,382.1L729.2,381.0L728.2,378.1L729.6,376.3L726.4,374.3L725.0,371.2L724.8,369.3L726.5,366.6L734.7,361.9L738.4,365.8L742.3,364.6L745.6,365.3L746.6,368.3L750.8,370.7L752.1,369.1L757.5,367.6L761.7,363.2L773.2,361.4L775.8,356.0L780.2,354.4L784.2,348.0L788.2,346.5L792.4,341.2L793.9,340.4L795.1,341.5Z","c":[746.0,315.2],"b":[672.5,199.9,136.1,203.4]},"CE":{"d":"M808.5,201.3L805.4,200.6L803.2,202.1L797.1,203.1L786.9,203.1L785.6,204.7L786.8,205.2L787.2,208.1L783.4,214.7L785.6,215.6L786.1,218.2L784.5,219.9L785.3,223.0L787.6,223.7L786.4,226.4L788.1,229.4L787.6,231.3L790.6,232.1L790.5,238.9L787.6,245.1L789.0,247.6L787.4,249.7L788.3,250.1L787.4,252.5L791.4,257.9L795.1,260.0L795.7,270.9L794.8,272.5L796.4,280.0L795.6,281.8L798.5,288.2L798.5,293.7L800.3,297.5L808.5,300.6L807.1,302.2L807.1,306.4L804.8,313.5L807.9,314.7L811.1,313.0L814.3,315.0L824.5,313.9L828.3,317.6L830.4,317.3L830.1,319.8L837.9,323.4L839.4,326.3L842.3,326.6L842.9,324.4L847.7,322.0L849.8,319.3L852.7,312.8L849.1,310.2L849.4,306.7L847.1,305.4L847.1,303.3L850.8,300.1L849.3,298.2L852.6,291.1L851.3,290.0L852.8,285.4L855.8,282.1L858.9,282.3L862.6,277.7L864.4,274.0L863.5,272.5L867.9,268.2L874.2,253.9L883.5,251.5L881.3,248.0L875.1,246.2L871.0,240.8L865.3,237.1L854.4,223.7L849.8,222.9L835.3,211.4L819.4,202.7Z","c":[826.8,258.0],"b":[783.4,200.6,100.1,126.0]},"RN":{"d":"M901.5,290.3L904.1,288.0L906.5,287.9L906.6,290.5L908.2,291.4L911.8,290.7L915.0,292.9L921.7,291.8L934.2,294.4L935.4,293.0L936.3,293.8L938.4,292.8L936.8,286.5L935.4,285.2L931.4,267.7L927.6,261.2L922.8,258.6L914.1,256.8L909.8,258.1L896.4,257.8L890.5,253.7L885.8,254.4L883.5,251.5L874.2,253.9L867.9,268.2L863.5,272.5L864.4,274.0L862.6,277.7L858.1,282.8L855.1,282.6L851.5,288.6L852.0,289.5L854.5,288.9L853.9,290.3L858.6,293.2L862.6,293.6L871.2,287.9L871.7,285.3L878.5,284.2L884.0,281.3L885.4,281.8L885.8,284.4L880.8,288.7L880.0,293.3L878.4,293.9L877.9,298.3L882.0,297.8L883.4,300.8L884.9,301.2L889.5,298.3L890.6,300.1L893.5,298.8L896.1,301.5L895.2,303.9L896.6,304.9L901.4,301.0L900.2,298.3L901.3,295.4L903.1,296.3L903.0,294.7L901.0,293.1Z","c":[897.4,276.6],"b":[851.5,251.5,86.9,53.4]},"PB":{"d":"M875.8,317.7L877.6,314.6L883.3,312.4L889.2,315.6L889.9,317.4L886.7,318.8L884.8,321.3L885.9,324.9L881.1,329.1L885.7,330.4L885.7,334.7L889.8,338.0L898.5,333.2L898.9,329.2L899.9,328.0L902.9,328.3L904.0,325.7L907.3,326.2L908.4,324.6L913.5,325.8L924.2,322.0L925.8,317.6L931.7,314.9L936.0,315.5L938.6,318.9L941.7,319.2L942.6,309.4L938.4,292.8L936.3,293.8L935.4,293.0L934.2,294.4L921.7,291.8L915.0,292.9L911.8,290.7L908.2,291.4L906.6,290.5L906.5,287.9L904.1,288.0L903.2,289.7L901.6,289.6L900.8,291.9L903.1,296.3L901.3,295.4L900.2,298.3L901.4,301.0L896.6,304.9L895.2,303.9L896.1,301.5L893.5,298.8L890.6,300.1L889.5,298.3L884.9,301.2L883.4,300.8L882.0,297.8L877.9,298.3L878.4,293.9L880.0,293.3L880.8,288.7L885.8,284.4L885.4,281.8L884.0,281.3L878.5,284.2L871.7,285.3L871.2,287.9L862.6,293.6L858.6,293.2L853.9,290.3L854.5,288.9L852.7,289.1L851.3,290.0L852.6,291.1L849.3,298.2L850.8,300.1L847.1,303.3L847.1,305.4L849.4,306.7L849.1,310.2L852.7,312.8L848.3,321.0L851.2,324.3L855.7,323.7L857.0,322.4L858.9,326.3L861.6,324.9L863.7,326.2L864.6,324.2L866.5,324.6L869.0,321.8L871.1,321.9Z","c":[893.8,308.6],"b":[847.1,281.3,95.5,56.7]},"PE":{"d":"M784.8,348.0L790.2,348.0L792.9,351.4L795.3,351.2L797.7,357.3L801.3,360.0L799.0,366.4L802.4,367.3L807.4,364.1L808.8,364.7L811.7,356.7L814.3,358.1L818.5,356.5L820.4,353.7L820.0,351.1L824.8,350.3L824.9,346.9L832.3,343.7L834.6,344.5L835.8,348.0L840.7,348.8L842.6,350.5L846.1,350.0L850.2,355.0L851.8,351.1L853.2,351.1L854.2,352.0L853.4,354.9L855.8,356.3L857.7,355.1L858.6,356.2L857.7,357.3L859.8,363.5L863.3,359.6L866.0,359.0L871.4,351.5L873.7,355.1L876.9,354.4L879.6,355.5L884.1,361.0L887.4,361.5L889.5,364.1L891.1,364.7L892.5,362.2L900.0,363.6L903.2,360.6L907.2,359.5L907.2,357.9L910.9,355.8L910.5,354.3L915.7,351.9L918.5,351.5L919.7,353.3L924.7,350.9L934.0,353.2L941.8,329.4L941.3,322.7L942.3,321.2L941.7,319.2L938.6,318.9L936.0,315.5L931.7,314.9L925.8,317.6L924.2,322.0L913.5,325.8L908.4,324.6L907.3,326.2L904.0,325.7L902.9,328.3L899.9,328.0L898.9,329.2L898.5,333.2L889.8,338.0L885.7,334.7L885.7,330.4L881.1,329.1L885.9,324.9L884.8,321.3L885.6,319.8L889.9,317.4L889.2,315.6L883.9,312.3L877.6,314.6L876.9,317.1L873.8,318.6L871.1,321.9L869.0,321.8L866.5,324.6L864.6,324.2L863.7,326.2L861.6,324.9L858.9,326.3L857.0,322.4L855.7,323.7L851.2,324.3L848.3,321.0L842.9,324.4L842.3,326.6L839.4,326.3L837.9,323.4L830.1,319.8L830.4,317.3L828.3,317.6L824.5,313.9L814.3,315.0L811.1,313.0L807.9,314.7L804.8,313.5L804.2,315.3L800.2,317.5L802.5,321.9L801.2,324.5L804.5,326.9L803.2,333.9L798.6,336.9L797.7,339.4L795.1,341.5L793.9,340.4L792.4,341.2L788.2,346.5Z","c":[865.6,338.6],"b":[784.8,312.3,157.5,55.0]},"AL":{"d":"M865.2,359.2L863.3,359.6L859.8,363.5L860.6,365.8L863.6,366.3L875.8,373.7L881.2,375.0L888.0,379.7L889.7,379.5L893.3,384.9L896.3,386.8L898.4,386.5L900.1,390.6L902.5,390.4L904.3,392.6L907.4,386.8L912.5,382.1L918.1,373.5L929.5,361.1L934.0,353.2L924.7,350.9L919.7,353.3L918.5,351.5L915.7,351.9L910.5,354.3L910.9,355.8L907.2,357.9L907.2,359.5L903.2,360.6L900.0,363.6L892.5,362.2L891.1,364.7L888.2,363.2L887.4,361.5L884.1,361.0L879.6,355.5L876.9,354.4L873.7,355.1L871.4,351.5Z","c":[898.5,368.1],"b":[859.8,350.9,74.2,41.8]},"SE":{"d":"M891.5,383.3L890.5,380.1L883.7,377.5L881.2,375.0L875.8,373.7L868.1,368.8L865.4,368.1L864.1,370.0L865.4,377.8L867.9,378.2L870.7,381.3L871.7,388.6L869.0,390.3L870.2,396.4L866.8,399.1L864.5,397.7L860.6,397.9L859.8,402.2L863.1,405.5L864.4,409.6L866.0,410.1L866.3,414.8L870.3,418.1L873.2,419.1L874.4,418.0L877.1,418.8L879.2,417.8L882.1,415.6L893.1,398.7L904.1,392.6L902.5,390.4L900.1,390.6L898.4,386.5L896.3,386.8Z","c":[879.1,394.9],"b":[859.8,368.1,44.3,51.0]},"BA":{"d":"M832.9,344.1L824.9,346.9L824.8,350.3L820.0,351.1L820.4,353.7L818.5,356.5L814.3,358.1L811.7,356.7L808.8,364.7L807.4,364.1L802.4,367.3L799.0,366.4L800.9,362.3L800.9,358.7L798.1,357.8L795.3,351.2L792.9,351.4L790.2,348.0L784.2,348.0L780.2,354.4L775.8,356.0L773.2,361.4L761.7,363.2L757.5,367.6L752.1,369.1L750.8,370.7L746.6,368.3L745.6,365.3L742.3,364.6L738.4,365.8L734.7,361.9L733.3,362.1L725.1,368.4L726.4,374.3L729.6,376.3L728.2,378.1L729.2,381.0L727.0,382.1L722.7,391.1L720.6,390.5L719.5,394.7L717.9,396.2L714.8,395.7L712.9,393.9L709.2,396.4L707.3,395.8L705.1,397.3L705.2,399.1L698.8,403.3L695.2,401.1L691.3,400.7L686.7,395.5L686.4,392.9L687.7,391.3L682.7,382.9L679.8,384.1L680.4,386.7L678.0,388.3L677.5,391.6L669.3,396.6L668.2,400.1L666.9,400.4L666.7,403.5L664.9,403.6L659.3,413.6L662.6,418.1L664.7,417.7L671.2,420.7L664.9,420.3L665.7,422.2L664.0,426.7L667.2,428.0L663.0,430.7L664.2,432.5L664.2,438.7L665.9,439.1L666.7,442.4L668.4,442.6L665.7,445.9L666.7,446.2L665.7,453.5L670.4,452.9L665.2,457.4L666.1,462.8L670.6,461.3L671.5,462.3L667.6,465.3L667.6,469.4L669.2,469.9L667.0,471.9L667.8,474.0L666.5,474.6L667.5,476.0L666.8,478.5L668.6,483.6L671.7,484.7L675.4,488.7L672.7,491.6L673.5,495.2L672.2,501.6L673.9,503.8L672.0,508.8L670.3,509.8L670.8,510.8L671.7,511.2L674.1,508.3L679.4,507.7L692.2,498.3L694.9,498.6L707.6,488.3L713.0,486.0L721.3,486.4L726.4,488.3L724.1,493.8L724.9,496.5L731.2,498.5L732.5,500.1L735.1,497.7L741.1,496.0L746.4,497.4L760.8,507.2L765.6,507.1L767.0,509.2L774.1,507.2L784.8,517.2L785.4,523.2L789.9,523.9L794.3,520.8L795.7,521.9L797.8,520.8L800.6,521.3L803.9,524.7L806.6,523.7L808.3,525.1L811.8,524.7L813.6,527.3L815.6,527.6L817.3,529.6L819.5,529.6L820.9,532.4L819.4,536.7L817.7,537.4L815.8,541.0L814.8,540.8L813.7,543.6L810.8,543.9L809.4,548.8L811.4,550.3L810.6,552.0L805.9,551.4L804.4,554.1L803.1,565.0L812.0,572.8L813.2,575.7L811.1,577.5L812.1,578.9L825.4,587.8L829.7,579.3L835.0,576.0L838.2,571.6L837.0,569.8L836.4,558.5L838.6,551.8L838.1,548.4L841.2,535.7L845.0,525.9L843.0,521.3L840.0,498.4L843.2,478.3L841.5,474.2L842.2,471.6L843.9,471.5L843.1,468.5L844.1,466.4L843.8,464.5L842.7,464.6L842.5,461.5L850.0,455.3L854.2,455.3L857.0,453.8L864.4,445.9L873.1,432.5L881.4,416.1L877.1,418.8L870.3,418.1L866.3,414.8L866.0,410.1L864.4,409.6L863.1,405.5L859.8,402.2L860.6,397.9L864.5,397.7L866.8,399.1L870.2,396.4L869.0,390.3L871.7,388.6L870.7,381.3L867.9,378.2L865.4,377.8L864.1,370.0L865.4,368.1L863.6,366.3L860.6,365.8L858.0,359.0L858.6,356.2L857.7,355.1L855.8,356.3L853.4,354.9L854.2,352.0L853.2,351.1L851.8,351.1L850.8,354.3L849.3,354.6L848.5,351.9L846.1,350.0L842.6,350.5L840.7,348.8L835.8,348.0L834.6,344.5Z","c":[776.1,441.8],"b":[659.3,344.1,222.1,243.7]},"MG":{"d":"M632.7,588.3L626.1,591.8L618.5,587.6L616.8,588.6L611.5,587.5L605.1,588.7L603.0,587.0L599.1,589.8L597.9,589.0L595.9,589.9L595.0,592.4L591.2,595.5L589.0,591.6L581.9,595.4L576.2,594.4L575.0,596.1L569.4,596.8L564.6,603.1L564.1,606.8L560.7,607.7L557.3,611.5L555.9,614.8L557.1,616.1L553.8,616.8L554.7,618.8L553.2,619.0L551.8,622.6L552.9,631.3L555.1,629.0L565.6,623.7L568.8,625.9L574.4,626.1L576.9,627.4L587.7,626.8L590.1,628.6L595.0,628.4L593.6,632.1L595.6,636.8L598.1,635.9L599.4,633.0L601.3,633.4L601.9,639.2L603.3,640.1L605.3,633.2L615.3,632.0L618.7,632.8L619.8,632.4L619.5,629.9L622.5,632.8L624.5,632.3L625.5,630.1L627.5,632.3L628.6,628.9L631.9,628.6L633.7,630.4L637.9,628.3L639.3,631.2L642.8,633.2L643.5,634.6L642.1,640.4L645.4,642.1L646.7,645.2L643.3,651.2L645.6,653.6L646.2,658.7L649.2,663.0L648.8,664.5L654.7,663.1L660.6,665.3L660.8,668.2L656.5,674.9L658.3,678.9L655.8,681.1L658.4,682.7L655.7,686.6L657.1,689.3L663.2,692.9L663.7,695.5L661.8,696.5L665.1,698.1L664.1,699.4L664.8,701.5L669.7,700.6L669.8,702.0L675.3,699.6L676.2,700.7L680.1,698.1L677.7,696.4L680.4,695.2L679.7,693.6L680.9,693.3L681.2,695.2L683.3,694.0L683.2,695.2L684.6,695.1L685.6,693.7L687.6,695.3L695.9,690.7L698.0,690.8L703.7,688.0L705.3,688.5L710.8,685.2L715.0,685.7L726.6,680.6L734.1,680.8L736.9,679.1L742.1,679.7L741.9,681.6L743.5,681.3L748.1,678.0L762.9,671.9L760.5,670.2L763.1,666.1L762.3,665.5L764.8,660.3L764.3,658.5L767.4,654.8L765.7,653.4L769.8,652.5L773.8,645.5L774.1,639.7L772.7,638.5L775.2,634.3L784.2,633.9L786.2,627.6L788.9,626.5L789.3,621.0L794.7,615.8L794.2,607.3L791.9,605.7L791.8,602.9L787.5,600.7L787.8,599.2L790.7,600.3L795.4,599.7L794.8,596.6L792.1,595.2L792.8,590.8L789.0,590.3L789.6,587.1L792.1,583.5L795.6,582.3L798.9,583.3L795.7,579.1L797.4,578.3L800.5,580.0L805.0,576.8L812.1,578.9L811.1,577.5L813.2,575.7L812.0,572.8L803.1,565.0L804.2,561.6L803.7,556.1L805.9,551.4L810.6,552.0L811.4,550.3L809.4,548.8L810.8,543.9L813.7,543.6L814.8,540.8L815.8,541.0L817.7,537.4L819.4,536.7L820.9,532.4L819.5,529.6L817.3,529.6L815.6,527.6L813.6,527.3L811.8,524.7L808.3,525.1L806.6,523.7L803.9,524.7L800.6,521.3L797.8,520.8L795.7,521.9L794.3,520.8L789.9,523.9L785.4,523.2L784.8,517.2L774.1,507.2L767.0,509.2L765.6,507.1L760.8,507.2L746.4,497.4L741.1,496.0L735.1,497.7L732.5,500.1L731.2,498.5L724.9,496.5L724.1,493.8L726.4,488.3L721.3,486.4L713.0,486.0L707.6,488.3L694.9,498.6L692.2,498.3L679.4,507.7L674.1,508.3L671.7,511.2L670.3,509.8L673.7,505.6L673.0,502.3L666.2,502.9L665.4,500.1L661.0,497.3L659.6,499.3L661.0,506.0L658.1,506.9L652.5,505.0L650.9,506.1L651.8,507.5L650.8,511.1L651.7,510.6L653.0,512.8L650.8,515.7L650.4,518.7L652.6,520.1L653.7,526.4L646.5,528.6L645.8,527.8L643.6,530.0L642.2,529.8L640.6,532.9L641.3,535.4L638.0,542.2L643.0,546.1L644.1,551.4L646.0,553.9L638.5,562.4L636.8,562.6L636.2,565.9L637.9,567.8L641.3,567.5L642.7,569.7L640.6,574.8L642.3,580.4L635.4,584.7Z","c":[705.1,590.7],"b":[551.8,486.0,269.1,215.9]},"ES":{"d":"M786.8,627.8L783.5,634.3L775.2,634.3L772.7,638.5L774.1,641.1L772.3,648.3L775.6,649.5L775.7,656.6L782.9,659.5L791.2,659.6L794.3,661.6L799.2,650.7L803.4,649.1L807.7,644.1L810.5,636.3L812.6,634.6L813.8,627.8L818.2,622.4L822.0,620.5L823.9,616.0L824.9,611.9L823.5,597.0L825.4,587.8L809.1,577.5L805.0,576.8L800.5,580.0L798.2,578.3L795.7,579.1L798.9,583.3L795.6,582.3L792.1,583.5L789.6,587.1L789.0,590.3L792.8,590.8L792.1,595.2L794.8,596.6L795.4,599.7L790.7,600.3L787.8,599.2L787.5,600.7L791.8,602.9L791.9,605.7L794.2,607.3L794.7,615.8L789.3,621.0L788.9,626.5Z","c":[801.2,618.5],"b":[772.3,576.8,53.1,84.8]},"RJ":{"d":"M705.9,701.7L702.2,703.4L701.4,707.9L699.8,709.5L703.8,713.0L705.8,712.1L707.0,712.9L708.5,710.7L703.9,708.9L704.8,705.7L710.7,704.0L711.1,702.7L713.1,702.0L713.9,703.9L716.4,704.8L718.5,704.5L719.4,702.7L724.1,701.8L726.1,701.8L732.1,705.4L738.0,704.3L741.7,702.7L738.6,698.4L743.3,695.9L744.6,697.5L742.0,700.9L742.6,702.7L768.4,703.1L771.5,698.4L769.4,695.6L770.2,692.3L776.8,686.5L788.2,682.4L793.8,678.7L793.1,669.6L791.6,667.2L794.3,661.6L791.2,659.6L782.9,659.5L775.7,656.6L775.6,649.5L772.3,648.3L769.8,652.5L765.7,653.4L767.4,654.8L764.3,658.5L764.8,660.3L762.3,665.5L763.1,666.1L760.5,670.2L762.9,671.9L748.1,678.0L743.5,681.3L741.9,681.6L742.1,679.7L736.9,679.1L734.1,680.8L726.6,680.6L715.0,685.7L710.8,685.2L705.3,688.5L701.9,688.8L705.7,694.0L708.9,694.9L712.0,693.3L717.2,695.7L714.8,699.6L710.0,701.0L709.3,700.1ZM712.8,709.2L719.0,708.2L716.0,706.1L713.9,706.9Z","c":[753.7,683.8],"b":[699.8,648.3,94.5,64.8]},"SP":{"d":"M656.5,674.9L660.8,668.2L660.6,665.3L654.7,663.1L648.8,664.5L649.2,663.0L646.2,658.7L645.6,653.6L643.3,651.2L646.7,645.2L645.4,642.1L642.1,640.4L643.5,634.6L642.8,633.2L639.3,631.2L637.9,628.3L633.7,630.4L631.9,628.6L628.6,628.9L627.5,632.3L625.5,630.1L624.5,632.3L622.5,632.8L619.5,629.9L619.8,632.4L618.7,632.8L615.3,632.0L605.3,633.2L603.3,640.1L601.9,639.2L601.3,633.4L599.4,633.0L596.6,637.0L594.7,635.6L593.6,630.7L595.0,628.4L590.1,628.6L587.7,626.8L576.9,627.4L574.4,626.1L568.8,625.9L565.6,623.7L553.6,630.1L550.3,636.2L544.6,638.0L538.4,645.7L537.9,652.7L535.7,653.4L533.9,656.6L531.7,657.8L532.2,662.5L529.7,666.4L527.0,666.9L527.5,670.9L519.0,682.5L504.8,691.3L502.3,694.5L506.6,693.1L512.1,694.6L514.7,693.1L516.8,694.8L522.8,694.3L523.5,695.8L525.1,695.0L526.2,691.8L535.6,695.6L546.5,695.6L549.8,697.9L555.4,698.8L557.8,702.7L563.1,701.5L572.0,702.7L577.3,701.3L579.1,705.2L583.5,706.6L585.3,709.2L587.0,714.6L586.0,719.1L587.8,721.4L586.4,724.8L592.9,732.2L592.5,734.3L594.1,736.3L596.1,737.4L593.4,742.6L593.5,745.3L596.0,746.2L600.7,745.1L611.3,746.0L613.0,747.4L610.6,753.8L611.7,755.8L615.1,753.2L616.6,754.6L619.3,753.5L621.2,757.4L620.6,758.8L622.3,759.9L624.5,759.4L622.7,761.4L626.9,757.7L628.8,753.1L649.0,739.0L649.2,736.9L652.8,734.2L664.6,728.1L665.4,729.4L668.4,728.6L669.9,725.2L673.8,723.4L678.8,722.9L686.8,724.6L687.4,719.4L691.3,718.7L691.9,717.0L693.3,717.3L693.0,716.2L695.5,716.3L695.9,714.3L699.4,712.2L701.0,713.5L703.8,713.0L699.8,709.5L701.4,707.9L702.2,703.4L709.3,700.1L710.0,701.0L714.8,699.6L717.0,696.5L716.8,694.9L712.0,693.3L708.9,694.9L705.7,694.0L703.1,689.3L701.8,689.1L694.2,691.4L687.6,695.3L685.6,693.7L684.6,695.1L683.2,695.2L683.3,694.0L681.2,695.2L680.9,693.3L679.7,693.6L680.4,695.2L677.7,696.4L680.1,698.1L676.2,700.7L675.3,699.6L669.8,702.0L669.7,700.6L664.8,701.5L664.1,699.4L665.1,698.1L661.8,696.5L663.7,695.5L663.2,692.9L657.1,689.3L655.7,686.6L658.4,682.7L655.8,681.1L658.3,678.9ZM690.2,725.5L691.6,723.4L689.0,722.0L686.1,726.0L687.4,727.2L689.9,726.5L690.7,727.9L691.5,726.5Z","c":[607.5,685.5],"b":[502.3,623.7,214.8,137.7]},"PR":{"d":"M597.9,745.8L593.5,745.3L593.4,742.6L596.1,737.4L594.1,736.3L592.5,734.3L592.9,732.2L586.4,724.8L587.8,721.4L586.0,719.1L587.0,714.6L585.3,709.2L583.5,706.6L579.1,705.2L577.3,701.3L572.0,702.7L563.1,701.5L557.8,702.7L555.4,698.8L549.8,697.9L546.5,695.6L535.6,695.6L526.2,691.8L525.1,695.0L523.5,695.8L522.8,694.3L516.8,694.8L514.7,693.1L512.1,694.6L505.5,693.2L491.6,701.1L486.5,712.8L481.0,715.5L478.3,727.6L472.7,731.7L474.5,737.6L472.9,740.4L472.7,746.1L470.2,752.2L470.5,757.5L465.9,764.9L466.5,768.4L470.5,770.1L471.4,768.6L473.6,767.6L475.9,768.1L478.0,766.1L477.9,767.5L484.0,770.1L484.5,776.9L489.4,784.8L491.4,785.7L498.0,784.7L502.5,788.3L511.1,787.1L514.5,788.9L524.4,789.7L531.8,793.4L541.0,793.2L543.0,796.4L543.5,795.1L547.1,794.2L545.8,789.4L548.0,786.0L551.0,784.3L555.1,784.8L555.3,785.8L558.6,784.1L559.7,784.7L561.8,780.1L564.6,779.2L569.2,781.9L569.0,780.7L571.0,779.3L572.4,780.3L573.6,779.2L578.5,779.0L587.8,784.4L597.0,778.6L610.7,778.0L614.5,769.8L617.3,768.3L618.4,766.5L617.6,766.0L619.9,765.5L624.5,759.4L622.3,759.9L620.6,758.8L621.2,757.4L619.3,753.5L616.6,754.6L615.1,753.2L611.7,755.8L610.6,753.8L613.0,747.4L611.3,746.0Z","c":[538.1,744.6],"b":[465.9,691.8,158.6,104.6]},"SC":{"d":"M518.2,789.5L511.1,787.1L502.5,788.3L498.0,784.7L492.9,786.1L489.4,784.8L487.8,788.4L487.0,797.1L488.6,802.0L485.6,804.5L484.7,807.7L492.3,808.5L492.6,807.2L495.6,805.8L497.7,806.8L497.0,808.7L500.3,808.3L500.7,807.1L503.1,807.4L503.6,805.6L504.8,808.6L508.4,807.7L512.2,810.5L512.6,809.6L517.3,810.1L518.4,808.9L518.8,810.5L521.6,811.4L521.5,810.1L522.6,809.9L523.4,811.7L525.8,811.0L529.2,812.8L532.8,816.5L537.7,815.6L539.0,817.8L541.3,817.5L542.8,819.8L545.3,820.3L546.3,822.2L551.6,825.1L552.9,827.4L554.7,827.7L556.3,831.8L557.8,831.8L558.9,834.6L563.8,839.0L571.1,839.1L574.6,840.4L577.6,839.3L583.0,840.7L584.1,844.0L582.8,843.7L577.9,847.6L578.0,855.0L576.5,857.3L573.4,858.2L573.5,860.0L575.9,862.1L574.2,859.8L578.0,858.2L583.8,861.4L591.9,852.2L605.1,843.5L607.1,840.9L607.3,837.8L609.5,834.2L610.7,824.7L613.5,822.4L612.8,822.0L616.0,815.2L615.0,812.9L612.4,813.6L612.1,811.4L610.2,810.2L613.4,807.3L610.3,806.0L611.3,803.7L610.3,803.6L610.1,798.2L608.5,795.3L612.9,784.5L610.7,781.8L610.7,778.0L597.0,778.6L587.8,784.4L578.5,779.0L573.6,779.2L572.4,780.3L571.0,779.3L569.0,780.7L569.2,781.9L564.6,779.2L561.8,780.1L559.7,784.7L558.6,784.1L555.3,785.8L555.1,784.8L551.0,784.3L548.0,786.0L545.8,789.4L547.1,794.2L543.5,795.1L543.0,796.4L540.6,793.1L531.8,793.4L524.4,789.7Z","c":[565.6,809.7],"b":[484.7,778.0,131.4,84.1]},"RS":{"d":"M482.0,926.8L487.3,930.4L490.7,939.2L493.5,939.9L495.5,942.6L500.8,944.1L502.8,944.3L504.9,942.7L505.6,940.2L510.4,938.6L511.4,937.5L509.1,936.3L510.2,933.7L511.2,931.9L513.9,931.6L512.3,935.9L514.7,941.3L511.3,949.1L508.8,950.7L504.7,947.0L503.1,948.7L501.2,948.3L500.6,952.9L498.1,955.6L496.7,954.9L494.4,956.9L493.5,959.2L494.3,965.7L492.5,966.4L491.9,969.1L495.9,971.4L510.2,959.9L516.9,949.5L521.8,936.4L526.5,932.0L526.5,930.0L524.2,929.4L526.1,927.4L523.3,928.9L523.0,927.7L525.5,925.9L523.5,924.8L523.4,921.8L528.1,920.3L529.0,913.4L530.8,910.8L537.5,909.8L537.8,906.9L542.2,905.3L540.9,901.0L543.5,900.1L543.7,894.2L544.8,893.9L545.8,895.8L546.5,890.1L550.0,888.0L545.8,885.7L545.6,879.5L547.3,879.3L547.4,882.6L552.3,885.2L551.7,887.7L554.6,889.0L554.9,886.3L560.7,885.5L561.1,883.1L562.5,883.0L563.9,884.4L563.1,890.1L561.3,889.5L562.1,887.1L561.5,888.0L559.4,887.3L560.6,893.3L559.6,897.6L553.7,900.5L553.0,904.3L548.6,905.0L549.1,910.1L547.2,914.4L544.2,916.3L542.6,915.3L538.1,921.2L533.6,922.7L532.2,924.7L526.5,923.9L528.7,926.7L527.5,927.6L527.0,931.5L532.9,925.9L546.5,917.5L555.8,908.7L568.9,890.6L576.5,872.5L583.8,861.4L578.0,858.2L574.2,859.8L575.9,862.1L573.5,860.0L573.4,858.2L576.5,857.3L578.0,855.0L577.9,847.6L582.8,843.7L584.1,844.0L583.0,840.7L577.6,839.3L574.6,840.4L571.1,839.1L563.8,839.0L558.9,834.6L557.8,831.8L556.3,831.8L554.7,827.7L552.9,827.4L551.6,825.1L546.3,822.2L545.3,820.3L542.8,819.8L541.3,817.5L539.0,817.8L537.7,815.6L536.0,815.4L532.8,816.5L529.2,812.8L525.8,811.0L523.4,811.7L522.6,809.9L521.5,810.1L521.6,811.4L518.8,810.5L518.4,808.9L517.3,810.1L512.6,809.6L512.2,810.5L508.4,807.7L506.5,808.5L505.8,807.5L505.5,808.9L503.6,805.6L503.1,807.4L500.7,807.1L500.3,808.3L497.0,808.7L497.7,806.8L495.6,805.8L492.6,807.2L492.3,808.5L485.1,807.8L484.0,806.6L483.2,807.7L482.0,807.2L478.8,810.9L476.1,811.1L473.9,814.6L472.5,813.5L472.2,815.0L471.2,813.7L468.1,816.1L467.0,814.8L464.6,817.6L461.9,817.9L461.1,816.8L457.9,822.9L454.7,823.3L456.1,824.3L453.3,825.8L451.8,824.8L448.8,826.5L446.1,830.5L445.0,830.3L443.1,832.4L442.0,831.3L441.4,832.8L438.1,834.4L440.6,836.9L440.0,838.7L435.7,837.3L435.4,840.3L432.1,841.4L432.2,843.6L428.0,847.7L425.4,848.5L425.4,850.7L423.5,852.0L422.3,855.2L418.5,856.2L412.9,865.5L405.4,872.4L401.4,874.0L400.1,878.4L394.3,882.6L394.9,884.4L398.5,885.7L401.1,884.6L403.7,885.3L406.7,880.4L412.2,880.4L416.8,883.2L432.1,897.7L432.5,905.1L435.8,904.8L440.7,901.9L440.7,899.9L442.8,899.1L447.8,903.6L450.8,909.3L454.9,911.3L456.6,909.8L460.6,914.1L466.6,914.4L469.8,919.3L478.8,926.2L479.8,925.4Z","c":[497.2,870.9],"b":[394.3,805.6,189.8,165.8]},"MS":{"d":"M495.1,579.2L493.5,580.3L490.0,578.9L486.2,579.4L484.2,577.5L481.9,577.3L484.2,572.0L487.9,571.0L487.8,560.2L480.2,566.4L478.7,569.9L476.1,569.6L473.5,571.0L471.4,570.2L469.3,566.9L467.0,566.3L462.8,567.4L460.0,570.0L453.4,570.7L449.5,568.0L444.3,566.5L440.9,562.9L432.4,560.4L431.6,558.8L421.8,562.6L420.6,561.7L415.2,562.2L412.7,564.2L411.6,567.8L409.2,568.9L407.4,572.7L397.5,576.9L392.1,572.3L391.5,568.0L389.7,568.7L394.8,582.7L397.7,585.2L395.2,585.4L390.2,601.8L391.3,601.8L391.8,604.6L389.8,605.2L381.4,623.2L387.9,628.5L386.9,630.2L385.4,629.9L381.0,633.0L380.5,635.1L384.6,640.5L384.8,646.3L386.6,645.9L387.5,647.0L385.5,649.1L387.9,649.7L386.3,651.5L388.9,653.6L387.8,655.1L388.1,659.7L386.5,661.2L387.9,662.8L385.5,666.8L387.4,671.2L386.0,672.3L386.7,673.4L385.5,675.3L386.6,675.9L384.4,679.8L384.7,681.2L389.2,682.7L392.0,681.2L394.6,683.3L399.6,684.7L408.7,684.5L412.3,686.5L416.2,684.5L417.0,685.4L420.2,681.7L423.2,681.0L425.0,684.3L427.5,685.9L436.4,686.1L438.7,688.5L439.3,692.7L441.7,694.6L441.3,704.5L444.1,708.8L443.3,711.8L444.6,713.3L443.2,715.9L446.3,723.6L446.0,726.7L448.3,728.6L458.5,727.8L464.3,724.6L470.2,726.4L473.9,730.5L477.4,728.5L481.0,715.5L486.5,712.8L489.5,707.0L490.2,702.7L500.3,696.9L503.0,692.6L519.0,682.5L527.5,670.9L527.0,666.9L529.7,666.4L532.2,662.5L531.7,657.8L533.9,656.6L535.7,653.4L537.9,652.7L538.4,645.7L544.6,638.0L551.2,635.4L552.9,631.6L551.8,622.6L553.2,619.0L554.7,618.8L554.4,615.9L551.8,612.8L542.8,608.4L537.0,607.6L531.3,604.2L526.9,603.1L524.3,600.5L520.5,599.9L516.1,595.8L510.8,596.6L506.9,595.4L505.7,592.9L507.8,590.1L509.6,589.7L510.2,587.6L506.3,586.8L503.1,587.9L501.3,581.5L503.1,580.2Z","c":[460.4,637.3],"b":[380.5,558.8,174.2,171.7]},"MT":{"d":"M426.1,365.3L416.5,364.5L414.5,365.4L412.9,361.5L408.7,361.1L407.2,359.9L407.7,357.8L403.7,353.4L399.4,352.3L398.6,350.2L394.3,349.3L392.1,340.6L393.2,335.9L388.6,329.5L387.0,322.4L381.6,314.3L379.4,316.9L379.7,321.0L375.5,326.1L377.6,333.8L377.0,338.5L374.5,342.6L375.2,345.2L374.0,347.9L376.6,348.2L373.9,350.3L298.4,350.3L301.1,353.3L299.0,357.6L299.8,361.4L298.0,361.7L297.3,364.1L299.0,364.9L298.4,366.8L300.9,371.0L298.6,373.2L300.2,376.8L297.9,384.0L301.3,390.7L300.9,399.8L299.2,404.8L325.4,404.9L328.0,407.8L329.2,406.5L336.6,408.8L338.4,413.5L338.0,415.7L333.7,419.8L333.7,424.0L334.9,427.3L336.8,427.9L339.2,436.1L341.8,438.5L337.7,444.9L335.0,446.6L334.5,452.0L329.6,457.0L327.1,466.2L321.4,469.1L319.3,471.7L323.7,474.1L327.2,479.6L324.9,482.2L325.2,486.4L328.7,495.0L329.9,495.3L330.6,507.1L322.6,507.1L330.7,516.5L332.3,536.2L374.2,537.6L375.2,536.1L376.7,536.3L376.3,542.5L374.1,544.4L373.0,549.9L373.1,552.9L374.9,554.4L375.0,559.1L378.2,563.1L383.5,566.8L384.6,567.3L387.4,565.7L390.5,568.6L391.5,568.0L392.1,572.3L397.5,576.9L407.4,572.7L414.4,562.6L420.6,561.7L421.8,562.6L429.5,559.0L431.6,558.8L432.4,560.4L440.9,562.9L444.3,566.5L449.5,568.0L453.4,570.7L460.0,570.0L462.8,567.4L467.0,566.3L469.3,566.9L472.5,570.8L478.7,569.9L480.2,566.4L487.8,560.2L487.9,571.0L484.2,572.0L481.9,577.3L484.2,577.5L486.2,579.4L490.0,578.9L493.5,580.3L494.3,579.0L503.1,580.2L500.9,573.8L499.2,572.3L499.8,562.4L503.5,556.1L504.5,551.1L508.8,548.8L511.2,544.2L513.8,542.9L512.5,537.1L515.7,536.1L515.6,533.7L520.9,531.4L522.7,527.0L528.6,526.8L530.1,524.9L531.7,525.2L536.1,516.8L537.3,509.0L540.0,506.3L544.9,504.0L546.3,505.8L550.8,502.7L553.7,493.0L553.4,487.1L555.3,482.7L556.9,481.9L555.9,473.2L557.5,472.3L558.7,467.9L562.2,462.9L562.3,456.5L564.3,454.2L564.6,451.4L561.9,449.9L561.2,446.1L560.1,446.0L561.9,441.4L560.4,430.9L561.6,427.1L559.6,423.5L561.1,419.9L559.2,418.7L559.1,416.6L562.3,406.8L561.7,403.4L563.2,399.0L562.4,396.6L566.9,389.0L567.4,384.1L571.5,376.3Z","c":[434.8,453.6],"b":[297.3,314.3,274.2,266.0]},"GO":{"d":"M619.4,521.1L620.2,517.2L639.0,517.2L641.3,519.6L641.6,522.1L640.2,529.6L641.6,530.5L645.8,527.8L646.5,528.6L653.7,526.4L652.6,520.1L650.4,518.7L650.8,515.7L653.0,512.8L651.7,510.6L650.8,511.1L651.8,507.5L650.9,506.1L652.5,505.0L658.1,506.9L661.0,506.0L659.6,499.3L661.0,497.3L665.4,500.1L666.2,502.9L671.0,503.1L673.1,499.6L673.6,493.1L672.7,491.6L675.4,488.7L667.8,482.5L667.8,479.2L666.8,478.5L667.5,476.0L666.5,474.6L667.8,474.0L667.0,471.9L669.2,469.9L667.6,469.4L667.6,465.3L671.5,462.3L670.6,461.3L666.1,462.8L665.2,457.4L670.4,452.9L664.2,454.6L664.3,451.5L663.1,450.5L662.2,454.2L655.1,454.1L652.6,456.6L645.4,460.1L643.7,459.7L642.3,461.5L639.9,460.7L639.0,461.7L634.2,457.5L633.0,460.1L634.1,464.3L632.7,466.6L629.3,462.7L625.8,462.7L623.5,460.8L623.1,462.0L620.9,462.4L621.6,458.7L613.9,461.8L613.8,458.9L612.6,458.4L611.1,462.7L610.6,456.4L607.8,454.9L607.3,453.0L604.1,450.0L601.6,453.8L598.9,452.2L598.2,449.7L595.3,452.0L592.4,457.6L592.1,461.7L577.5,453.4L570.1,450.9L569.8,447.7L573.5,439.9L569.6,442.3L565.4,447.8L564.3,454.2L562.8,454.9L562.2,462.9L558.7,467.9L557.5,472.3L555.9,473.2L556.9,481.9L555.3,482.7L553.4,487.1L553.7,493.0L550.8,502.7L546.3,505.8L544.7,504.1L540.0,506.3L537.3,509.0L536.1,516.8L531.7,525.2L530.1,524.9L528.6,526.8L522.7,527.0L520.9,531.4L515.6,533.7L515.7,536.1L512.5,537.1L513.8,542.9L511.2,544.2L508.8,548.8L504.5,551.1L503.5,556.1L501.1,559.1L498.8,570.1L503.1,578.5L503.0,580.7L501.3,581.5L502.4,587.2L504.2,588.1L505.6,586.8L509.1,587.1L510.6,588.4L505.7,592.9L506.9,595.4L510.8,596.6L516.1,595.8L518.1,596.6L520.5,599.9L524.3,600.5L526.9,603.1L531.3,604.2L537.0,607.6L542.8,608.4L550.7,612.0L556.5,616.7L555.9,614.8L557.3,611.5L560.7,607.7L564.1,606.8L564.6,603.1L570.4,596.4L575.0,596.1L576.2,594.4L581.9,595.4L589.0,591.6L591.2,595.5L595.0,592.4L595.9,589.9L597.9,589.0L599.1,589.8L603.0,587.0L605.1,588.7L611.5,587.5L616.8,588.6L618.5,587.6L626.1,591.8L632.4,588.7L635.4,584.7L642.3,580.4L640.6,574.8L642.7,569.7L641.3,567.5L637.9,567.8L636.2,565.9L636.8,562.6L638.5,562.4L646.0,553.9L644.1,551.4L643.0,546.1L638.0,542.2L641.3,535.4L640.6,532.9L641.7,530.8L618.4,530.8L618.3,525.4L620.0,523.4Z","c":[586.0,530.6],"b":[498.8,439.9,176.5,176.8]},"DF":{"d":"M624.6,530.8L641.7,530.8L640.0,528.7L641.3,519.6L639.0,517.2L620.2,517.2L619.2,522.3L620.0,523.4L618.3,525.4L618.4,530.8Z","c":[629.8,524.1],"b":[618.3,517.2,23.4,13.6]}}};
+
+  // ---------------------------------------------------------------- works (fictional, shaped like the Obrasgov API)
+  const SIT = { done: ["Concluída", "var(--done)"], exec: ["Em execução", "var(--exec)"], stop: ["Paralisada", "var(--stop)"], idle: ["Não iniciada", "var(--idle)"] };
+  const AREAS = {
+    "Saúde": ["Construção da UBS da QNN 14", "Reforma da ala pediátrica do Hospital Regional", "UPA 24 horas do Sol Nascente", "Ampliação do Centro de Saúde 7"],
+    "Educação": ["Construção de creche no Setor P Sul", "Reforma da Escola Classe 31", "Quadra coberta do Centro de Ensino Fundamental 26", "Construção de escola no Pôr do Sol"],
+    "Saneamento": ["Rede de esgoto do Sol Nascente, trecho 2", "Drenagem de águas da chuva na QNO 17", "Reservatório de água do Setor O"],
+    "Mobilidade": ["Pavimentação da Via Leste", "Ciclovia Ceilândia–Taguatinga", "Terminal de ônibus do Setor O", "Passarela da Estrada Parque Ceilândia"],
+    "Esporte e cultura": ["Praça poliesportiva da QNM 28", "Centro cultural da Expansão do Setor O", "Reforma do ginásio da Guariroba"],
+  };
+  const FROM = { "Saúde": "Ministério da Saúde", "Educação": "Fundo Nacional de Desenvolvimento da Educação", "Saneamento": "Ministério das Cidades", "Mobilidade": "Ministério das Cidades", "Esporte e cultura": "Ministério do Esporte" };
+  const EXEC = { "Saúde": "Secretaria de Saúde do DF", "Educação": "Secretaria de Educação do DF", "Saneamento": "Companhia de Saneamento do DF", "Mobilidade": "Secretaria de Obras do DF", "Esporte e cultura": "Administração Regional de Ceilândia" };
+  const WHY = ["Rescisão do contrato com a empresa executora", "Pendência de licença ambiental", "Falta de repasse da parcela prevista", "Revisão do projeto de engenharia"];
+  const CONF = { direto: ["Vínculo direto", "A emenda aparece no registro desta obra."], convenio: ["Vínculo por convênio", "A emenda financiou o convênio que paga esta obra."], municipio: ["Só por localidade", "A emenda foi para o DF, mas não há registro ligando-a a esta obra. Não atribuímos a obra ao parlamentar."] };
+  const fmtDate = (d) => d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" });
+  const addMonths = (d, m) => { const x = new Date(d); x.setMonth(x.getMonth() + m); return x; };
+  const OBRAS = (() => {
+    const list = []; let i = 0;
+    for (const [area, names] of Object.entries(AREAS)) for (const name of names) {
+      const r = rnd(); const sit = r < .38 ? "done" : r < .74 ? "exec" : r < .92 ? "stop" : "idle";
+      const value = Math.round((0.4 + rnd() * rnd() * 38) * 1e6 / 1000) * 1000;
+      const pct = sit === "done" ? 100 : sit === "idle" ? 0 : Math.round(8 + rnd() * 80);
+      const start = new Date(2021 + Math.floor(rnd() * 4), Math.floor(rnd() * 12), 1 + Math.floor(rnd() * 27));
+      const months = 10 + Math.floor(rnd() * 26);
+      const authorPool = [...REPS.DF.federal, ...REPS.DF.senators];
+      const confKey = pick(["direto", "direto", "convenio", "municipio"]);
+      list.push({
+        id: "o" + (++i), area, name, sit, value, pct,
+        paid: Math.round(value * (sit === "done" ? .97 : sit === "idle" ? 0 : pct / 100 * (0.8 + rnd() * .3))),
+        committed: Math.round(value * (sit === "idle" ? .3 : .9)),
+        startPlanned: start, endPlanned: addMonths(start, months),
+        startReal: sit === "idle" ? null : addMonths(start, Math.floor(rnd() * 4)),
+        endReal: sit === "done" ? addMonths(start, months + Math.floor(rnd() * 9) - 2) : null,
+        stoppedSince: sit === "stop" ? addMonths(new Date(2026, 9, 1), -(3 + Math.floor(rnd() * 24))) : null,
+        why: pick(WHY), updated: addMonths(new Date(2026, 9, 20), -Math.floor(rnd() * 7)),
+        author: pick(authorPool), conf: confKey, amendment: `2025 · ${4000 + Math.floor(rnd() * 900)} · ${String(1 + Math.floor(rnd() * 20)).padStart(4, "0")}`,
+        company: `${pick(["Construtora", "Engenharia", "Obras"])} ${pick(["Planalto", "Cerrado", "Candango", "Paranoá", "Alvorada"])} Ltda.`,
+        x: 0.1 + rnd() * 0.36, y: 0.36 + rnd() * 0.36, photos: sit === "idle" ? 0 : Math.floor(rnd() * 4),
+      });
+    }
+    return list;
+  })();
+  // Per-person profile details, from a private generator so the shared sequence stays stable.
+  const rngFor = (key) => { let h = 2166136261; for (const c of key) h = Math.imul(h ^ c.charCodeAt(0), 16777619); return () => ((h = Math.imul(h ^ (h >>> 15), 2246822507) ^ Math.imul(h ^ (h >>> 13), 3266489909), (h >>>= 0) / 4294967296)); };
+  const PROJ_T = [["PL", "Cria programa de apoio a pequenos negócios em cidades-satélite"], ["PL", "Garante acompanhante para idosos em consultas no SUS"], ["PLP", "Muda regras de repasse do Fundo Constitucional do DF"], ["PEC", "Altera prazos de pagamento de precatórios"], ["PL", "Obriga escolas a ter plano de acessibilidade"], ["PL", "Cria cadastro nacional de obras paralisadas"], ["PL", "Amplia a tarifa social de energia"], ["PL", "Regula o transporte por aplicativo"]];
+  const HOMAGE = ["Institui o Dia Nacional do Agente Comunitário de Saúde", "Inscreve nome no Livro dos Heróis da Pátria", "Denomina viaduto na BR-070"];
+  const PSTATUS = ["Aguardando relator", "Em comissão", "Aprovado na Câmara", "Aguardando plenário", "Arquivado"];
+  const CATS = ["Divulgação do mandato", "Passagens aéreas", "Combustível", "Aluguel de escritório", "Consultorias", "Telefonia"];
+  const profileOf = (r) => {
+    const g = rngFor(r.id); const pk = (a) => a[Math.floor(g() * a.length)];
+    const projects = PROJ_T.filter(() => g() < .6).map(([type, title]) => ({ type, title, num: `${Math.floor(100 + g() * 4800)}/${2023 + Math.floor(g() * 4)}`, status: pk(PSTATUS), role: g() < .7 ? "Autoria" : g() < .5 ? "Coautoria" : "Relatoria", homage: false }))
+      .concat(HOMAGE.filter(() => g() < .5).map((title) => ({ type: "PL", title, num: `${Math.floor(100 + g() * 4800)}/2025`, status: pk(PSTATUS), role: "Autoria", homage: true })));
+    const monthly = Array.from({ length: 10 }, () => Math.round(r.spent / 10 * (0.55 + g() * 0.9)));
+    const catW = CATS.map(() => g()); const cs = catW.reduce((a, b) => a + b);
+    const prevParty = pk(partyKeys);
+    return {
+      projects, monthly, cats: CATS.map((c, i) => [c, Math.round(r.spent * catW[i] / cs)]).sort((a, b) => b[1] - a[1]),
+      assets: [["2018", Math.round(r.assets * (0.45 + g() * .3))], ["2022", Math.round(r.assets * (0.7 + g() * .2))], ["2026", r.assets]],
+      donors: [["Fundo Especial de Financiamento de Campanha, via partido", Math.round(800 + g() * 2200) * 1000], ["Recursos próprios", Math.round(20 + g() * 300) * 1000], ["Doações de pessoas físicas (412 doadores)", Math.round(60 + g() * 500) * 1000], ["Fundo Partidário", Math.round(40 + g() * 200) * 1000]],
+      history: [[`2015–2019`, "Deputado(a) distrital", prevParty], [`2019–2023`, r.office === "Senador(a)" ? "Deputado(a) federal" : "Sem mandato", prevParty], [r.office === "Senador(a)" ? "2023–2031" : "2023–2027", r.office, r.party]],
+      since: r.office === "Senador(a)" ? "1º fev 2023 · mandato até jan 2031" : "1º fev 2023 · mandato até jan 2027",
+    };
+  };
+
+  // ---------------------------------------------------------------- helpers
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const brl = (n) => n >= 1e6 ? `R$ ${(n / 1e6).toLocaleString("pt-BR", { maximumFractionDigits: 1 })} mi` : n >= 1e3 ? `R$ ${(n / 1e3).toLocaleString("pt-BR", { maximumFractionDigits: 0 })} mil` : `R$ ${n}`;
+  const optLabel = { yes: "Sim", no: "Não", other: "Abstenção" };
+  const initials = (n) => n.split(" ").map((p) => p[0]).slice(0, 2).join("");
+  const partyChip = (k) => `<span class="party" style="background:${PARTIES[k][1]}">${pLabel(k)}</span>`;
+
+  // Placeholder portrait: illustrated bust on a soft background, party-colored base.
+  const portrait = (r, opts = {}) => {
+    const c = PARTIES[r.party][1];
+    const skin = ["#e8c4a0", "#c99772", "#a8734f", "#7a4f35", "#f0d2b6"][r.hue % 5];
+    const hair = ["#2b2118", "#4a3424", "#1a1a1a", "#7b5a3a", "#9a9a9a"][(r.hue >> 2) % 5];
+    return `<svg viewBox="0 0 120 126" role="img" aria-label="Foto ilustrativa de ${esc(r.name)}"><rect width="120" height="126" fill="hsl(${r.hue} 18% 86%)"/><rect y="88" width="120" height="38" fill="${c}" opacity=".9"/><path d="M18 126c2-26 18-40 42-40s40 14 42 40z" fill="hsl(${r.hue} 10% 28%)"/><path d="M50 86h20l-2 12H52z" fill="${skin}"/><path d="M52 92l8 14 8-14" fill="#f4f2ec"/><ellipse cx="60" cy="58" rx="20" ry="24" fill="${skin}"/><path d="M39 56c0-17 9-26 21-26s21 9 21 26c-4-9-11-13-21-13s-17 4-21 13z" fill="${hair}"/>${opts.initials === false ? "" : `<text x="112" y="120" text-anchor="end" font-family="Onest, sans-serif" font-size="13" font-weight="700" fill="#fff" opacity=".9">${initials(r.name)}</text>`}</svg>`;
+  };
+  // Simplified DF flag (white field, green band, yellow-and-green cross).
+  const flagDF = `<svg viewBox="0 0 30 20" aria-label="Bandeira do Distrito Federal"><rect width="30" height="20" fill="#fff"/><rect y="6.6" width="30" height="6.8" fill="#13723a"/><rect x="11.5" y="6.6" width="7" height="6.8" fill="#13723a"/><path d="M15 7.4l1 2.6 2.6 0-2.1 1.4.8 2.5L15 12.4l-2.3 1.5.8-2.5-2.1-1.4 2.6 0z" fill="#f2c200"/></svg>`;
+  const flagFor = (uf) => uf === "DF" ? flagDF : `<svg viewBox="0 0 30 20" aria-label="Bandeira de ${esc(UF_NAMES[uf])}"><rect width="30" height="20" fill="var(--surface-2)"/><text x="15" y="13.5" text-anchor="middle" font-size="8" font-weight="800" fill="var(--fg)">${uf}</text></svg>`;
+
+  // ---------------------------------------------------------------- state
+  const state = { view: "inicio", rep: null, uf: null, vote: "v1", shareOpen: false, format: "story", place: null, mapMode: "party", profileRep: null, tab: "votos", themeF: null, showHomage: false, obra: null, obraF: { sit: "todas", area: "todas" } };
+  const layer = document.getElementById("layer");
+  const main = document.getElementById("main");
+  const panel = document.getElementById("panel");
+
+  const toast = (msg) => { const t = document.createElement("div"); t.className = "toast"; t.textContent = msg; t.setAttribute("role", "status"); document.body.append(t); setTimeout(() => t.remove(), 2200); };
+
+  // ---------------------------------------------------------------- views
+  const tileColor = (pct) => `color-mix(in srgb, var(--yes) ${Math.round(15 + pct * 0.85)}%, var(--surface))`;
+  // Small states get a labelled box to the right of the coast, joined by a leader line.
+  const CALLOUTS = { RN: 300, PB: 340, PE: 380, AL: 420, SE: 460, ES: 640, RJ: 690 };
+  const FULL_VB = [0, 0, 1110, GEO.h];
+  const fillFor = (uf, mode) => {
+    if (mode === "vote") return tileColor(ufYes[uf][state.vote]);
+    if (mode === "neutral") return uf === state.uf ? "color-mix(in srgb, var(--fg) 22%, var(--surface-2))" : "var(--surface-2)";
+    const [k, n] = topParty(uf);
+    return `color-mix(in srgb, ${PARTIES[k][1]} ${Math.round(38 + (n / SEATS[uf]) * 120)}%, var(--surface))`;
+  };
+  const vbFor = (uf) => {
+    if (!uf) return FULL_VB;
+    const [x, y, w, h] = GEO.uf[uf].b; const pad = Math.max(w, h) * 0.18 + 12;
+    return [x - pad, y - pad, w + pad * 2, h + pad * 2];
+  };
+  let currentVB = FULL_VB.slice();
+  const mapHtml = (mode) => {
+    const zoomed = Boolean(state.uf);
+    const labelTxt = (uf) => (mode === "vote" ? `${uf}<tspan class="pc" x="${GEO.uf[uf].c[0]}" dy="16">${ufYes[uf][state.vote]}%</tspan>` : uf);
+    const paths = Object.entries(GEO.uf).map(([uf, g]) => `<path class="uf${state.uf === uf ? " sel" : ""}" data-uf="${uf}" d="${g.d}" fill="${fillFor(uf, mode)}" tabindex="0" role="button" aria-label="${UF_NAMES[uf]}"></path>`).join("");
+    const k = vbFor(state.uf)[2] / FULL_VB[2]; // keep the selected label readable at any zoom
+    const labels = Object.entries(GEO.uf).filter(([uf]) => !(uf in CALLOUTS) || state.uf === uf).map(([uf, g]) => { const sel = state.uf === uf; const fs = sel ? Math.max(8, 26 * k) : uf === "DF" ? 13 : null; return `<text class="lab${sel ? " sel-lab" : ""}" x="${g.c[0]}" y="${g.c[1] + (sel ? 0 : uf === "DF" ? -10 : 5)}" text-anchor="middle" ${fs ? `style="font-size:${fs}px;stroke-width:${sel ? Math.max(1, 4 * k) : 3.5}px"` : ""}>${sel ? uf : labelTxt(uf)}</text>`; }).join("");
+    const calls = Object.entries(CALLOUTS).map(([uf, y]) => { const [cx, cy] = GEO.uf[uf].c; const v = mode === "vote" ? ` ${ufYes[uf][state.vote]}%` : ""; return `<g class="call" data-uf="${uf}"><line x1="${cx}" y1="${cy}" x2="1010" y2="${y}"></line><rect x="1010" y="${y - 15}" width="${mode === "vote" ? 92 : 56}" height="30" rx="8" fill="${fillFor(uf, mode)}"></rect><text x="1022" y="${y + 6}">${uf}${v}</text></g>`; }).join("");
+    const crumbs = `<nav class="crumbs" aria-label="Navegação do mapa"><button data-map-reset>Brasil</button>${state.uf ? `<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 2l4 4-4 4"/></svg><b>${UF_NAMES[state.uf]}</b>` : ""}</nav>`;
+    const modes = mode === "vote" ? "" : `<div class="modes" role="group" aria-label="Cor do mapa"><button data-map-mode="party" aria-pressed="${mode === "party"}">Maior bancada</button><button data-map-mode="neutral" aria-pressed="${mode === "neutral"}">Sem cor</button></div>`;
+    const counts = {}; Object.keys(GEO.uf).forEach((uf) => { const k = topParty(uf)[0]; counts[k] = (counts[k] || 0) + 1; });
+    const legend = mode === "vote"
+      ? `<div class="legend"><span>0%</span><span class="ramp">${[15, 35, 55, 75, 95].map((pc) => `<span style="flex:1;background:${tileColor(pc)}"></span>`).join("")}</span><span>100% Sim</span></div>`
+      : mode === "party" ? `<div class="legend">${Object.entries(counts).sort((a, b) => pLabel(a[0]).localeCompare(pLabel(b[0]))).map(([k, n]) => `<span><i style="background:${PARTIES[k][1]}"></i>${pLabel(k)} ${n}</span>`).join("")}<span>estados com a maior bancada federal · cor mais forte = bancada maior</span></div>`
+      : `<div class="legend"><span>Toque num estado para ver quem o representa</span></div>`;
+    return `<div class="mapbox"><div class="map-tools">${crumbs}${modes}</div>
+      <svg class="map${zoomed ? " zoomed" : ""}" viewBox="${currentVB.join(" ")}" data-target="${vbFor(state.uf).join(" ")}" aria-label="Mapa do Brasil por estado">${paths}${labels}${calls}</svg>
+      <div class="zoombtns"><button data-zoom="in" aria-label="Aproximar">+</button><button data-zoom="out" aria-label="Afastar">−</button></div>
+      <div class="tip" hidden></div></div>${legend}`;
+  };
+  // Animate the viewBox from where it was to the selected state (or back to Brazil).
+  const animateMap = () => {
+    const svg = main.querySelector("svg.map"); if (!svg) return;
+    const from = currentVB.slice(); const to = svg.dataset.target.split(" ").map(Number);
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const t0 = performance.now(); const dur = reduce ? 0 : 520;
+    const step = (now) => {
+      const k = dur ? Math.min(1, (now - t0) / dur) : 1; const e = 1 - Math.pow(1 - k, 3);
+      currentVB = from.map((v, i) => v + (to[i] - v) * e);
+      svg.setAttribute("viewBox", currentVB.join(" "));
+      if (k < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  };
+  const bindMapTip = () => {
+    const box = main.querySelector(".mapbox"); if (!box) return;
+    const tip = box.querySelector(".tip");
+    box.addEventListener("pointermove", (e) => {
+      const el = e.target.closest("[data-uf]"); if (!el || e.pointerType === "touch") { tip.hidden = true; return; }
+      const uf = el.dataset.uf; const [k, n] = topParty(uf); const r = box.getBoundingClientRect();
+      tip.innerHTML = state.view === "votacao" ? `<b>${UF_NAMES[uf]}</b> · ${ufYes[uf][state.vote]}% Sim` : `<b>${UF_NAMES[uf]}</b> · ${SEATS[uf]} deputados · maior bancada ${pLabel(k)} (${n})`;
+      tip.style.left = `${e.clientX - r.left}px`; tip.style.top = `${e.clientY - r.top}px`; tip.hidden = false;
+    });
+    box.addEventListener("pointerleave", () => { tip.hidden = true; });
+  };
+
+  const shareCard = (kind, format) => {
+    const sizes = { story: [270, 480], feed: [300, 375], link: [360, 189] };
+    const [w, h] = sizes[format];
+    let foot = `<div class="sc-foot"><span>Fonte: Câmara, Senado e CLDF · atualizado 26/10/2026</span><b>cobra.org.br</b></div>`;
+    let body;
+    if (kind === "rep" && state.rep) {
+      const r = state.rep;
+      body = `<div class="sc-top"><b>Cobra</b><span>${esc(r.office)} · ${r.uf}</span></div>
+        <div style="display:flex;gap:10px;align-items:center"><div style="width:${format === "link" ? 56 : 72}px;border-radius:12px;overflow:hidden;flex:none">${portrait(r, { initials: false })}</div><div><h4>${esc(r.name)}</h4><div style="margin-top:6px">${partyChip(r.party)}</div></div></div>
+        ${format === "link" ? "" : `<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div><div class="big">${r.presence}%</div><div class="src">presença · mediana ${r.houseMedian}%</div></div><div><div class="big" style="font-size:28px">${brl(r.spent)}</div><div class="src">gastos da cota no ano</div></div></div>`}
+        ${format === "story" ? `<div class="lbl">Últimos votos</div>${VOTES.filter((v) => r.votes[v.id] && ((r.office === "Senador(a)") === (v.house === "Senado"))).slice(0, 2).map((v) => `<div style="display:flex;gap:8px;align-items:center;font-size:12px"><span class="chip ${r.votes[v.id]}">${optLabel[r.votes[v.id]]}</span>${esc(v.title)}</div>`).join("")}` : ""}`;
+    } else if (kind === "obra" && state.obra) {
+      const o = state.obra;
+      body = `<div class="sc-top"><b>Cobra</b><span>Obras · Ceilândia (DF)</span></div><h4>${esc(o.name)}</h4>
+        <div><span class="st" style="background:${SIT[o.sit][1]}">${o.sit === "stop" ? `Paralisada há ${monthsSince(o.stoppedSince)} meses` : SIT[o.sit][0]}</span></div>
+        <div style="display:flex;justify-content:space-between;gap:8px"><div><div class="big" style="font-size:30px">${brl(o.value)}</div><div class="src">valor previsto</div></div><div style="text-align:right"><div class="big" style="font-size:30px">${o.pct}%</div><div class="src">executado</div></div></div>
+        ${format === "link" ? "" : `<div class="bar" style="height:8px"><span style="width:${o.pct}%;background:${SIT[o.sit][1]}"></span></div><div class="src">Recurso federal: ${esc(FROM[o.area])}. Informado pelo gestor em ${fmtDate(o.updated)}.</div>`}`;
+      foot = `<div class="sc-foot"><span>Fonte: Obrasgov.br · atualizado 23/10/2026</span><b>cobra.org.br</b></div>`;
+    } else if (kind === "vote") {
+      const v = VOTES.find((x) => x.id === state.vote); const tot = v.yes + v.no + v.other;
+      body = `<div class="sc-top"><b>Cobra</b><span>${v.house} · ${v.date}</span></div><h4>${esc(v.title)}</h4>
+        <div class="bigbar" style="height:14px"><span style="width:${v.yes / tot * 100}%;background:var(--yes)"></span><span style="width:${v.other / tot * 100}%;background:var(--other)"></span><span style="width:${v.no / tot * 100}%;background:var(--no)"></span><i></i></div>
+        <div style="display:flex;justify-content:space-between"><div><div class="big" style="color:var(--yes)">${v.yes}</div><div class="src">Sim</div></div><div style="text-align:right"><div class="big" style="color:var(--no)">${v.no}</div><div class="src">Não</div></div></div>
+        ${format === "story" ? `<div class="lbl">Como votaram os deputados do DF</div><div class="faces">${DF.federal.slice(0, 8).map((r) => `<div class="f">${portrait(r, { initials: false })}<span style="background:var(--${r.votes[v.id] === "yes" ? "yes" : r.votes[v.id] === "no" ? "no" : "other"})">${optLabel[r.votes[v.id]]}</span></div>`).join("")}</div>` : ""}`;
+    } else {
+      const list = [...DF.senators, ...DF.federal];
+      body = `<div class="sc-top"><b>Cobra</b><span>Seus representantes</span></div><h4>Quem representa ${esc(state.place || "Ceilândia (DF)")} em Brasília</h4>
+        <div class="faces" style="grid-template-columns:repeat(${format === "link" ? 6 : 4},1fr)">${list.slice(0, format === "link" ? 6 : format === "feed" ? 8 : 11).map((r) => `<div class="f">${portrait(r, { initials: false })}<span style="background:${PARTIES[r.party][1]}">${pLabel(r.party)}</span></div>`).join("")}</div>
+        ${format === "story" ? `<div class="src">3 senadores · 8 deputados federais · 24 deputados distritais</div>` : ""}`;
+    }
+    return `<div class="sc" style="width:${w}px;height:${h}px"><div class="sc-in">${body}${foot}</div></div>`;
+  };
+
+  const renderHome = () => {
+    const prevRep = state.rep; state.rep = DF.federal[2];
+    const cards = [shareCard("vote", "story"), shareCard("places", "story"), shareCard("rep", "story")].map((c) => `<div class="ex">${c}</div>`);
+    state.rep = prevRep;
+    main.innerHTML = `
+      <section class="card hero">
+        <div>
+          <p class="eyebrow">Acompanhe o mandato, não a campanha</p>
+          <h1>O que fazem os políticos que <em>representam você</em></h1>
+          <p class="lead">Digite seu CEP e veja quem representa sua cidade, como votaram, quanto gastaram e o que propõem. Só fatos, com fonte oficial.</p>
+          <form class="search" id="cepForm" role="search">
+            <label for="cep">CEP, cidade ou nome do político</label>
+            <input id="cep" name="cep" inputmode="numeric" autocomplete="postal-code" placeholder="CEP, cidade ou nome" value="72210-000">
+            <button class="btn primary" type="submit">Ver meus representantes</button>
+          </form>
+          <p class="hint">Sem cadastro. Seu CEP vira só o nome da cidade e é descartado. Exemplo: <button type="button" id="ex">Ceilândia, DF</button></p>
+        </div>
+        <div class="examples" aria-label="Exemplos de cards para compartilhar">${cards.join("")}</div>
+      </section>
+      <section class="card" style="display:flex;flex-direction:column;gap:12px">
+        <div class="section-h"><h2>Explore pelo mapa</h2><p>Toque num estado para ver quem o representa no Congresso</p></div>
+        ${mapHtml(state.mapMode)}
+        <p class="explain">Deputados federais e senadores são eleitos pelo estado inteiro, não por bairro. Por isso todos os eleitores de um estado têm os mesmos representantes no Congresso.</p>
+      </section>
+      <section class="card">
+        <div class="section-h"><h2>O que aconteceu</h2><p>Votações recentes, explicadas</p></div>
+        <div class="votelist" style="margin-top:14px">${VOTES.map(voteCard).join("")}</div>
+      </section>`;
+    if (state.rep) panelRep(state.rep);
+    else if (!state.uf) panelEmpty("Escolha um estado ou um político", "Toque num estado no mapa ou busque pelo seu CEP para ver quem representa você.");
+    else panelUF(state.uf);
+  };
+
+  const voteCard = (v) => {
+    const tot = v.yes + v.no + v.other;
+    return `<button class="vcard" data-vote="${v.id}"><div class="house"><span>${v.house} · ${v.date}</span><span class="status ${v.status === "Aprovada" ? "ok" : "ko"}">${v.status === "Aprovada" ? "✓" : "✕"} ${v.status}</span></div><h3>${esc(v.title)}</h3><div class="split"><span style="width:${v.yes / tot * 100}%;background:var(--yes)"></span><span style="width:${v.other / tot * 100}%;background:var(--other)"></span><span style="width:${v.no / tot * 100}%;background:var(--no)"></span></div><div class="counts"><span><b>${v.yes}</b> Sim</span><span><b>${v.no}</b> Não</span><span><b>${v.other}</b> outros</span></div></button>`;
+  };
+
+  const repCard = (r) => `<button class="rep" data-rep="${r.id}" aria-pressed="${state.rep?.id === r.id}">
+      <div class="photo">${portrait(r)}<span class="flag">${flagFor(r.uf)}</span></div>
+      <div class="who"><span class="name">${esc(r.name)}</span><span class="meta">${partyChip(r.party)}${r.uf}</span></div></button>`;
+
+  const renderReps = () => {
+    const place = state.place || "Ceilândia (DF)";
+    main.innerHTML = `
+      <section class="card" style="display:flex;flex-direction:column;gap:14px">
+        <div class="section-h"><div><p class="eyebrow">Seus representantes</p><h2 style="font-family:var(--f-display);font-weight:500;font-size:clamp(28px,3.4vw,40px);margin-top:6px">${esc(place)}</h2></div>
+          <div style="display:flex;gap:8px"><button class="btn" data-go="inicio">Trocar local</button><button class="btn primary" data-share="places"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15V3m0 0L7.5 7.5M12 3l4.5 4.5M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>Compartilhar</button></div></div>
+        <p class="explain">No Distrito Federal não há prefeito nem vereadores. Os 24 deputados distritais fazem o papel de deputado estadual e de vereador ao mesmo tempo.</p>
+      </section>
+      ${[["Senado", "3 senadores", DF.senators], ["Câmara dos Deputados", "8 deputados federais pelo DF", DF.federal], ["Câmara Legislativa do DF", "24 deputados distritais", DF.district]].map(([h, s, list]) => `
+        <section class="group card"><h3>${h} <span>· ${s} · ordem alfabética</span></h3><div class="grid">${list.map(repCard).join("")}</div></section>`).join("")}`;
+    if (state.rep) panelRep(state.rep); else panelEmpty("Toque num representante", "Você vê os últimos votos, a presença, os gastos e o patrimônio declarado, sempre com a fonte.");
+  };
+
+  const monthsSince = (d) => Math.max(1, Math.round((new Date(2026, 9, 26) - d) / (30.4 * 864e5)));
+  const sitPill = (o) => `<span class="st" style="background:${SIT[o.sit][1]}">${o.sit === "stop" ? `Paralisada há ${monthsSince(o.stoppedSince)} meses` : SIT[o.sit][0]}</span>`;
+
+  const renderProfile = () => {
+    const r = state.profileRep; const P = profileOf(r);
+    const tab = state.tab;
+    const tabs = [["votos", "Como votou"], ["projetos", "Projetos"], ["gastos", "Gastos"], ["patrimonio", "Patrimônio e doadores"], ["historico", "Histórico"], ["obras", "Emendas e obras", "fase 2"]];
+    const ownVotes = VOTES.filter((v) => r.votes[v.id] && ((r.office === "Senador(a)") === (v.house === "Senado")));
+    const themes = ["Todos", ...new Set(VOTES.map((v) => v.theme))];
+    const projShown = P.projects.filter((x) => state.showHomage || !x.homage);
+    const maxM = Math.max(...P.monthly); const months = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out"];
+    const myObras = OBRAS.filter((o) => o.author.id === r.id && o.conf !== "municipio");
+    let content = "";
+    if (tab === "votos") content = `<div class="filters" role="group" aria-label="Tema">${themes.map((th) => `<button class="fchip" data-theme-f="${th}" aria-pressed="${(state.themeF || "Todos") === th}">${th}</button>`).join("")}</div>
+      <div style="margin-top:8px">${ownVotes.filter((v) => !state.themeF || state.themeF === "Todos" || v.theme === state.themeF).map((v) => `<div class="row"><span class="chip ${r.votes[v.id]}">${optLabel[r.votes[v.id]]}</span><div><div class="t">${esc(v.title)}</div><div class="d">${v.house} · ${v.date} · ${v.theme} · resultado: ${v.status.toLowerCase()} (${v.yes} a ${v.no})</div></div><button class="btn right" data-vote="${v.id}">Ver votação</button></div>`).join("") || `<p class="src" style="padding:12px 0">${r.office === "Deputado(a) distrital" ? "Votações da CLDF chegam na fase 2." : "Nenhuma votação nesse tema."}</p>`}</div>`;
+    if (tab === "projetos") content = `<div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center"><p class="src">${P.projects.filter((x) => !x.homage).length} projetos de lei e propostas · ${P.projects.filter((x) => x.homage).length} homenagens e datas comemorativas</p><button class="fchip" data-homage aria-pressed="${Boolean(state.showHomage)}">Mostrar homenagens</button></div>
+      <div style="margin-top:6px">${projShown.map((x) => `<div class="row"><span class="tag">${x.type}</span><div><div class="t">${esc(x.title)}</div><div class="d">${x.type} ${x.num} · ${x.role}${x.homage ? " · homenagem" : ""}</div></div><span class="right src">${x.status}</span></div>`).join("")}</div>`;
+    if (tab === "gastos") content = `<div class="two"><div><p class="lbl">Por mês em 2026</p><div class="months">${P.monthly.map((v, i) => `<div class="m"><b style="height:${Math.round(v / maxM * 120)}px" title="${brl(v)}"></b>${months[i]}</div>`).join("")}</div></div>
+      <div><p class="lbl">Por categoria</p><div class="hbars">${P.cats.map(([c, v]) => `<div class="hb"><span>${c}</span><span class="val">${brl(v)}</span><span class="track"><span style="width:${v / P.cats[0][1] * 100}%"></span></span></div>`).join("")}</div></div></div>
+      <p class="explain" style="margin-top:14px">A cota para o exercício do mandato paga despesas como passagens, combustível e divulgação. O limite muda conforme o estado. ${esc(r.name)} usou ${Math.round(r.spent / r.limit * 100)}% do limite anual; a média da casa é 64%. <button class="back" disabled>Ver todas as notas fiscais</button></p>`;
+    if (tab === "patrimonio") content = `<div class="two"><div><p class="lbl">Patrimônio declarado ao TSE</p><div class="hbars">${P.assets.map(([y, v]) => `<div class="hb"><span>Eleição de ${y}</span><span class="val">${brl(v)}</span><span class="track"><span style="width:${v / P.assets[2][1] * 100}%"></span></span></div>`).join("")}</div></div>
+      <div><p class="lbl">Receitas da última campanha</p><div class="hbars">${P.donors.map(([d, v]) => `<div class="hb"><span>${d}</span><span class="val">${brl(v)}</span><span class="track"><span style="width:${v / P.donors[0][1] * 100}%;background:var(--muted)"></span></span></div>`).join("")}</div>
+      <p class="src" style="margin-top:10px">Doadores pessoas físicas aparecem agrupados. Não há busca por nome de doador.</p></div></div>`;
+    if (tab === "historico") content = `<div>${P.history.map(([y, c, k]) => `<div class="tl"><span class="y">${y}</span><span style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">${partyChip(k)} ${c}</span></div>`).join("")}</div>`;
+    if (tab === "obras") content = myObras.length ? `<p class="src">Obras no DF pagas com emendas de ${esc(r.name)}, com vínculo direto ou por convênio.</p><div class="olist" style="margin-top:10px">${myObras.map(obraCard).join("")}</div>` : `<p class="explain">Nenhuma obra no DF com vínculo direto ou por convênio às emendas deste parlamentar no protótipo.</p>`;
+    main.innerHTML = `
+      <section class="card" style="display:flex;flex-direction:column;gap:18px">
+        <button class="back" data-go="representantes">‹ Seus representantes</button>
+        <div class="profile-head"><div class="bigphoto">${portrait(r, { initials: false })}<span class="flag">${flagFor(r.uf)}</span></div>
+          <div><p class="eyebrow">${esc(r.office)} · ${UF_NAMES[r.uf]}</p><h1 style="margin-top:6px">${esc(r.name)}</h1>
+            <div class="facts">${partyChip(r.party)}<span>${PARTIES[r.party][0]}</span><span>${P.since}</span><span>Gabinete, e-mail e redes oficiais (no site real)</span></div>
+            <div class="p-actions" style="margin-top:14px"><button class="btn primary" data-share="profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15V3m0 0L7.5 7.5M12 3l4.5 4.5M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>Compartilhar</button><button class="btn" disabled>Seguir</button><button class="btn" disabled>Reportar erro</button></div></div></div>
+        <div class="kstrip">
+          <div class="kpi"><div class="v">${r.presence}<small>%</small></div><div class="l">presença no plenário</div><div class="bar"><span style="width:${r.presence}%"></span><i style="left:${r.houseMedian}%"></i></div><div class="src" style="margin-top:6px">mediana da casa: ${r.houseMedian}%</div></div>
+          <div class="kpi"><div class="v" style="font-size:22px">${brl(r.spent)}</div><div class="l">gastos da cota em 2026</div><div class="bar"><span style="width:${Math.round(r.spent / r.limit * 100)}%"></span></div><div class="src" style="margin-top:6px">${Math.round(r.spent / r.limit * 100)}% do limite anual</div></div>
+          <div class="kpi"><div class="v">${P.projects.filter((x) => !x.homage).length}</div><div class="l">projetos de autoria ou relatoria</div><div class="src" style="margin-top:6px">+ ${P.projects.filter((x) => x.homage).length} homenagens</div></div>
+          <div class="kpi"><div class="v" style="font-size:22px">${brl(r.assets)}</div><div class="l">patrimônio declarado em 2026</div><div class="src" style="margin-top:6px">${brl(P.assets[0][1])} em 2018</div></div>
+        </div>
+        <div class="tabs" role="tablist">${tabs.map(([k, l, s]) => `<button role="tab" data-tab="${k}" aria-selected="${tab === k}">${l}${s ? `<small>${s}</small>` : ""}</button>`).join("")}</div>
+        <div>${content}</div>
+        <p class="src">Fontes: Câmara dos Deputados, Senado Federal, CLDF, TSE e Obrasgov.br · atualizado em 26/10/2026 · dados fictícios no protótipo</p>
+      </section>`;
+  };
+
+  const obraCard = (o) => `<button class="ocard" data-obra="${o.id}" aria-pressed="${state.obra?.id === o.id}"><span class="n">${esc(o.name)}</span><span class="v">${brl(o.value)}</span><span class="a">${o.area} · ${sitPill(o)}</span><span class="src" style="text-align:right">${o.pct}% executado</span><span class="pbar"><span style="width:${o.pct}%;background:${SIT[o.sit][1]}"></span></span></button>`;
+
+  const renderObras = () => {
+    const f = state.obraF;
+    const shown = OBRAS.filter((o) => (f.sit === "todas" || o.sit === f.sit) && (f.area === "todas" || o.area === f.area));
+    const sum = (k) => OBRAS.filter((o) => o.sit === k).length;
+    const total = OBRAS.reduce((a, o) => a + o.value, 0); const paid = OBRAS.reduce((a, o) => a + o.paid, 0);
+    const [bx, by, bw, bh] = GEO.uf.DF.b;
+    const pins = shown.map((o) => `<circle class="pin${state.obra?.id === o.id ? " sel" : ""}" data-obra="${o.id}" cx="${bx + o.x * bw}" cy="${by + o.y * bh}" r="${bw * (0.011 + Math.sqrt(o.value / 4e7) * 0.022) * (state.obra?.id === o.id ? 1.4 : 1)}" fill="${SIT[o.sit][1]}"><title>${esc(o.name)} · ${SIT[o.sit][0]}</title></circle>`).join("");
+    main.innerHTML = `
+      <section class="card" style="display:flex;flex-direction:column;gap:16px">
+        <div class="section-h"><div><p class="eyebrow">Obras com recurso federal · fase 2</p><h2 style="font-family:var(--f-display);font-weight:500;font-size:clamp(28px,3.4vw,40px);margin-top:6px">Ceilândia (DF)</h2></div>
+          <button class="btn primary" data-share="places"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15V3m0 0L7.5 7.5M12 3l4.5 4.5M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>Compartilhar</button></div>
+        <div class="sumstrip">
+          <div class="kpi"><div class="v">${OBRAS.length}</div><div class="l">obras cadastradas</div></div>
+          <div class="kpi"><div class="v" style="font-size:22px">${brl(total)}</div><div class="l">valor previsto · ${brl(paid)} pagos</div></div>
+          <div class="kpi"><div class="v" style="color:var(--done)">${sum("done")}</div><div class="l">concluídas</div></div>
+          <div class="kpi"><div class="v" style="color:var(--exec)">${sum("exec")}</div><div class="l">em execução</div></div>
+          <div class="kpi"><div class="v" style="color:var(--stop)">${sum("stop")}</div><div class="l">paralisadas</div></div>
+        </div>
+        <div class="filters" role="group" aria-label="Situação">${[["todas", "Todas"], ["exec", "Em execução"], ["done", "Concluídas"], ["stop", "Paralisadas"], ["idle", "Não iniciadas"]].map(([k, l]) => `<button class="fchip" data-sit-f="${k}" aria-pressed="${f.sit === k}">${l}</button>`).join("")}</div>
+        <div class="filters" role="group" aria-label="Área">${["todas", ...Object.keys(AREAS)].map((a) => `<button class="fchip" data-area-f="${a}" aria-pressed="${f.area === a}">${a === "todas" ? "Todas as áreas" : a}</button>`).join("")}</div>
+        <div class="obras-layout">
+          <div><svg class="pinmap" viewBox="${bx - 4} ${by - 4} ${bw + 8} ${bh + 8}" aria-label="Mapa das obras no Distrito Federal"><path d="${GEO.uf.DF.d}" fill="var(--surface-2)" stroke="var(--line)" stroke-width="1" vector-effect="non-scaling-stroke"/><text x="${bx + bw * 0.29}" y="${by + bh * 0.32}" text-anchor="middle" style="font:600 ${(bw * 0.04).toFixed(2)}px var(--f-ui);fill:var(--muted)">Ceilândia</text><text x="${bx + bw * 0.62}" y="${by + bh * 0.47}" text-anchor="middle" style="font:600 ${(bw * 0.04).toFixed(2)}px var(--f-ui);fill:var(--muted)">Plano Piloto</text>${pins}</svg>
+            <div class="legend">${Object.entries(SIT).map(([, [l, c]]) => `<span><i style="background:${c};border-radius:50%"></i>${l}</span>`).join("")}<span>tamanho = valor previsto · posições ilustrativas</span></div></div>
+          <div class="olist">${shown.map(obraCard).join("") || `<p class="explain">Nenhuma obra com esses filtros.</p>`}</div>
+        </div>
+        <p class="explain">Situação, prazos e percentuais são informados pelos próprios gestores no Obrasgov.br e podem estar desatualizados. Cada obra mostra a data da última informação. Viu algo diferente na rua? Use “Reportar erro”.</p>
+      </section>`;
+    if (state.obra) panelObra(state.obra); else panelEmpty("Toque numa obra", "Veja valor, prazos, quanto já foi executado, de onde veio o dinheiro e, se estiver parada, o motivo informado.");
+  };
+
+  const panelObra = (o) => {
+    const [cl, ce] = CONF[o.conf]; const late = !o.endReal && o.endPlanned < new Date(2026, 9, 26);
+    panelShell(`<div class="p-head" style="align-items:flex-start"><div><p class="eyebrow">${o.area}</p><h2 style="margin-top:4px">${esc(o.name)}</h2><div class="sub" style="margin-top:8px">${sitPill(o)}<span>Ceilândia (DF)</span></div></div>${closeBtn}</div>
+      <div class="p-body">
+        <div class="kpis"><div class="kpi"><div class="v" style="font-size:22px">${brl(o.value)}</div><div class="l">valor previsto</div><div class="bar"><span style="width:${o.paid / o.value * 100}%"></span></div><div class="src" style="margin-top:6px">${brl(o.paid)} pagos · ${brl(o.committed)} empenhados</div></div>
+          <div class="kpi"><div class="v">${o.pct}<small>%</small></div><div class="l">execução física</div><div class="bar"><span style="width:${o.pct}%;background:${SIT[o.sit][1]}"></span></div></div></div>
+        ${o.sit === "stop" ? `<div class="warnbox"><b>Paralisada desde ${fmtDate(o.stoppedSince)}</b> (há ${monthsSince(o.stoppedSince)} meses).<br>Motivo informado: ${esc(o.why)}.</div>` : ""}
+        <div><p class="lbl">Prazos</p><div class="dates" style="margin-top:8px"><span></span><span class="h">Previsto</span><span class="h">Real</span>
+          <span>Início</span><span>${fmtDate(o.startPlanned)}</span><span>${o.startReal ? fmtDate(o.startReal) : "—"}</span>
+          <span>Término</span><span>${fmtDate(o.endPlanned)}</span><span>${o.endReal ? fmtDate(o.endReal) : late ? "Atrasada" : "—"}</span></div></div>
+        <div><p class="lbl">De onde veio o dinheiro</p>
+          <div class="vote-row" style="border:0"><span class="mini" style="width:44px;height:44px;border-radius:10px;overflow:hidden;flex:none">${portrait(o.author, { initials: false })}</span><div><div class="t">${o.conf === "municipio" ? "Emenda para o DF, sem ligação registrada com esta obra" : `Emenda ${o.amendment} de ${esc(o.author.name)}`}</div><div class="d">${o.conf === "municipio" ? "" : `${pLabel(o.author.party)} · ${o.author.office} · `}repasse de ${esc(FROM[o.area])}</div></div></div>
+          <span class="conf" style="color:${o.conf === "direto" ? "var(--done)" : o.conf === "convenio" ? "var(--exec)" : "var(--muted)"}">${cl}</span><p class="src" style="margin-top:6px">${ce}</p></div>
+        <div><p class="lbl">Quem executa</p><p style="margin-top:6px;font-size:13.5px">${esc(EXEC[o.area])} · contrato com ${esc(o.company)} (empresa fictícia)</p></div>
+        <div><p class="lbl">Fotos do gestor</p><div class="photos" style="margin-top:8px">${o.photos ? Array.from({ length: o.photos }, (_, i) => `<div>foto ${i + 1} enviada pelo gestor</div>`).join("") : `<div style="grid-column:1/-1;aspect-ratio:auto;padding:14px">O gestor ainda não enviou fotos.</div>`}</div></div>
+        <p class="src">Informado pelo gestor em ${fmtDate(o.updated)} · Fonte: Obrasgov.br, base atualizada em 23/10/2026</p>
+        <div class="p-actions"><button class="btn primary" data-share="obra"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15V3m0 0L7.5 7.5M12 3l4.5 4.5M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>Compartilhar</button><button class="btn" disabled>Reportar erro</button><button class="btn" disabled>Ver no Obrasgov</button></div>
+      </div>`);
+    panel.classList.add("open"); panel.scrollTop = 0;
+  };
+
+  const renderVote = () => {
+    const v = VOTES.find((x) => x.id === state.vote); const tot = v.yes + v.no + v.other;
+    const partyRows = Object.keys(PARTIES).map((k) => { const y = Math.round(20 + rnd() * 75); return [k, y]; }).sort((a, b) => pLabel(a[0]).localeCompare(pLabel(b[0])));
+    main.innerHTML = `
+      <section class="card vote-hero">
+        <div style="display:flex;gap:8px;flex-wrap:wrap">${VOTES.map((x) => `<button class="btn" data-vote="${x.id}" ${x.id === v.id ? 'style="border-color:var(--fg)"' : ""}>${x.house} · ${x.date}</button>`).join("")}</div>
+        <p class="eyebrow">${v.house} · ${v.date} · Tema: ${v.theme}</p>
+        <h1>${esc(v.title)}</h1>
+        <div class="bigsplit"><div class="n yes">${v.yes}<small>Sim</small></div>
+          <div class="bigbar" aria-label="${v.yes} Sim, ${v.no} Não, ${v.other} outros"><span style="width:${v.yes / tot * 100}%;background:var(--yes)"></span><span style="width:${v.other / tot * 100}%;background:var(--other)"></span><span style="width:${v.no / tot * 100}%;background:var(--no)"></span><i></i></div>
+          <div class="n no">${v.no}<small>Não</small></div></div>
+        <p class="summary">${esc(v.summary)}</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><span class="badge-ai">Rascunho por IA · revisado por pessoa em 23/10/2026</span><span class="badge-ai">Por que está aqui: ${esc(v.criterion)}</span></div>
+        <div class="p-actions"><button class="btn primary" data-share="vote"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15V3m0 0L7.5 7.5M12 3l4.5 4.5M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>Compartilhar</button><button class="btn" disabled>Ver na fonte oficial</button></div>
+      </section>
+      ${v.house === "Câmara" ? `<section class="card"><div class="section-h"><h2>Como votaram os deputados do DF</h2><p>Ordem alfabética</p></div><div class="myvotes" style="margin-top:12px">${DF.federal.map((r) => `<button class="myvote" data-rep="${r.id}"><span class="mini">${portrait(r, { initials: false })}</span><span><span class="nm">${esc(r.name)}</span><br><span class="pt">${pLabel(r.party)} · DF</span></span><span class="chip ${r.votes[v.id]}">${optLabel[r.votes[v.id]]}</span></button>`).join("")}</div></section>` : `<section class="card"><div class="section-h"><h2>Como votaram os senadores do DF</h2></div><div class="myvotes" style="margin-top:12px">${DF.senators.map((r) => `<button class="myvote" data-rep="${r.id}"><span class="mini">${portrait(r, { initials: false })}</span><span><span class="nm">${esc(r.name)}</span><br><span class="pt">${pLabel(r.party)} · DF</span></span><span class="chip ${r.votes[v.id]}">${optLabel[r.votes[v.id]]}</span></button>`).join("")}</div></section>`}
+      <div style="display:flex;flex-direction:column;gap:20px">
+        <section class="card"><div class="section-h"><h2>Por estado</h2><p>% de Sim entre os deputados de cada estado</p></div><div style="margin-top:12px">${mapHtml("vote")}</div></section>
+        <section class="card"><div class="section-h"><h2>Por partido</h2><p>% de Sim · ordem alfabética</p></div><div class="partybars" style="margin-top:14px">${partyRows.map(([k, y]) => `<div class="pb"><span>${partyChip(k)}</span><span class="track"><span style="width:${y}%;background:var(--yes)"></span></span><span>${y}%</span></div>`).join("")}</div></section>
+      </div>`;
+    if (state.rep) panelRep(state.rep); else if (state.uf) panelUF(state.uf); else panelEmpty("Toque num estado ou num deputado", "Veja o placar daquele estado ou o histórico de votos do político.");
+  };
+
+  // ---------------------------------------------------------------- panel
+  const panelShell = (inner) => { panel.innerHTML = `<div class="handle"></div>${inner}`; };
+  const closeBtn = `<button class="icon-btn p-close" data-close aria-label="Fechar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"/></svg></button>`;
+  const panelEmpty = (h, p) => { panel.classList.remove("open"); panelShell(`<div class="p-empty"><h2>${h}</h2><p>${p}</p></div>`); };
+  const panelRep = (r) => {
+    const pctSpent = Math.round(r.spent / r.limit * 100);
+    panelShell(`${state.uf ? `<div style="padding:14px 18px 0"><button class="back" data-back-uf>‹ Voltar para ${UF_NAMES[state.uf]}</button></div>` : ""}<div class="p-head"><div class="avatar">${portrait(r, { initials: false })}<span class="flag" style="width:22px;height:15px;left:4px;top:4px">${flagFor(r.uf)}</span></div>
+        <div><h2>${esc(r.name)}</h2><div class="sub">${partyChip(r.party)}<span>${esc(r.office)} · ${UF_NAMES[r.uf]}</span></div></div>${closeBtn}</div>
+      <div class="p-body">
+        <div class="kpis">
+          <div class="kpi"><div class="v">${r.presence}<small>%</small></div><div class="l">presença nas votações do plenário</div><div class="bar"><span style="width:${r.presence}%"></span><i style="left:${r.houseMedian}%"></i></div><div class="src" style="margin-top:6px">mediana da casa: ${r.houseMedian}%</div></div>
+          <div class="kpi"><div class="v" style="font-size:22px">${brl(r.spent)}</div><div class="l">gastos da cota em 2026</div><div class="bar"><span style="width:${pctSpent}%"></span></div><div class="src" style="margin-top:6px">${pctSpent}% do limite anual</div></div>
+        </div>
+        ${r.office === "Deputado(a) distrital" ? `<p class="explain">Votações da CLDF chegam na fase 2. Por enquanto, o perfil básico mostra cadastro e partido.</p>` : `<div><p class="lbl">Últimos votos</p>${VOTES.filter((v) => r.votes[v.id] && ((r.office === "Senador(a)") === (v.house === "Senado"))).map((v) => `<div class="vote-row"><span class="chip ${r.votes[v.id]}">${optLabel[r.votes[v.id]]}</span><div><div class="t">${esc(v.title)}</div><div class="d">${v.house} · ${v.date}</div></div></div>`).join("") || `<p class="src">Sem votações nominais recentes.</p>`}</div>`}
+        <div class="kpi"><div class="v" style="font-size:22px">${brl(r.assets)}</div><div class="l">patrimônio declarado ao TSE na última eleição</div></div>
+        <p class="src">Fontes: Câmara dos Deputados, Senado Federal, CLDF e TSE · atualizado em 26/10/2026</p>
+        <div class="p-actions"><button class="btn primary" data-share="rep"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15V3m0 0L7.5 7.5M12 3l4.5 4.5M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>Compartilhar</button><button class="btn" data-profile="${r.id}">Ver perfil completo</button><button class="btn" disabled>Seguir</button></div>
+      </div>`);
+    panel.classList.add("open");
+  };
+  const person = (r) => {
+    const v = state.view === "votacao" ? r.votes[state.vote] : null;
+    return `<button class="person" data-rep="${r.id}"><span class="ph">${portrait(r, { initials: false })}</span><span class="nm">${esc(r.name)}</span>${v ? `<span class="chip ${v}" style="font-size:10px;padding:1px 6px;align-self:flex-start">${optLabel[v]}</span>` : partyChip(r.party)}</button>`;
+  };
+  const panelUF = (uf) => {
+    const rows = ufParties[uf]; const max = Math.max(...rows.map((r) => r[1])); const [tk, tn] = topParty(uf);
+    const i = UF_ORDER.indexOf(uf); const prev = UF_ORDER[(i + UF_ORDER.length - 1) % UF_ORDER.length]; const next = UF_ORDER[(i + 1) % UF_ORDER.length];
+    const v = VOTES.find((x) => x.id === state.vote);
+    panelShell(`<div class="p-head"><div class="avatar" style="width:52px;height:36px;border-radius:6px">${flagFor(uf)}</div><div><h2>${UF_NAMES[uf]}</h2><div class="sub">${uf} · ${SEATS[uf]} deputados federais · 3 senadores</div></div>
+        <div class="p-nav"><button class="icon-btn" data-uf="${prev}" aria-label="Estado anterior: ${UF_NAMES[prev]}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 6l-6 6 6 6"/></svg></button><button class="icon-btn" data-uf="${next}" aria-label="Próximo estado: ${UF_NAMES[next]}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></button><button class="icon-btn" data-close aria-label="Fechar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div></div>
+      <div class="p-body">
+        ${state.view === "votacao"
+          ? `<div class="kpi"><div class="v">${ufYes[uf][state.vote]}<small>% Sim</small></div><div class="l">dos deputados de ${UF_NAMES[uf]} em “${esc(v.title)}”</div></div>`
+          : `<div class="statrow"><div class="kpi"><div class="v">${SEATS[uf]}</div><div class="l">deputados federais</div></div><div class="kpi"><div class="v">3</div><div class="l">senadores</div></div><div class="kpi"><div class="v" style="font-size:20px">${pLabel(tk)}</div><div class="l">maior bancada (${tn})</div></div></div>`}
+        <div><p class="lbl">Senadores · ordem alfabética</p><div class="peoplegrid">${REPS[uf].senators.map(person).join("")}</div></div>
+        <div><p class="lbl">Deputados federais · ordem alfabética</p><div class="peoplegrid">${REPS[uf].federal.map(person).join("")}</div></div>
+        <div><p class="lbl">Bancada federal por partido · ordem alfabética</p><div class="partybars" style="margin-top:10px">${rows.map(([k, n]) => `<div class="pb"><span>${partyChip(k)}</span><span class="track"><span style="width:${n / max * 100}%;background:${PARTIES[k][1]}"></span></span><span>${n}</span></div>`).join("")}</div></div>
+        ${uf === "DF" ? `<button class="btn primary" data-go="representantes">Ver também os 24 deputados distritais</button>` : ""}
+        <p class="src">Fonte: Câmara dos Deputados e Senado Federal · atualizado em 26/10/2026</p>
+      </div>`);
+    panel.classList.add("open"); panel.scrollTop = 0;
+  };
+
+  // ---------------------------------------------------------------- share sheet
+  const openShare = (kind) => {
+    state.shareOpen = kind;
+    const draw = () => {
+      const scale = state.format === "link" ? 0.94 : state.format === "feed" ? 0.92 : 0.82;
+      layer.innerHTML = `<div class="scrim" data-close-share></div><div class="sheet share" role="dialog" aria-modal="true" aria-labelledby="shareTitle"><div class="handle"></div>
+        <div class="sheet-h"><h2 id="shareTitle">Compartilhar</h2><button class="icon-btn" data-close-share aria-label="Fechar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+        <div class="formats" role="group" aria-label="Formato">${[["story", "Stories 9:16"], ["feed", "Feed 4:5"], ["link", "Prévia de link"]].map(([k, l]) => `<button data-format="${k}" aria-pressed="${state.format === k}">${l}</button>`).join("")}</div>
+        <div class="preview"><div style="transform:scale(${scale});transform-origin:top center;height:${({ story: 480, feed: 375, link: 189 })[state.format] * scale}px">${shareCard(kind, state.format)}</div></div>
+        <div class="share-actions">
+          <a class="btn wa" href="https://wa.me/?text=${encodeURIComponent("Veja quem representa Ceilândia (DF): https://cobra.org.br/representantes/5300108")}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.1-4.5-3.9-4.7-4.1-.1-.2-1.1-1.5-1.1-2.9s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 1.9c.1.2.1.4 0 .5l-.3.5-.4.4c-.1.1-.3.3-.1.6.2.3.7 1.2 1.6 1.9 1.1 1 2 1.3 2.3 1.4.3.1.5.1.6-.1l.9-1c.2-.3.4-.2.6-.1l1.8.9c.3.1.4.2.5.3.1.2.1.7-.2 1.4z"/></svg>Enviar no WhatsApp</a>
+          <button class="btn" data-fake="A imagem é gerada no site real">Baixar imagem</button>
+          <button class="btn" data-fake="A imagem é copiada no site real">Copiar imagem</button>
+          <a class="btn" href="https://x.com/intent/post?text=${encodeURIComponent("Veja quem representa Ceilândia (DF) https://cobra.org.br/representantes/5300108")}" target="_blank" rel="noopener">Postar no X</a>
+          <button class="btn" data-copy>Copiar link</button>
+        </div></div>`;
+      layer.querySelector('[data-close-share].icon-btn').focus();
+    };
+    draw();
+    layer.onclick = (e) => {
+      const f = e.target.closest("[data-format]"); if (f) { state.format = f.dataset.format; draw(); return; }
+      if (e.target.closest("[data-close-share]")) { layer.innerHTML = ""; state.shareOpen = false; if (state.view === "perfil") state.rep = null; return; }
+      const fake = e.target.closest("[data-fake]"); if (fake) { toast(fake.dataset.fake); return; }
+      if (e.target.closest("[data-copy]")) {
+        const link = "https://cobra.org.br/representantes/5300108";
+        navigator.clipboard?.writeText(link).then(() => toast("Link copiado"), () => toast(link));
+      }
+    };
+  };
+
+  // ---------------------------------------------------------------- routing
+  const render = () => {
+    document.querySelectorAll("[data-go]").forEach((b) => b.toggleAttribute("aria-current", false));
+    document.querySelectorAll(`.seg [data-go="${state.view}"], .tabbar [data-go="${state.view}"]`).forEach((b) => b.setAttribute("aria-current", "page"));
+    document.body.classList.toggle("nopanel", state.view === "perfil");
+    if (state.view === "inicio") renderHome(); else if (state.view === "representantes") renderReps(); else if (state.view === "perfil") renderProfile(); else if (state.view === "obras") renderObras(); else renderVote();
+    animateMap(); bindMapTip();
+  };
+  // Selecting a person only swaps the panel, so the map keeps its zoom.
+  const renderPanelOnly = () => { if (state.rep) panelRep(state.rep); else render(); };
+  const go = (view) => { state.view = view; state.rep = null; state.uf = null; state.obra = null; currentVB = FULL_VB.slice(); try { history.replaceState(null, "", "#" + view); } catch {} render(); window.scrollTo({ top: 0 }); };
+
+  document.addEventListener("click", (e) => {
+    const t = e.target;
+    const goBtn = t.closest("[data-go]"); if (goBtn && !goBtn.disabled) { go(goBtn.dataset.go); return; }
+    if (t.closest("#brand")) { go("inicio"); return; }
+    if (t.closest("#ex")) { state.place = "Ceilândia (DF)"; go("representantes"); return; }
+    const tile = t.closest("[data-uf]"); if (tile) { state.uf = tile.dataset.uf; state.rep = null; render(); return; }
+    if (t.closest("[data-map-reset]")) { state.uf = null; state.rep = null; render(); return; }
+    if (t.closest("[data-back-uf]")) { state.rep = null; render(); return; }
+    const mm = t.closest("[data-map-mode]"); if (mm) { state.mapMode = mm.dataset.mapMode; render(); return; }
+    const z = t.closest("[data-zoom]"); if (z) {
+      const svg = main.querySelector("svg.map"); const [x, y, w, h] = currentVB; const f = z.dataset.zoom === "in" ? 0.7 : 1 / 0.7;
+      const nw = Math.min(FULL_VB[2] * 1.2, Math.max(60, w * f)); const nh = h * (nw / w);
+      currentVB = [x + (w - nw) / 2, y + (h - nh) / 2, nw, nh]; svg.setAttribute("viewBox", currentVB.join(" ")); svg.dataset.target = currentVB.join(" "); return;
+    }
+    const rep = t.closest("[data-rep]"); if (rep) { state.rep = ALL.find((r) => r.id === rep.dataset.rep); renderPanelOnly(); return; }
+    const vote = t.closest("[data-vote]"); if (vote) { state.vote = vote.dataset.vote; state.view = "votacao"; state.rep = null; render(); window.scrollTo({ top: 0 }); return; }
+    if (t.closest("[data-close]") && state.obra) { state.obra = null; render(); return; }
+    if (t.closest("[data-close]")) { if (state.rep && state.uf) { state.rep = null; render(); } else { state.rep = null; state.uf = null; render(); } return; }
+    const prof = t.closest("[data-profile]"); if (prof) { state.profileRep = ALL.find((x) => x.id === prof.dataset.profile); state.view = "perfil"; state.tab = "votos"; state.themeF = null; state.rep = null; state.uf = null; panel.classList.remove("open"); render(); window.scrollTo({ top: 0 }); return; }
+    const tabB = t.closest("[data-tab]"); if (tabB) { state.tab = tabB.dataset.tab; render(); return; }
+    const thF = t.closest("[data-theme-f]"); if (thF) { state.themeF = thF.dataset.themeF; render(); return; }
+    if (t.closest("[data-homage]")) { state.showHomage = !state.showHomage; render(); return; }
+    const sf = t.closest("[data-sit-f]"); if (sf) { state.obraF.sit = sf.dataset.sitF; render(); return; }
+    const af = t.closest("[data-area-f]"); if (af) { state.obraF.area = af.dataset.areaF; render(); return; }
+    const ob = t.closest("[data-obra]"); if (ob) { state.obra = OBRAS.find((o) => o.id === ob.dataset.obra); if (state.view !== "obras") { state.view = "obras"; } render(); return; }
+    const share = t.closest("[data-share]"); if (share) { let k = share.dataset.share; if (k === "profile") { state.rep = state.profileRep; k = "rep"; } openShare(k); return; }
+    if (t.closest("#shareTop")) { if (state.view === "perfil") state.rep = state.profileRep; openShare(state.view === "votacao" ? "vote" : state.view === "obras" && state.obra ? "obra" : state.rep ? "rep" : "places"); return; }
+    if (t.closest("#theme")) {
+      const root = document.documentElement;
+      const dark = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+      root.dataset.theme = dark ? "light" : "dark";
+    }
+  });
+  document.addEventListener("submit", (e) => {
+    if (e.target.id !== "cepForm") return;
+    e.preventDefault();
+    const v = document.getElementById("cep").value.trim();
+    state.place = /^\d{5}-?\d{3}$/.test(v) || /ceil/i.test(v) || v === "" ? "Ceilândia (DF)" : `${v} (exemplo com dados do DF)`;
+    go("representantes");
+  });
+  document.addEventListener("keydown", (e) => {
+    if ((e.key === "Enter" || e.key === " ") && e.target.matches?.("path.uf")) { e.preventDefault(); state.uf = e.target.dataset.uf; state.rep = null; render(); return; } if (e.key === "Escape") { if (state.shareOpen) { layer.innerHTML = ""; state.shareOpen = false; } else if (state.rep || state.uf) { state.rep = null; state.uf = null; render(); } } });
+
+  const initial = (location.hash || "").slice(1);
+  state.view = ["inicio", "representantes", "votacao", "obras"].includes(initial) ? initial : "inicio";
+  if (state.view === "representantes") state.place = "Ceilândia (DF)";
+  render();
+})();
+</script>

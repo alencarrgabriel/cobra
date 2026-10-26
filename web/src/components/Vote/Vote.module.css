@@ -1,0 +1,56 @@
+.badge {
+  display: inline-flex;
+  flex: none;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  padding: 2px 9px;
+  border-radius: var(--radius-pill);
+  border: 1.5px solid currentColor;
+}
+
+.yes {
+  color: var(--vote-yes);
+}
+
+.no {
+  color: var(--vote-no);
+}
+
+.other {
+  color: var(--vote-other);
+}
+
+.split {
+  position: relative;
+  display: flex;
+  height: 10px;
+  border-radius: 5px;
+  overflow: hidden;
+  background: var(--surface-2);
+}
+
+.lg {
+  height: 22px;
+  border-radius: 11px;
+}
+
+.segYes {
+  background: var(--vote-yes);
+}
+
+.segNo {
+  background: var(--vote-no);
+}
+
+.segOther {
+  background: var(--vote-other);
+}
+
+.mid {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--fg);
+}
