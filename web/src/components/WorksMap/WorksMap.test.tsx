@@ -10,6 +10,8 @@ const pin = (code: string, lon: number, lat: number) => ({
   status: "stopped" as const,
   lat,
   lon,
+  plannedValue: null,
+  progress: null,
 });
 
 describe("WorksMap", () => {

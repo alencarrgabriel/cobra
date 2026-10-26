@@ -43,3 +43,33 @@
   padding-left: var(--space-3);
   border-left: 3px solid var(--line);
 }
+
+.mapLinks {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.mapLinks a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 6px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  color: var(--fg);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.mapLinks a:hover {
+  border-color: var(--fg);
+}
+
+.mapNote {
+  font-size: var(--text-sm);
+  color: var(--muted);
+}

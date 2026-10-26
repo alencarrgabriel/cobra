@@ -47,6 +47,8 @@ export type WorkPin = {
   status: WorkStatus;
   lat: number;
   lon: number;
+  plannedValue: number | null;
+  progress: number | null;
 };
 
 export type Party = { name: string; cnpj: string | null };
@@ -75,7 +77,8 @@ export type WorkDetail = WorkListItem & {
   actualEnd: string | null;
   progressUpdatedOn: string | null;
   hasPhotos: boolean;
-  hasLocation: boolean;
+  /** Coordinates as informed by the source; null when it does not inform them. */
+  location: { lat: number; lon: number } | null;
   qualityNotes: string[];
   events: WorkEvent[];
   sourceUrl: string | null;
@@ -202,9 +205,13 @@ async function cachedPins(
         status: WorkStatus;
         latitude: string | null;
         longitude: string | null;
+        planned_value: string | null;
+        physical_progress: string | null;
       }[]
     >`
-      select source_id, name, status, latitude, longitude from core.works
+      select source_id, name, status, latitude, longitude, planned_value,
+             physical_progress
+      from core.works
       where uf_code = ${q.uf}
       ${q.status ? sql`and status = ${q.status}` : sql``}
       ${q.type ? sql`and type = ${q.type}` : sql``}
@@ -221,6 +228,8 @@ async function cachedPins(
           status: r.status,
           lat: Number(r.latitude),
           lon: Number(r.longitude),
+          plannedValue: num(r.planned_value),
+          progress: num(r.physical_progress),
         });
       }
     }
@@ -273,7 +282,10 @@ async function cachedWork(code: string): Promise<DbResult<WorkDetail | null>> {
       actualEnd: w.actual_end_text,
       progressUpdatedOn: w.progress_updated_text,
       hasPhotos: w.has_photos,
-      hasLocation: w.latitude !== null && w.longitude !== null,
+      location:
+        w.latitude !== null && w.longitude !== null
+          ? { lat: Number(w.latitude), lon: Number(w.longitude) }
+          : null,
       qualityNotes: w.quality_notes,
       events: events.map((e) => ({
         status: e.status,

@@ -24,6 +24,10 @@ export default defineConfig({
         viewport: { width: 360, height: 740 },
         isMobile: true,
         hasTouch: true,
+        // Software WebGL, so the street map renders in headless runs and in CI.
+        launchOptions: {
+          args: ["--use-angle=swiftshader", "--enable-unsafe-swiftshader"],
+        },
       },
     },
   ],

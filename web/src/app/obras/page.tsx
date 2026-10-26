@@ -177,7 +177,11 @@ async function Results({
         <h2 id="mapa" className={styles.h2}>
           Onde ficam
         </h2>
-        <WorksMap pins={map.pins} withoutLocation={map.withoutLocation} />
+        <WorksMap
+          pins={map.pins}
+          withoutLocation={map.withoutLocation}
+          interactive
+        />
       </Card>
 
       <Card aria-labelledby="lista">

@@ -16,6 +16,11 @@ const nextConfig: NextConfig = {
         source: "/:path*",
         headers: securityHeaders(process.env.NODE_ENV === "development"),
       },
+      {
+        // Street map, glyphs and icons change only with a new extract (docs/mapa.md).
+        source: "/mapa/:path*",
+        headers: [{ key: "Cache-Control", value: "public, max-age=86400" }],
+      },
     ];
   },
 };

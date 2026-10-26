@@ -15,10 +15,10 @@ Documentação conferida em 2026-10-26: Protomaps (Getting Started, PMTiles com 
 ## Decisions
 
 ### D1. Biblioteca e fundo
-- MapLibre GL JS 6.x. A versão fixada tem pelo menos duas semanas de publicada (hoje: 6.14.0, de 11/10). Vetorial, de código aberto, desenha no WebGL e aguenta milhares de pinos.
+- MapLibre GL JS 6.14.0 (publicada em 11/10, a mais nova com pelo menos duas semanas). Vetorial, de código aberto, desenha no WebGL e aguenta milhares de pinos.
 - Fundo: recorte do DF da build diária do Protomaps (`pmtiles extract https://build.protomaps.com/<data>.pmtiles --bbox=-48.35,-16.10,-47.25,-15.45`), zoom 0 a 15. Recorte de 20261026: 49 MB, crédito "© OpenStreetMap".
 - Estilo gerado por `@protomaps/basemaps` (`layers('protomaps', namedFlavor('light' | 'dark'), { lang: 'pt' })`). Português tem suporte e usa fontes latinas.
-- Fontes (Noto Sans, OFL) e ícones (`sprites/v4/light|dark`) do repositório `protomaps/basemaps-assets`, copiados para `web/public/mapa/` e servidos pelo site.
+- Fontes (Noto Sans, OFL) e ícones (`sprites/v4/light|dark`) do repositório `protomaps/basemaps-assets` (commit `028c18f`), copiados para `web/public/mapa/` e servidos pelo site. Das fontes, só as faixas latinas usadas pelo português (1,8 MB em vez de 19 MB).
 - Alternativas rejeitadas:
   - Google Maps embutido: manda IP e cookies do visitante ao Google ao abrir a página, exige chave e cobrança.
   - Mapa da Qlik, usado pelo painel do Serpro: chave licenciada ao Serpro.
@@ -28,7 +28,7 @@ Documentação conferida em 2026-10-26: Protomaps (Getting Started, PMTiles com 
 - `web/scripts/fetch-basemap.mjs` baixa um arquivo fixado em `web/basemap.json` (`{ build, bbox, url, sha256, bytes }`), confere o SHA-256 e grava em `web/public/mapa/df.pmtiles`, que fica no `.gitignore`.
 - O recorte é feito uma vez, por quem atualiza o mapa, com o CLI `pmtiles`. Hospedagem definitiva do arquivo a definir com o deploy (armazenamento de objetos ou release do GitHub).
 - Enquanto não houver hospedagem, o script grava o arquivo a partir de um caminho local (`BASEMAP_FILE`), conferindo o mesmo hash. Sem o arquivo, o mapa interativo não aparece e o SVG continua.
-- O PMTiles é lido com requisições HTTP `Range`. Vamos confirmar que o servidor do Next devolve 206 para arquivos em `public/`; se não, servimos por um Route Handler com suporte a `Range`.
+- O PMTiles é lido com requisições HTTP `Range`. O servidor do Next devolve 206 para arquivos em `public/` (conferido em teste), então não há Route Handler. `/mapa/*` tem cache de um dia.
 
 ### D3. Carregamento e alternativa sem JavaScript
 - O componente `WorksMapInteractive` é client-only e é carregado com `next/dynamic` (`ssr: false`), só em `/obras`. O servidor continua renderizando o SVG atual dentro de um `<noscript>`-equivalente: o SVG é a primeira coisa na tela e é trocado pelo mapa quando este fica pronto.
@@ -46,7 +46,7 @@ Documentação conferida em 2026-10-26: Protomaps (Getting Started, PMTiles com 
 - Fundo `light` ou `dark` conforme o tema do site. A troca de tema chama `setStyle` com o outro sabor e repõe os pinos.
 
 ### D6. CSP
-- O MapLibre cria um worker a partir de um blob. Duas opções: a build CSP do MapLibre, com o arquivo do worker servido pelo site (`setWorkerUrl`), ou `worker-src blob:`. Preferimos a build CSP, que não afrouxa a política. `connect-src 'self'` já cobre o PMTiles, as fontes e os ícones.
+- O MapLibre 6 não tem mais a build CSP separada: o worker é um módulo (`maplibre-gl-worker.mjs`). Quando a URL do worker é da mesma origem, ele é carregado direto, sem `blob:`. O build copia o worker para `public/mapa/lib/` (`scripts/copy-map-worker.mjs`) e o mapa chama `setWorkerUrl`. A CSP fica como estava: `script-src 'self'` cobre o worker e `connect-src 'self'` cobre o PMTiles, as fontes e os ícones.
 
 ### D7. Links para o Google Maps
 - Formato oficial "Maps URLs", sem chave:
@@ -58,7 +58,8 @@ Documentação conferida em 2026-10-26: Protomaps (Getting Started, PMTiles com 
 ### D8. Testes
 - Vitest: montagem do GeoJSON (só obras com coordenadas, propriedades certas) e das URLs do Google (formato e codificação).
 - Playwright: a página continua com SVG e lista sem JavaScript; com JavaScript, o canvas do mapa aparece; toque num pino abre o resumo com link; filtro "Paralisada" reduz o GeoJSON a um ponto; nenhuma requisição sai para outro domínio; links da ficha com e sem coordenadas.
-- O CI precisa do arquivo do mapa. Usamos um recorte pequeno de teste (zoom até 10, poucas centenas de KB) versionado em `web/e2e/fixtures/`, apontado por variável só nos testes.
+- O CI precisa do arquivo do mapa. Usamos um recorte pequeno de teste (zoom até 10, 1,5 MB) versionado em `web/e2e/fixtures/`, posto no lugar por `pnpm basemap:test`.
+- O Chromium dos testes roda o WebGL por software (SwiftShader).
 
 ## Risks / Trade-offs
 

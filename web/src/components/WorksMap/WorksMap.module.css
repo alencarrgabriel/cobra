@@ -72,3 +72,69 @@
 .credit {
   font-size: var(--text-xs);
 }
+
+/* Interactive street map (change mapa-de-obras). */
+.switcher {
+  position: relative;
+}
+
+.hidden {
+  display: none;
+}
+
+/* Created out of sight while the street map loads; the drawing stays on screen. */
+.pending {
+  position: absolute;
+  inset: 0;
+  visibility: hidden;
+}
+
+.interactive {
+  width: 100%;
+  height: min(70vh, 520px);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--line);
+}
+
+.interactive :global(.maplibregl-popup-content) {
+  background: var(--surface);
+  color: var(--fg);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3) var(--space-4);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--fg) 18%, transparent);
+}
+
+.interactive :global(.maplibregl-popup-tip) {
+  border-top-color: var(--surface);
+  border-bottom-color: var(--surface);
+}
+
+.interactive :global(.maplibregl-popup-close-button) {
+  color: var(--fg);
+  font-size: var(--text-lg);
+  width: 32px;
+  height: 32px;
+}
+
+.popup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+}
+
+.popup p {
+  margin: 0;
+}
+
+.popupName {
+  font-weight: 600;
+  padding-right: var(--space-5);
+}
+
+.popupStatus {
+  font-weight: 600;
+  color: var(--status);
+}

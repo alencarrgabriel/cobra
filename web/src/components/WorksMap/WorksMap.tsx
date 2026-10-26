@@ -1,14 +1,18 @@
 import boundary from "@/lib/geo/df-boundary.json";
 import { fitProjection, type LonLat } from "@/lib/geo/projection";
 import { WORK_STATUSES } from "@/lib/works/filters";
+import { pinsToGeoJSON } from "@/lib/works/geojson";
 import { formatInteger, STATUS_INFO } from "@/lib/works/format";
 import type { WorkPin } from "@/lib/works/queries";
 
+import { MapSwitcher } from "./MapSwitcher";
 import styles from "./WorksMap.module.css";
 
 type Props = {
   pins: WorkPin[];
   withoutLocation: number;
+  /** Replaces the drawing with the interactive street map once it is ready. */
+  interactive?: boolean;
 };
 
 const RING = boundary.ring as LonLat[];
@@ -19,42 +23,49 @@ const plural = (n: number, one: string, many: string) =>
   `${formatInteger(n)} ${n === 1 ? one : many}`;
 
 /** Server-rendered map of the DF with one link per located work (design D5). */
-export function WorksMap({ pins, withoutLocation }: Props) {
+export function WorksMap({ pins, withoutLocation, interactive }: Props) {
   const shown = pins.filter((p) => PROJECTION.inBounds([p.lon, p.lat]));
   const outside = pins.length - shown.length;
   const present = WORK_STATUSES.filter((s) =>
     shown.some((p) => p.status === s),
   );
+  const drawing = (
+    <svg
+      className={styles.map}
+      viewBox={`0 0 ${PROJECTION.width} ${PROJECTION.height}`}
+      role="group"
+      aria-label={`Mapa do Distrito Federal com ${plural(shown.length, "obra", "obras")}`}
+    >
+      <path d={OUTLINE} className={styles.outline} />
+      {shown.map((p) => {
+        const [x, y] = PROJECTION.project([p.lon, p.lat]);
+        const info = STATUS_INFO[p.status];
+        return (
+          <a
+            key={p.code}
+            href={`/obras/${encodeURIComponent(p.code)}`}
+            aria-label={`${p.name}, ${info.label}`}
+            className={styles.pin}
+          >
+            <circle
+              cx={x}
+              cy={y}
+              r={5}
+              style={{ fill: info.color }}
+              data-status={p.status}
+            />
+          </a>
+        );
+      })}
+    </svg>
+  );
   return (
     <figure className={styles.figure}>
-      <svg
-        className={styles.map}
-        viewBox={`0 0 ${PROJECTION.width} ${PROJECTION.height}`}
-        role="group"
-        aria-label={`Mapa do Distrito Federal com ${plural(shown.length, "obra", "obras")}`}
-      >
-        <path d={OUTLINE} className={styles.outline} />
-        {shown.map((p) => {
-          const [x, y] = PROJECTION.project([p.lon, p.lat]);
-          const info = STATUS_INFO[p.status];
-          return (
-            <a
-              key={p.code}
-              href={`/obras/${encodeURIComponent(p.code)}`}
-              aria-label={`${p.name}, ${info.label}`}
-              className={styles.pin}
-            >
-              <circle
-                cx={x}
-                cy={y}
-                r={5}
-                style={{ fill: info.color }}
-                data-status={p.status}
-              />
-            </a>
-          );
-        })}
-      </svg>
+      {interactive ? (
+        <MapSwitcher geojson={pinsToGeoJSON(shown)}>{drawing}</MapSwitcher>
+      ) : (
+        drawing
+      )}
       <figcaption className={styles.caption}>
         {present.length > 0 ? (
           <ul className={styles.legend} aria-label="Legenda">
@@ -84,7 +95,12 @@ export function WorksMap({ pins, withoutLocation }: Props) {
             {outside === 1 ? "não aparece" : "não aparecem"} no mapa.
           </p>
         ) : null}
-        <p className={styles.credit}>Limite do DF: IBGE.</p>
+        <p className={styles.credit}>
+          Limite do DF: IBGE.
+          {interactive
+            ? " Mapa de ruas: Protomaps e © colaboradores do OpenStreetMap."
+            : ""}
+        </p>
       </figcaption>
     </figure>
   );

@@ -18,6 +18,8 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     "playwright-report/**",
     "test-results/**",
+    // Map assets copied from packages (docs/mapa.md).
+    "public/mapa/**",
   ]),
 ]);
 

@@ -151,6 +151,43 @@ test.describe("ficha da obra", () => {
     );
   });
 
+  test("obra com localização tem links para o Google Maps", async ({
+    page,
+  }) => {
+    await page.goto("/obras/900002.53-02");
+    const links = page.getByTestId("mapa-externo");
+    const point = "-15.83%2C-48.13";
+    await expect(
+      links.getByRole("link", { name: "Ver no Google Maps" }),
+    ).toHaveAttribute(
+      "href",
+      `https://www.google.com/maps/search/?api=1&query=${point}`,
+    );
+    await expect(
+      links.getByRole("link", { name: "Como chegar" }),
+    ).toHaveAttribute(
+      "href",
+      `https://www.google.com/maps/dir/?api=1&destination=${point}`,
+    );
+    await expect(
+      links.getByRole("link", { name: "Street View" }),
+    ).toHaveAttribute(
+      "href",
+      `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${point}`,
+    );
+    await expect(page.getByText("serviço externo ao Cobra")).toBeVisible();
+  });
+
+  test("obra sem localização não mostra links de mapa externo", async ({
+    page,
+  }) => {
+    await page.goto("/obras/900005.53-05");
+    await expect(page.getByTestId("mapa-externo")).toHaveCount(0);
+    await expect(page.getByTestId("sem-localizacao")).toHaveText(
+      "A fonte não informa a localização desta obra.",
+    );
+  });
+
   test("código inexistente responde 404", async ({ page }) => {
     for (const path of ["/obras/999999.53-99", "/obras/nao-existe"]) {
       const response = await page.goto(path);

@@ -27,6 +27,11 @@ __pycache__/
 # Downloaded raw data (never committed)
 data/raw/
 
+# Map basemap: large file, fetched and checked by web/scripts/fetch-basemap.mjs
+data/basemap/
+web/public/mapa/df.pmtiles
+web/public/mapa/lib/
+
 # Environment files: only the documented example and fake test values are versioned
 .env
 .env.*

@@ -16,6 +16,7 @@ import { getWork, type Party, type WorkDetail } from "@/lib/works/queries";
 import { DataUnavailable, isDataUnavailable } from "../DataUnavailable";
 import styles from "../obras.module.css";
 import { SourceNote } from "../SourceNote";
+import { ExternalMapLinks } from "./ExternalMapLinks";
 import ficha from "./ficha.module.css";
 
 // The page waits for the database before responding so that an unknown code gets a real
@@ -104,6 +105,19 @@ export default async function WorkPage({
             Percentual informado em {formatDate(work.progressUpdatedOn)}.
           </p>
         ) : null}
+      </Card>
+
+      <Card aria-labelledby="onde">
+        <h2 id="onde" className={styles.h2}>
+          Onde fica
+        </h2>
+        {work.location ? (
+          <ExternalMapLinks lat={work.location.lat} lon={work.location.lon} />
+        ) : (
+          <p className={styles.note} data-testid="sem-localizacao">
+            A fonte não informa a localização desta obra.
+          </p>
+        )}
       </Card>
 
       {work.qualityNotes.length > 0 ? (
@@ -213,11 +227,6 @@ export default async function WorkPage({
             ) : null,
           )}
         </dl>
-        {!work.hasLocation ? (
-          <p className={styles.note}>
-            A fonte não informa a localização desta obra.
-          </p>
-        ) : null}
       </Card>
 
       <SourceNote

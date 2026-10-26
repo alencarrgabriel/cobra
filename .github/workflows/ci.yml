@@ -47,6 +47,8 @@ jobs:
       - run: pnpm --filter web format:check
       - run: pnpm --filter web typecheck
       - run: pnpm --filter web test
+      # Small street map for browser tests (docs/mapa.md); the full one is not in Git.
+      - run: pnpm --filter web basemap:test
       - run: pnpm --filter web build
       - run: pnpm --filter web check:bundle
       - name: Cache Playwright browsers

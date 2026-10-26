@@ -1,0 +1,21 @@
+{
+  "$comment": "Street map of the DF (Protomaps build, OpenStreetMap data). See docs/mapa.md to make a new extract.",
+  "df": {
+    "build": "20261026",
+    "bbox": "-48.35,-16.10,-47.25,-15.45",
+    "maxzoom": 15,
+    "file": "df-20261026.pmtiles",
+    "url": null,
+    "sha256": "b5c99552a04bdfdf155f8d790202a29feef87c7bfc0815cc486efabd8b2fd3b4",
+    "bytes": 48809027
+  },
+  "test": {
+    "build": "20261026",
+    "bbox": "-48.35,-16.10,-47.25,-15.45",
+    "maxzoom": 10,
+    "file": "df-test.pmtiles",
+    "path": "e2e/fixtures/df-test.pmtiles",
+    "sha256": "10bf5fb89407a249bbc28cc7abb72151a0560205a2ecf59a6869d768a1eaa70c",
+    "bytes": 1525243
+  }
+}
