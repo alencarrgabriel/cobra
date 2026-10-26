@@ -2,7 +2,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
 // Scenarios from openspec spec `identidade-visual`: Contraste e acessibilidade automática.
-const PAGES = ["/", "/design"];
+const PAGES = ["/", "/design", "/obras", "/obras/900002.53-02"];
 const THEMES = ["light", "dark"] as const;
 
 for (const path of PAGES) {

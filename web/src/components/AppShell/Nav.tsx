@@ -22,6 +22,10 @@ const ICONS: Record<Section["icon"], ReactNode> = {
   works: <path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6" />,
 };
 
+// A section stays marked on its inner pages, e.g. /obras/<code>.
+const isCurrent = (pathname: string, href: string) =>
+  pathname === href || (href !== "/" && pathname.startsWith(`${href}/`));
+
 export function Nav({ variant }: { variant: "top" | "bottom" }) {
   const pathname = usePathname();
   return (
@@ -49,7 +53,9 @@ export function Nav({ variant }: { variant: "top" | "bottom" }) {
                 <Link
                   href={s.href}
                   className={styles.item}
-                  aria-current={pathname === s.href ? "page" : undefined}
+                  aria-current={
+                    isCurrent(pathname, s.href) ? "page" : undefined
+                  }
                 >
                   {icon}
                   {s.label}

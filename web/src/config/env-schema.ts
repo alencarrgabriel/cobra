@@ -11,6 +11,12 @@ export const serverEnvSchema = z.object({
     .string()
     .regex(/^[0-9a-f]{7,40}$/, "must be a git commit SHA")
     .optional(),
+  // Read-only connection to the Cobra database. Optional: without it the site stays up
+  // and data pages explain that data is unavailable (spec obras-na-cidade).
+  WEB_DATABASE_URL: z
+    .string()
+    .regex(/^postgres(ql)?:\/\//, "must be a postgres:// URL")
+    .optional(),
 });
 
 /**

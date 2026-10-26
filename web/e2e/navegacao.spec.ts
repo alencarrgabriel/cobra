@@ -59,10 +59,23 @@ test("seções ainda não entregues aparecem como em breve e não são links", a
   page,
 }) => {
   await page.goto("/");
-  for (const label of ["Representantes", "Votações", "Obras"]) {
+  for (const label of ["Representantes", "Votações"]) {
     await expect(
       page.getByRole("link", { name: new RegExp(label) }),
     ).toHaveCount(0);
   }
   await expect(page.getByText("em breve").first()).toBeAttached();
+});
+
+test("Obras é um link e fica marcada também na ficha de uma obra", async ({
+  page,
+}) => {
+  await page.goto("/obras/900001.53-01");
+  const top = page.getByRole("navigation", { name: "Seções", exact: true });
+  const bar = page.getByRole("navigation", { name: "Seções (barra inferior)" });
+  const nav = (await top.isVisible()) ? top : bar;
+  await expect(nav.getByRole("link", { name: "Obras" })).toHaveAttribute(
+    "aria-current",
+    "page",
+  );
 });

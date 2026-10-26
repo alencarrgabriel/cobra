@@ -15,5 +15,5 @@ export const SECTIONS: Section[] = [
     icon: "people",
   },
   { label: "Votações", href: "/votacoes", available: false, icon: "votes" },
-  { label: "Obras", href: "/obras", available: false, icon: "works" },
+  { label: "Obras", href: "/obras", available: true, icon: "works" },
 ];

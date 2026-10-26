@@ -16,11 +16,25 @@ jobs:
   web:
     name: Site (web)
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
     env:
       APP_ENV: test
       # Distinctive values so `check:bundle` can prove they never reach the browser bundle.
       APP_COMMIT_SHA: ${{ github.sha }}
       DATABASE_URL: postgresql://ci-sentinel:ci-sentinel-password@127.0.0.1:5432/ci_sentinel
+      # Browser tests recreate the database cobra_e2e here (web/e2e/db/setup.ts).
+      E2E_ADMIN_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/postgres
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6

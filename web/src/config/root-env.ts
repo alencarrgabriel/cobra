@@ -22,9 +22,10 @@ export function loadRootEnv(
   ];
   for (const file of files) {
     const fullPath = path.join(rootDir, file);
-    if (!existsSync(fullPath)) continue;
+    // Not bundled: the files are read at runtime only (avoids tracing the whole project).
+    if (!existsSync(/*turbopackIgnore: true*/ fullPath)) continue;
     for (const [key, value] of Object.entries(
-      parseEnv(readFileSync(fullPath, "utf8")),
+      parseEnv(readFileSync(/*turbopackIgnore: true*/ fullPath, "utf8")),
     )) {
       if (process.env[key] === undefined) process.env[key] = value;
     }

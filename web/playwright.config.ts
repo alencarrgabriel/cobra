@@ -1,10 +1,13 @@
 import { defineConfig, devices } from "@playwright/test";
 
+import { e2eUrl } from "./e2e/db/setup";
+
 const port = 3100;
 
 // Runs against the production build: run `pnpm build` first (the root `pnpm check` does).
 export default defineConfig({
   testDir: "./e2e",
+  globalSetup: "./e2e/db/setup.ts",
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? [["github"], ["html", { open: "never" }]] : "list",
@@ -28,6 +31,6 @@ export default defineConfig({
     command: `pnpm start --port ${port}`,
     url: `http://localhost:${port}/api/health`,
     reuseExistingServer: !process.env.CI,
-    env: { APP_ENV: "test" },
+    env: { APP_ENV: "test", WEB_DATABASE_URL: e2eUrl() },
   },
 });

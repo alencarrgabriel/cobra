@@ -1,0 +1,74 @@
+.figure {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.map {
+  width: 100%;
+  max-width: 720px;
+  height: auto;
+  display: block;
+  margin-inline: auto;
+}
+
+.outline {
+  fill: var(--surface-2);
+  stroke: var(--line);
+  stroke-width: 1.5;
+}
+
+.pin circle {
+  stroke: var(--surface);
+  stroke-width: 1;
+  opacity: 0.9;
+}
+
+.pin:hover circle,
+.pin:focus-visible circle {
+  stroke: var(--fg);
+  stroke-width: 2;
+  opacity: 1;
+}
+
+.pin:focus-visible {
+  outline: none;
+}
+
+.caption {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+
+.caption p {
+  margin: 0;
+}
+
+.legend {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+}
+
+.legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: var(--radius-pill);
+}
+
+.credit {
+  font-size: var(--text-xs);
+}

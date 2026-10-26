@@ -20,7 +20,9 @@ Dados: `core.works`, `core.work_progress`, `core.work_status_events`, `core.work
 ### D2. Renderização e cache
 - `/obras`: cabeçalho e explicação são estáticos. Os resultados ficam num componente dentro de `<Suspense>` que primeiro lê `searchParams` (dado da requisição) e então chama as consultas. Assim nenhuma consulta roda no build.
 - As consultas usam `'use cache'` com `cacheLife('hours')`: os dados mudam uma vez por dia e o cache absorve picos (RNF-08). A chave inclui os filtros.
-- `/obras/[codigo]`: mesmo padrão com `params`; `generateMetadata` busca o nome da obra; código inexistente chama `notFound()`.
+- Erros lançados dentro de `'use cache'` chegam à página mascarados em produção. Por isso cada leitura em cache devolve o resultado como valor (`tryDb`): dados por horas; banco indisponível por segundos (`cacheLife('seconds')`). A função exportada transforma a indisponibilidade em `DataUnavailableError` fora do cache, e a página mostra o aviso.
+- "há N meses" depende da data de hoje: a página chama `connection()` antes de calcular, para renderizar por requisição.
+- `/obras/[codigo]`: mesmo padrão com `params`; `generateMetadata` busca o nome da obra. A página chega em partes: primeiro a moldura estática, depois o conteúdo. Depois que a moldura sai, o status HTTP não muda mais. Por isso o código inexistente é tratado antes, em `src/proxy.ts`: o código é conferido pelo formato e por uma consulta ao banco, e o código desconhecido vai para a página "não encontrada" com status 404. Com o banco fora do ar, o proxy deixa passar e a ficha mostra o aviso de dados indisponíveis. `notFound()` na página fica só como segurança.
 
 ### D3. Filtros na URL
 `?situacao=<status>&area=<tipo>&ordem=valor|nome&pagina=N`. Os valores de situação usam os nomes em português sem acento (`concluida`, `em-execucao`, `paralisada`, `inacabada`, `cadastrada`, `cancelada`), convertidos para o enum do banco. Valores inválidos são ignorados (voltam ao padrão), nunca causam erro. Os filtros são links (`<a>`), sem JavaScript: funcionam e podem ser compartilhados.
@@ -32,6 +34,7 @@ Padrão: valor previsto, do maior para o menor, com empate por nome; alternativa
 - Limite do DF a partir da malha de UFs do IBGE (código 53), simplificado e guardado em `web/src/lib/geo/df-boundary.json` em longitude e latitude.
 - Projeção equirretangular com correção pelo cosseno da latitude média, calculada no servidor. O mapa é um SVG renderizado no servidor, sem biblioteca. Cada pino é um link para a ficha, com `aria-label` (nome e situação), cor pelo token `--work-*` e tamanho fixo.
 - Abaixo do mapa: legenda das cores e "N obras sem localização não aparecem no mapa".
+- Coordenadas fora do retângulo do DF, como vieram da fonte (9 de 1.136 na carga real), também não viram pino. O mapa informa quantas são.
 - Alternativa: biblioteca de mapas com fundo de ruas (Leaflet ou MapLibre). Rejeitada por ora: pesaria no celular e exigiria provedor de mapas externo (CSP e privacidade). Pode entrar quando houver bairros.
 
 ### D6. Textos e situações
