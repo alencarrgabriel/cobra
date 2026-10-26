@@ -21,11 +21,15 @@ Toda tabela de dado público SHALL ter, em cada linha, a fonte oficial, o identi
 - **THEN** todas têm as colunas de rastreabilidade com os tipos e a obrigatoriedade definidos, e a verificação falha se alguma tabela não tiver
 
 ### Requirement: Fontes de uma lista conhecida
-A fonte de cada linha SHALL ser uma das fontes cadastradas (Câmara, Senado, TSE, CLDF, IBGE ou curadoria do Cobra); valores fora da lista SHALL ser rejeitados.
+A fonte de cada linha SHALL ser uma das fontes cadastradas (Câmara, Senado, TSE, CLDF, IBGE, Obrasgov.br ou curadoria do Cobra); valores fora da lista SHALL ser rejeitados.
 
 #### Scenario: Fonte desconhecida
 - **WHEN** se tenta gravar uma linha com fonte `wikipedia`
 - **THEN** o banco rejeita a gravação
+
+#### Scenario: Obra do Obrasgov
+- **WHEN** se grava uma obra com fonte `obrasgov`
+- **THEN** a gravação é aceita
 
 ### Requirement: Identificador original único por fonte
 Em cada tabela de dado público cujo registro tem identificador próprio na fonte, o par fonte e identificador original SHALL ser único, permitindo atualizar o registro em novas coletas sem duplicá-lo.
