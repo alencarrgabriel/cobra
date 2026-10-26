@@ -1,0 +1,326 @@
+{
+ "data": [
+  {
+   "id_projeto_investimento": "30410.53-71",
+   "projeto_estruturante": null,
+   "desc_nome": "Execução do Mezanino do CFT do Campus São Sebastião",
+   "nr_cep": "71.697-040",
+   "desc_endereco": "Área Especial 2, S/N, Bairro São Bartolomeu - São Sebastião/DF",
+   "desc_projeto": "Trata-se dos serviços de finalização do edifício do CFT do Campus São Sebastião doInstituto Federal de Brasília.A proposta é finalizar o primeiro pavimento ou mezanino.",
+   "desc_funcao_social": "atender a comunidade acadêmica do Campus São Sebastião integrando mais um laboratório de práticas pedagógicas à comunidade",
+   "desc_meta_global": "aumentar a oferta de cursos técnicos/tecnológicos e de curta duração, e para isso, necessita aumentar sua área para laboratórios e salas de aulas integradas a esses laboratórios.",
+   "dt_inicial_prevista": "2024-03-18",
+   "dt_final_prevista": "2024-09-30",
+   "dt_cadastro": "2023-12-19",
+   "ano_cadastro": 2023,
+   "natureza_intervencao": "Obra",
+   "id_natureza_intervencao": 2,
+   "especie_intervencao": "Ampliação",
+   "id_especie_intervencao": 2,
+   "situacao": "Concluída",
+   "uf_principal": "DF",
+   "organizacao_resp": "INSTITUTO FED. ED. CIENCIA E TEC. DE BRASILIA",
+   "cnpj_organizacao_resp": null,
+   "populacao_beneficiada": null,
+   "desc_populacao_beneficiada": null,
+   "qtd_empregos_gerados": null,
+   "ind_bim": 0,
+   "dt_inicial_efetiva": null,
+   "dt_final_efetiva": null,
+   "obs_pertinentes_intervencao": null,
+   "sistema_resp": "CIPI",
+   "possui_estudo_viabilidade": "SIM",
+   "repassadores": [
+    {
+     "organizacao_repassador": "MINISTÉRIO DA EDUCAÇÃO",
+     "cnpj_repassador": null
+    }
+   ],
+   "tomadores": [
+    {
+     "organizacao_tomador": "INSTITUTO FED. ED. CIENCIA E TEC. DE BRASILIA",
+     "cnpj_tomador": null
+    }
+   ],
+   "executores": [
+    {
+     "organizacao_executor": "INSTITUTO FED. ED. CIENCIA E TEC. DE BRASILIA",
+     "cnpj_executor": null
+    }
+   ],
+   "investimentos_previstos": [
+    {
+     "vl_investimento_previsto": 1000000.0,
+     "desc_nome_fonte_recurso": "Federal"
+    }
+   ],
+   "ppas": [
+    {
+     "tipo_ppa": "Federal",
+     "desc_ppa": "PPA 2020-2023 Esfera Orçamentária: 10 Orçamento Fiscal Função Governo: 12 Educação Subfunção Governo:363 Ensino Profissional Programa: 5012 Educação Profissional e Tecnológica"
+    }
+   ],
+   "eixos_tipos": [
+    {
+     "eixo": "Social",
+     "id_eixo": 4,
+     "tipo": "Educação",
+     "id_tipo": 46,
+     "subtipo": "Educação",
+     "id_subtipo": 84
+    }
+   ],
+   "fotos": [],
+   "pins": [
+    {
+     "pin": "POINT (-47.77783 -15.8913600065925)",
+     "latitude": "-15.8913600065925",
+     "longitude": "-47.77783"
+    }
+   ],
+   "areas_restricao": [
+    {
+     "area_restricao": "Território Quilombola Federal"
+    },
+    {
+     "area_restricao": "Unidade de Conservação"
+    }
+   ]
+  },
+  {
+   "id_projeto_investimento": "59698.53-89",
+   "projeto_estruturante": "NÃO",
+   "desc_nome": "Obra Remanescente Usina Fotovoltaica",
+   "nr_cep": null,
+   "desc_endereco": "Estrada Contorno do Bosque s/nº, Sudoeste",
+   "desc_projeto": "Contratação de empresa especializada em obras técnicas de engenharia para a execução de obra remanescente de instalaçãodo Sistema de Geração de energia Fotovoltaica no Hospital das Forças Armadas, conectada à rede da NEOENERGIA (ONGRID)",
+   "desc_funcao_social": "A implantação do sistema fotovoltaico tem por finalidade encontrar alternativas para a implantação de uma matriz energética complementar que possibilite reduzir os custos operacionais com redução da conta de energia elétrica do HOSPITAL DAS FORÇAS ARMADAS e que também promova o uso de energias limpas e renováveis.",
+   "desc_meta_global": "Geração de energia por meio de usina fotovoltaica",
+   "dt_inicial_prevista": "2025-06-02",
+   "dt_final_prevista": "2026-01-02",
+   "dt_cadastro": "2025-05-19",
+   "ano_cadastro": 2025,
+   "natureza_intervencao": "Obra",
+   "id_natureza_intervencao": 2,
+   "especie_intervencao": "Construção",
+   "id_especie_intervencao": 1,
+   "situacao": "Em execução",
+   "uf_principal": "DF",
+   "organizacao_resp": "FUNDO DE ADMINISTRACAO DO HFA",
+   "cnpj_organizacao_resp": null,
+   "populacao_beneficiada": null,
+   "desc_populacao_beneficiada": null,
+   "qtd_empregos_gerados": null,
+   "ind_bim": 0,
+   "dt_inicial_efetiva": null,
+   "dt_final_efetiva": null,
+   "obs_pertinentes_intervencao": null,
+   "sistema_resp": "CIPI",
+   "possui_estudo_viabilidade": "SIM",
+   "repassadores": [],
+   "tomadores": [],
+   "executores": [
+    {
+     "organizacao_executor": "FUNDO DE ADMINISTRACAO DO HFA",
+     "cnpj_executor": null
+    }
+   ],
+   "investimentos_previstos": [
+    {
+     "vl_investimento_previsto": 6492295.55,
+     "desc_nome_fonte_recurso": "Federal"
+    }
+   ],
+   "ppas": [],
+   "eixos_tipos": [
+    {
+     "eixo": "Econômico",
+     "id_eixo": 3,
+     "tipo": "Energia",
+     "id_tipo": 31,
+     "subtipo": "Usina",
+     "id_subtipo": 76
+    }
+   ],
+   "fotos": [],
+   "pins": [
+    {
+     "pin": "POINT (-47.9368267021912 -15.8040438151091)",
+     "latitude": "-15.8040438151091",
+     "longitude": "-47.9368267021912"
+    }
+   ],
+   "areas_restricao": [
+    {
+     "area_restricao": "Território Quilombola Federal"
+    },
+    {
+     "area_restricao": "Unidade de Conservação"
+    }
+   ]
+  },
+  {
+   "id_projeto_investimento": "10930.53-87",
+   "projeto_estruturante": null,
+   "desc_nome": "Construção do 42º GBM - Sol Nascente",
+   "nr_cep": null,
+   "desc_endereco": null,
+   "desc_projeto": "Construção do 42º GBM, no Sol Nascente, a fim de fortalecer o Corpo de Bombeiros Militar do Distrito Federal.",
+   "desc_funcao_social": "Público indireto:42º GBM (Setor P Sul): 100 militares de acordo com Diretoria de Pessoal CBMDF.Público direto: público alvo indireto totaliza 88.577 habitantes, segundo http://www.codeplan.df.gov.br. Reduzir o tempo de resposta às solicitações e atender melhor as demandas de localidade cujo acesso se dá por vias estreitas e/ou não pavimentadas, sobretudo em Sol Nascente e P Sul.. Esses resultados serão mensurados por meio do indicador institucional: Tempo resposta. Oobjetivo é reduzir este tempo resposta para 8min para pelo menos 80% da ocorrência (conforme Portariano 19 de 1º de outubro de 2020). Assim serão apresentados Relatório fotográficos das novas instalações; Relatório comparativo do tempo resposta (ex ante e ex post); Relatório descritivo dos atendimentos realizados pelo novo grupamento.",
+   "desc_meta_global": "Construção do 42º GBM, no Sol Nascente, a fim de fortalecer o Corpo de Bombeiros Militar do Distrito Federal.",
+   "dt_inicial_prevista": "2022-12-14",
+   "dt_final_prevista": "2026-12-14",
+   "dt_cadastro": "2022-10-20",
+   "ano_cadastro": 2022,
+   "natureza_intervencao": "Obra",
+   "id_natureza_intervencao": 2,
+   "especie_intervencao": "Construção",
+   "id_especie_intervencao": 1,
+   "situacao": "Paralisada",
+   "uf_principal": "DF",
+   "organizacao_resp": "MINISTERIO DA ECONOMIA",
+   "cnpj_organizacao_resp": null,
+   "populacao_beneficiada": 88577,
+   "desc_populacao_beneficiada": "Sol Nascente e Por do Sol contabilizam uma população de 88.577, assim a população de toda essa região será beneficiada",
+   "qtd_empregos_gerados": 75,
+   "ind_bim": 0,
+   "dt_inicial_efetiva": null,
+   "dt_final_efetiva": null,
+   "obs_pertinentes_intervencao": null,
+   "sistema_resp": "Transferegov.br",
+   "possui_estudo_viabilidade": "SIM",
+   "repassadores": [
+    {
+     "organizacao_repassador": "MINISTÉRIO DA JUSTIÇA E SEGURANÇA PÚBLICA",
+     "cnpj_repassador": "00394494000136"
+    }
+   ],
+   "tomadores": [],
+   "executores": [
+    {
+     "organizacao_executor": "CORPO DE BOMBEIROS MILITAR DO DISTRITO FEDERAL",
+     "cnpj_executor": "08977914000119"
+    }
+   ],
+   "investimentos_previstos": [
+    {
+     "vl_investimento_previsto": 3342341.14,
+     "desc_nome_fonte_recurso": "Federal"
+    }
+   ],
+   "ppas": [
+    {
+     "tipo_ppa": "Federal",
+     "desc_ppa": "Programa 5016 - Segurança Pública, Combate à Corrupção, ao Crime Organizado e ao Crime Violento. Como diretriz deste programa é a Intensificação do combate à corrupção, à violência e ao crime organizado. Por intermédio da presente investimento pretende-se otimizar o atendimento imediato ao cidadão em situações de emergências e melhorar a sinergia no emprego da unidade em operações Bombeiro Militar que preste apoio aos demais órgãos da segurança públicas em operações integradas, no sentido de apoiar as ações de manutenção da ordem pública e da incolumidade das pessoas, do patrimônio, do meio ambiente e de bens e direitos."
+    }
+   ],
+   "eixos_tipos": [
+    {
+     "eixo": "Administrativo",
+     "id_eixo": 1,
+     "tipo": "Segurança Pública",
+     "id_tipo": 1,
+     "subtipo": "Obras em Imóveis de Uso Público",
+     "id_subtipo": 59
+    }
+   ],
+   "fotos": [],
+   "pins": [
+    {
+     "pin": "POINT (-48.13324 -15.83469)",
+     "latitude": "-15.83469",
+     "longitude": "-48.13324"
+    }
+   ],
+   "areas_restricao": [
+    {
+     "area_restricao": "Unidade de Conservação"
+    },
+    {
+     "area_restricao": "Território Quilombola Federal"
+    }
+   ]
+  },
+  {
+   "id_projeto_investimento": "19754.53-12",
+   "projeto_estruturante": null,
+   "desc_nome": "Modernização de Elevadores do Bloco G do MS",
+   "nr_cep": null,
+   "desc_endereco": null,
+   "desc_projeto": "Modernização integral de 8(oito) elevadores do Bloco “G”, da Esplanada dos Ministérios, Brasília/DF, Edifício Sede do Ministério da Saúde",
+   "desc_funcao_social": "Modernização de Elevadores do MS bem público institucional",
+   "desc_meta_global": "Contratação de uma empresa especializada em engenharia eletromecânica para modernização integral de 8(oito) elevadores do Bloco “G”, da Esplanada dos Ministérios, Brasília/DF, Edifício Sede do Ministério da Saúde, conforme condições, quantidades e exigências estabelecidas neste instrumento e seus anexos do processo 25000.148796/2022-25",
+   "dt_inicial_prevista": "2023-01-31",
+   "dt_final_prevista": "2023-11-30",
+   "dt_cadastro": "2023-01-26",
+   "ano_cadastro": 2023,
+   "natureza_intervencao": "Outros",
+   "id_natureza_intervencao": -1,
+   "especie_intervencao": "Fabricação",
+   "id_especie_intervencao": 5,
+   "situacao": "Cadastrada",
+   "uf_principal": "DF",
+   "organizacao_resp": "MINISTÉRIO DA SAÚDE",
+   "cnpj_organizacao_resp": "00394544012787",
+   "populacao_beneficiada": null,
+   "desc_populacao_beneficiada": null,
+   "qtd_empregos_gerados": null,
+   "ind_bim": 0,
+   "dt_inicial_efetiva": null,
+   "dt_final_efetiva": null,
+   "obs_pertinentes_intervencao": null,
+   "sistema_resp": "CIPI",
+   "possui_estudo_viabilidade": "SIM",
+   "repassadores": [],
+   "tomadores": [],
+   "executores": [
+    {
+     "organizacao_executor": "MINISTÉRIO DA SAÚDE",
+     "cnpj_executor": "00394544012787"
+    }
+   ],
+   "investimentos_previstos": [
+    {
+     "vl_investimento_previsto": 7141939.72,
+     "desc_nome_fonte_recurso": "Federal"
+    }
+   ],
+   "ppas": [
+    {
+     "tipo_ppa": "Federal",
+     "desc_ppa": "Ação 2000 PO Q"
+    }
+   ],
+   "eixos_tipos": [
+    {
+     "eixo": "Administrativo",
+     "id_eixo": 1,
+     "tipo": "Saúde",
+     "id_tipo": 4,
+     "subtipo": "Obras em Imóveis de Uso Público",
+     "id_subtipo": 59
+    }
+   ],
+   "fotos": [],
+   "pins": [
+    {
+     "pin": "POINT(-47.8684721413212 -15.8002630106667)",
+     "latitude": "-15.8002630106667",
+     "longitude": "15.8002630106667)"
+    }
+   ],
+   "areas_restricao": [
+    {
+     "area_restricao": "Unidade de Conservação"
+    },
+    {
+     "area_restricao": "Território Quilombola Federal"
+    }
+   ]
+  }
+ ],
+ "total_pages": 1,
+ "total_items": 4,
+ "page_number": 1,
+ "page_size": 200
+}
