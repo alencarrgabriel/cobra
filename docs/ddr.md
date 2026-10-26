@@ -1,6 +1,8 @@
 # Cobra — Documento de Definição de Requisitos (DDR)
 
 > Convertido de `Cobra — Documento de Definição de Requisitos (DDR).docx` em 2026-10-20. Este arquivo passa a ser a fonte da verdade; os diagramas foram transcritos em texto.
+>
+> **Versão 2 (2026-10-26).** Decisões incorporadas após pesquisa de referências e concorrentes: identidade visual inspirada no seuimposto.com (Pandora), cores e marcas de partido como identificação, jornada "CEP → grade de representantes → gaveta", módulo de economia e educação na fase 2, Ibovespa só na fase 3 e sem cotação de ações individuais, Apuração Brasil como concorrente direto. O histórico está no fim do documento.
 
 ## 1. Visão geral do produto e objetivos estratégicos
 
@@ -12,11 +14,15 @@ Proposta de valor.
 
 - Pessoal: o usuário informa o CEP, a cidade ou o estado e vê "seus representantes", não uma lista de 594 parlamentares.
 
+- Visual: cada representante aparece com foto, bandeira do estado e cor e sigla do partido; mapa clicável, cards e números grandes, no padrão visual dos produtos de dados mais acessados no período eleitoral de 2026.
+
 - Compreensível: votações e projetos explicados em linguagem simples, com o voto de cada representante.
 
 - Concreto: emendas parlamentares ligadas às obras da cidade do usuário, com valor, prazo e situação.
 
 - Ativo: o produto vai até o usuário com alertas semanais por e-mail e WhatsApp.
+
+- Educativo: explica como funcionam o Legislativo e a economia (juros, inflação, impostos, bolsa) e liga cada indicador às votações sobre o tema, sem atribuir causa (fase 2).
 
 - Neutro: útil para eleitores de qualquer posição política.
 
@@ -36,8 +42,11 @@ Diferenciais frente às iniciativas existentes.
 
 | Iniciativa | Foco | O que o Cobra faz diferente |
 |---|---|---|
-| Excelências (Transparência Brasil) | Perfis de congressistas, processos e patrimônio | Recorte por localização, feed e alertas, obras |
-| Radar do Congresso (Congresso em Foco) | Dados do Congresso e índices de governismo e transparência | Sem índices próprios; linguagem simples; cobertura subnacional |
+| Apuração Brasil (apuracaobrasil.com) — **concorrente direto** | Portal de transparência do Congresso: presença, votos, cota, emendas por cidade, alertas por e-mail, app e planos pagos | Busca por CEP com grade visual de "seus representantes"; votações explicadas em linguagem simples (não só a ementa); cobertura distrital e depois subnacional; sem ranking de presença; economia explicada |
+| seuimposto.com (Pandora) — referência visual | Apuração ao vivo das eleições 2026: mapa clicável, gaveta lateral, fotos e barras de placar | Mesmo nível visual, aplicado ao acompanhamento do mandato o ano todo, não só no dia da eleição |
+| Excelências (Transparência Brasil) | Perfis de congressistas, processos e patrimônio | Em 2026-10-26 o domínio exibia conteúdo sem relação com o projeto; aparenta estar desativado |
+| Radar do Congresso (Congresso em Foco) | Grade de fotos com a bandeira do estado, dados do Congresso e índices de governismo e transparência | Sem índices próprios; linguagem simples; cobertura subnacional |
+| Placar Congresso | Histórico de votações, idealizado por um deputado, com foco na posição em relação ao governo | Iniciativa apartidária, sem enquadramento governo × oposição como eixo |
 | Ranking dos Políticos | Notas e ranking por critérios declarados do grupo | Nenhuma nota ou ranking |
 | Quem Me Representa (UFCG) | Afinidade entre eleitor e deputado antes do voto | Acompanhamento do mandato depois da eleição |
 | Operação Serenata de Amor | Gastos suspeitos da cota parlamentar | Gastos como parte de um perfil completo |
@@ -59,7 +68,11 @@ Personas.
 
 Jornadas principais.
 
-- Primeiro acesso (Ana). Chega por um link compartilhado → informa o CEP → vê seus 3 senadores, 8 deputados federais e 24 deputados distritais → abre o feed "O que aconteceu" → ativa o resumo semanal no WhatsApp com opt-in explícito.
+- Primeiro acesso (Ana). Chega por um link compartilhado → informa o CEP → vê a grade "Seus representantes": 3 senadores, 8 deputados federais e 24 deputados distritais, cada um com foto, bandeira do DF e cor e sigla do partido → toca num representante e abre uma gaveta com os últimos votos, presença, gastos e patrimônio, com "ver perfil completo" → abre o feed "O que aconteceu" → ativa o resumo semanal no WhatsApp com opt-in explícito.
+
+- Explorar pelo mapa (Ana ou Júlia). Na página inicial, toca num estado do mapa do Brasil → vê a bancada daquele estado em grade de fotos e o placar das votações recentes por estado → compartilha o card.
+
+- Entender a economia (Ana, fase 2). Abre "Economia em números" → vê a Selic e a inflação com explicação simples ("o que é e como afeta você") → segue para as votações recentes sobre impostos e preços, com o voto dos seus representantes.
 
 - Acompanhar quem elegeu (Carlos). Marca os políticos em quem votou como "seguidos" → recebe alerta quando eles votam numa votação relevante → abre o perfil, vê o voto e o histórico → compartilha o card da votação.
 
@@ -73,9 +86,13 @@ O MVP cobre os 81 senadores e os 513 deputados federais para todo o Brasil, com 
 
 Fora do MVP, de propósito: notas, rankings, comparação ideológica, comentários abertos de usuários, previsão de voto e qualquer conteúdo sobre candidaturas durante o período eleitoral.
 
+Fora do produto em qualquer fase: cotação de ações individuais, análise ou recomendação de investimento, anúncios de apostas e chat aberto.
+
 | Funcionalidade | MVP (fase 1) | Fase 2 | Fase 3 | Fase 4 |
 |---|---|---|---|---|
 | Busca por CEP, cidade ou UF | Sim |  |  |  |
+| Grade "Seus representantes" com foto, bandeira e partido | Sim |  |  |  |
+| Mapa do Brasil clicável (bancada e placar por estado) | Sim |  |  |  |
 | Senadores e deputados federais | Perfil completo |  |  |  |
 | Deputados distritais (CLDF) | Perfil básico | Perfil completo |  |  |
 | Governador e deputados estaduais |  |  | Estados com API de alta maturidade (MG, PR, PE, MT) | Demais estados |
@@ -93,6 +110,9 @@ Fora do MVP, de propósito: notas, rankings, comparação ideológica, comentár
 | Cards compartilháveis | Sim |  |  |  |
 | Relato de obra pelo cidadão (foto) |  |  | Sim, com moderação |  |
 | Exportação de dados e API pública |  |  |  | Sim |
+| Economia em números (indicadores oficiais explicados) |  | Sim |  |  |
+| Trilhas educativas (Legislativo, economia, bolsa) |  | Sim |  |  |
+| Ibovespa diário (sem ações individuais) |  |  | Se houver licença da B3 |  |
 
 ## 4. Requisitos funcionais
 
@@ -110,6 +130,8 @@ Os requisitos estão agrupados em seis módulos. Prioridade: Alta = necessário 
 | RF-06 | Para o DF, apresentar deputados distritais como representantes estaduais e municipais ao mesmo tempo | Alta | 1 |
 | RF-07 | Lembrar a localização do usuário no dispositivo (sem conta) | Média | 1 |
 | RF-08 | Filtrar a bancada por partido | Média | 1 |
+| RF-09 | Exibir os representantes em grade de cards com foto oficial, nome, bandeira da UF, sigla e cor do partido; tocar num card abre uma gaveta (celular) ou painel lateral (computador) com o resumo e link para o perfil | Alta | 1 |
+| RF-31 | Mapa do Brasil clicável na página inicial: ao tocar num estado, mostrar a bancada e o placar das votações recentes daquele estado | Alta | 1 |
 
 ### 4.2 Feed "O que aconteceu"
 
@@ -139,6 +161,7 @@ Os requisitos estão agrupados em seis módulos. Prioridade: Alta = necessário 
 | RF-28 | Emendas parlamentares enviadas, por município e situação | Média | 2 |
 | RF-29 | Comparar 2 ou 3 políticos lado a lado, só com fatos | Baixa | 2 |
 | RF-30 | Botão "Seguir" (exige conta ou contato verificado) | Alta | 1 |
+| RF-32 | Identificar todo político pela cor, sigla e logotipo do seu partido e pela bandeira da sua UF, com as mesmas regras para todos os partidos (§9.1) | Alta | 1 |
 
 ### 4.4 Obras e emendas
 
@@ -152,6 +175,16 @@ Os requisitos estão agrupados em seis módulos. Prioridade: Alta = necessário 
 | RF-45 | Mostrar as emendas Pix recebidas pelo município e o plano de trabalho, quando informado | Média | 3 |
 | RF-46 | Mapa das obras do município | Média | 3 |
 | RF-47 | Relato do cidadão sobre a situação real da obra, com foto e moderação | Baixa | 3 |
+
+### 4.4b Economia e educação (fase 2)
+
+| ID | Requisito | Prioridade | Fase |
+|---|---|---|---|
+| RF-70 | Página "Economia em números" com indicadores oficiais: Selic, câmbio, inflação (IPCA), desemprego, PIB, dívida pública e arrecadação federal, cada um com fonte e data | Alta | 2 |
+| RF-71 | Explicação em linguagem simples de cada indicador: o que é, como é medido e como afeta o cidadão | Alta | 2 |
+| RF-72 | Ligar cada indicador às votações e projetos sobre o mesmo tema, por assunto, sem afirmar causa e efeito | Média | 2 |
+| RF-73 | Trilhas educativas curtas: como uma lei é feita, o que faz cada cargo, como funcionam juros, inflação, impostos e a bolsa de valores | Média | 2 |
+| RF-74 | Ibovespa diário como termômetro, sem cotação de ações individuais, condicionado a licença de dados da B3 | Baixa | 3 |
 
 ### 4.5 Alertas
 
@@ -203,6 +236,7 @@ O site deve abrir rápido num celular comum com 4G, continuar no ar mesmo quando
 | RNF-17 | Observabilidade | Integrações e site | Logs, métricas e alertas de falha para a equipe |
 | RNF-18 | Transparência | Código | Código aberto em repositório público (licença a definir) |
 | RNF-19 | Custo | Infraestrutura no MVP | Até R$ 1.000 por mês (estimativa a validar) |
+| RNF-20 | Identidade visual | Consistência | Um design system próprio (cores, tipografia, componentes) aplicado a todas as páginas, com modo claro e escuro, ver cap. 13 |
 
 ## 6. Fontes de dados e estratégia de integração (ETL)
 
@@ -223,6 +257,13 @@ Todos os dados vêm de fontes oficiais e são copiados para o banco próprio do 
 | Tribunais de Contas estaduais (ex.: TCE-SP) | Obras estaduais e municipais | Varia por estado | Integração caso a caso | 3 |
 | Assembleias Legislativas | Deputados estaduais, votações | APIs em MG, PR, PE, MT; parciais em AM, AP, AC, RO; PDF/HTML nos demais | Começar pelas de alta maturidade | 3 |
 | Base de CEP (ex.: DNE dos Correios ou base aberta) | CEP → município (código IBGE) | Arquivo ou serviço | Licença e custo a definir | 1 |
+| Fotos oficiais (Câmara, Senado, CLDF) | Foto de cada parlamentar | Vêm nas APIs de cada casa | Confirmar licença de uso e crédito exigido | 1 |
+| Bandeiras das UFs | Bandeira de cada estado | Arquivos vetoriais de fontes oficiais | Símbolos oficiais; registrar a origem de cada arquivo | 1 |
+| Cores e logotipos de partidos | Identificação visual dos partidos | Tabela curada pelo Cobra a partir da identidade publicada por cada partido | O TSE não define cores oficiais; logotipos são marcas registradas, usadas só para identificação | 1 |
+| Banco Central (SGS) | Selic, câmbio e outras séries | API pública (api.bcb.gov.br); sem chave | A antiga série 7 (Ibovespa) parou de ser atualizada em 2019 | 2 |
+| IBGE (SIDRA) | Inflação (IPCA), desemprego, PIB | API pública; sem chave | — | 2 |
+| Tesouro Nacional e Receita Federal | Dívida pública e arrecadação | Dados abertos | — | 2 |
+| B3 (market data) | Ibovespa | Licença de distribuição de dados (Política de Market Data; o Ofício Circular 036/2026 permite exibição em atraso em sites abertos) | Exige contrato; preço a consultar | 3 |
 
 ### 6.2 Estratégia de integração
 
@@ -322,6 +363,8 @@ O Cobra descreve o que aconteceu e deixa o julgamento para o usuário: nenhuma n
 
 - Mesmo tratamento para todos. Mesmos campos, mesma ordem e mesmo destaque para qualquer partido ou político.
 
+- Identidade de partido é identificação, não juízo. Cada político aparece com a cor, a sigla e o logotipo do seu partido e a bandeira da sua UF, como fazem o TSE e as casas legislativas. A regra vale igual para todos os partidos: mesmo tamanho, mesma posição, mesmo tipo de destaque. As cores de "Sim" e "Não" nas votações não reutilizam cores de partido, para não sugerir alinhamento.
+
 - Ordem neutra. Listas de políticos em ordem alfabética ou por critério objetivo declarado; nunca por "desempenho".
 
 - Linguagem simples, não simplista. Texto acessível sem omitir o que muda de fato.
@@ -331,6 +374,10 @@ O Cobra descreve o que aconteceu e deixa o julgamento para o usuário: nenhuma n
 - Correção pública. Erros corrigidos com registro visível do que mudou e quando.
 
 - Contexto mínimo para números. Gastos e presença sempre com referência (limite da cota, média da casa), sem rotular como bom ou ruim.
+
+- Economia sem causalidade. Indicadores econômicos se ligam a votações só pelo assunto; nenhum texto ou gráfico afirma que uma votação, um político ou um partido causou uma variação de mercado ou de indicador.
+
+- Nada de recomendação de investimento. O conteúdo sobre bolsa é educativo e não comenta ações ou emissores específicos.
 
 ### 9.2 Critério de "votação relevante"
 
@@ -418,6 +465,10 @@ Publicar dados sobre o mandato de políticos é amparado pela Lei de Acesso à I
 
 - Marca: registrar o nome definitivo no INPI antes do lançamento público.
 
+- Marcas de terceiros: logotipos de partidos usados só para identificar o partido; confirmar no parecer jurídico. A identidade visual do Cobra se inspira no seuimposto.com (Pandora) sem copiar layout, código, marca ou imagens.
+
+- Mercado de capitais: conteúdo sobre ações específicas pode ser enquadrado como relatório de análise (Resolução CVM 20), que exige analista credenciado; por isso o Cobra não comenta nem recomenda ações. Exibir o Ibovespa exige licença de dados da B3.
+
 ## 11. Matriz de riscos e mitigação
 
 Os maiores riscos não são técnicos: são a acusação de parcialidade, que destrói a confiança, e a falta de usuários e de financiamento. Riscos técnicos de fontes instáveis são resolvidos com a arquitetura de cópia local.
@@ -437,6 +488,9 @@ Os maiores riscos não são técnicos: são a acusação de parcialidade, que de
 | Ataques ou pressão de políticos e apoiadores | Reputação | Média | Médio | Canal de contestação com prazo, registro público de correções, assessoria jurídica |
 | Cobertura subnacional mais lenta que o esperado | Produto | Alta | Baixo | Expansão por maturidade dos dados; avisar com clareza o que ainda não é coberto |
 | Dependência de uma só pessoa para o conhecimento técnico | Operacional | Média | Médio | Código aberto, documentação, comunidade de voluntários |
+| Concorrente direto já no ar (Apuração Brasil) com dados do Congresso, emendas e app | Produto | Alta | Alto | Diferenciar em busca por CEP com grade visual, linguagem simples, cobertura distrital e economia explicada; lançar o piloto do DF rápido |
+| Uso de cor e marca de partido ser lido como favorecimento | Reputação | Média | Médio | Regra pública e idêntica para todos os partidos (§9.1); auditoria de destaque por partido |
+| Custo ou recusa da licença da B3 | Financeiro | Média | Baixo | Ibovespa só na fase 3 e opcional; indicadores oficiais gratuitos cobrem a fase 2 |
 
 ## 12. Métricas de sucesso e roadmap
 
@@ -461,8 +515,8 @@ O MVP é um sucesso se, em 3 meses, as pessoas voltarem sozinhas: a métrica pri
 | Fase | Período | Entregas |
 |---|---|---|
 | 1. MVP federal | Meses 1 a 3 | Senado e Câmara; feed e perfis; alertas por e-mail; piloto no DF |
-| 2. Obras | Meses 4 a 6 | Obras federais; emendas e obras; resumo no WhatsApp; distritais completos |
-| 3. Estados | Meses 7 a 12 | ALs de MG, PR, PE, MT; prefeitos e vereadores; emendas Pix; relatos de obras |
+| 2. Obras e economia | Meses 4 a 6 | Obras federais; emendas e obras; resumo no WhatsApp; distritais completos; economia em números e trilhas educativas |
+| 3. Estados | Meses 7 a 12 | ALs de MG, PR, PE, MT; prefeitos e vereadores; emendas Pix; relatos de obras; Ibovespa diário se houver licença |
 | 4. Escala nacional | Ano 2 | Demais estados; câmaras municipais; API pública; exportação de dados |
 
 - Meta 1 (libera fase 2): 5 mil visitantes por mês e 1 mil inscritos no resumo.
@@ -470,6 +524,35 @@ O MVP é um sucesso se, em 3 meses, as pessoas voltarem sozinhas: a métrica pri
 - Meta 3 (libera fase 4): financiamento garantido para 12 meses.
 
 Cada fase só começa quando a meta anterior é atingida; o MVP federal (fase 1) é a única com escopo fechado, e as datas das demais dependem do financiamento.
+
+## 13. Identidade visual e experiência
+
+A referência principal é o seuimposto.com, a apuração ao vivo das eleições 2026 feita pela Pandora. O Cobra adota a mesma qualidade visual e os mesmos padrões de interação, com identidade própria (nome, logotipo, paleta e componentes do Cobra) e sem copiar código, imagens ou marca. Outras referências: grade de fotos com bandeira do Radar do Congresso, busca central por CEP do abgeordnetenwatch.de e do GovTrack, e acessibilidade do Padrão Digital de Governo (gov.br/ds).
+
+### 13.1 Padrões adotados
+
+| Padrão | Como aparece no Cobra |
+|---|---|
+| Manchete em fonte serifada, interface em fonte sem serifa | Destaques ("Câmara aprova…") em serifa; dados e navegação em sem serifa |
+| Fotos oficiais recortadas em todo lugar | Cards de representantes, gaveta, perfil, página da votação |
+| Cor e sigla do partido e bandeira da UF | Em todo card de político (RF-32), pela regra do §9.1 |
+| Números grandes com unidade compacta (64,3 mi) | Gastos, presença, patrimônio, indicadores |
+| Barra de placar dividida | Página da votação: Sim × Não, com o voto dos seus representantes |
+| Mapa clicável com navegação por níveis (Brasil › UF › município) e trilha de navegação | Página inicial e votações (placar por UF) |
+| Painel lateral no computador e gaveta deslizante no celular | Resumo de um representante ou de um estado sem sair do mapa ou da grade |
+| Busca única com atalhos de teclado | CEP, cidade ou nome do político |
+| Comparação sempre presente | Média da casa, limite da cota, mandato anterior |
+| "Últimas atualizações" com horário | Feed "O que aconteceu" |
+| Barra de navegação inferior no celular | Início · Buscar · Votações · Economia (fase 2) |
+| Fundo claro quente, cards arredondados, botões em pílula, modo escuro | Toda a identidade |
+
+### 13.2 O que não se adota
+
+Chat aberto (excluído no cap. 3), anúncios de apostas, contador de "pessoas acompanhando" e projeções de resultado.
+
+### 13.3 Entrega
+
+A identidade é definida numa change própria (`identidade-visual`), validada antes com um protótipo navegável com dados fictícios, e implementada como design system no código (tokens de cor e tipografia, componentes reutilizáveis), com contraste WCAG AA em modo claro e escuro (RNF-13, RNF-20).
 
 ## Anexo: decisões em aberto e pontos a verificar
 
@@ -484,6 +567,9 @@ As decisões abaixo já têm uma recomendação para não travar o desenvolvimen
 | Deputados distritais no DF | Um bloco "Seus deputados distritais" explicando que fazem o papel de deputado estadual e de vereador | O DF não tem prefeito nem vereadores |
 | Forma jurídica | Começar como projeto pessoal com código aberto; formalizar associação sem fins lucrativos ao buscar editais | Editais e doações exigem CNPJ; uma OSC transmite independência |
 | Nome definitivo | Decidir antes do lançamento público e registrar no INPI | "Cobra" é provisório |
+| Cores e marcas de partido (decidido em 2026-10-26) | Usar cor, sigla e logotipo do partido e bandeira da UF como identificação, iguais para todos | Facilita reconhecer o político, segue a prática do TSE e das casas; a neutralidade está em não dar nota, ranking nem adjetivo |
+| Economia e bolsa (decidido em 2026-10-26) | Economia em números e trilhas educativas na fase 2; Ibovespa diário na fase 3, se houver licença; nunca ações individuais | Fontes oficiais gratuitas para indicadores; licença da B3 e regras da CVM para ações |
+| Referência visual (decidido em 2026-10-26) | seuimposto.com (Pandora), com identidade própria | Melhor experiência visual entre as referências pesquisadas |
 
 ### Pontos a verificar
 
@@ -503,4 +589,19 @@ As decisões abaixo já têm uma recomendação para não travar o desenvolvimen
 
 - ☐ Parecer jurídico sobre LGPD, legislação eleitoral e direito de resposta
 
-- ☐ Situação atual (ativos ou não) dos projetos concorrentes citados no capítulo 1
+- ☑ Situação atual dos concorrentes (verificado em 2026-10-26): Apuração Brasil ativo e concorrente direto; Excelências aparenta estar desativado; Radar do Congresso ativo
+
+- ☐ Licença de uso e crédito exigido para as fotos oficiais da Câmara, do Senado e da CLDF
+
+- ☐ Tabela de cores de partidos: fonte de cada cor e processo de revisão
+
+- ☐ Uso de logotipos de partidos (confirmar no parecer jurídico)
+
+- ☐ Preço e modalidade da licença de market data da B3 para o Ibovespa (fase 3)
+
+## Histórico de versões
+
+| Versão | Data | Mudanças |
+|---|---|---|
+| 1 | 2026-10-20 | Conversão do documento original (.docx) |
+| 2 | 2026-10-26 | Concorrentes atualizados; RF-09, RF-31, RF-32 (grade visual, mapa, identidade de partido); módulo 4.4b de economia e educação (RF-70 a RF-74, fases 2 e 3); RNF-20; novas fontes de dados; regras de identidade de partido, economia sem causalidade e sem recomendação de investimento (§9.1); riscos novos; roadmap; cap. 13 de identidade visual |
