@@ -47,3 +47,14 @@ As migrações SHALL criar os papéis sem senha e sem permissão de login; usuá
 #### Scenario: Migração sem senha
 - **WHEN** as migrações do repositório são inspecionadas
 - **THEN** nenhuma contém senha ou cria papel com permissão de login
+
+### Requirement: Dados brutos e operacionais restritos aos coletores
+Os esquemas de dados brutos e de operação dos coletores (fila e execuções) SHALL ser acessíveis apenas ao papel dos coletores; o papel do site SHALL não ter acesso a eles.
+
+#### Scenario: Site tenta ler a fila
+- **WHEN** o papel do site consulta a tabela de tarefas da fila
+- **THEN** o banco nega a operação por falta de permissão
+
+#### Scenario: Coletor grava resposta bruta
+- **WHEN** o papel dos coletores grava uma resposta bruta
+- **THEN** a gravação é permitida
