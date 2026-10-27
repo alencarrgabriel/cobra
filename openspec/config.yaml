@@ -102,9 +102,9 @@ context: |
   formatos, prévia de link e painel; card de votação vai com a 24 e RF-69 com a 17);
   16 plano-de-governo (por tema, trecho literal, página do PDF, obras da mesma área, busca);
   17 mapa-do-brasil (malha do IBGE, bancada por estado, placar com "—" até as votações, RF-69);
-  18a ingestao-tse-candidaturas (trajetória 1994–2024 com votos, no perfil).
+  18a ingestao-tse-candidaturas (trajetória 1994–2024 com votos, no perfil);
+  18b ingestao-tse-patrimonio (bens por tipo e variação desde 2006, sem descrição do bem).
   Próximas:
-  18b ingestao-tse-patrimonio (bens por tipo e variação, RF-37);
   18c ingestao-tse-doadores (receitas de campanha, sem busca por nome de doador, RF-26);
   19 ingestao-camara-votacoes; 20 ingestao-senado-votacoes; 21 ingestao-despesas-presenca;
   22 relevancia-e-eventos; 23 painel-editorial; 24 feed-e-pagina-votacao; 25 alertas-email;
