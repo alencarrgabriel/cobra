@@ -6,6 +6,7 @@ import { type DbResult, tryDb, unwrap } from "@/lib/db";
 import { NEUTRAL_PARTY_COLOR } from "@/lib/party-color";
 import type { WorkStatus } from "@/lib/works/filters";
 
+import type { Declaration } from "./assets";
 import type { HouseSlug } from "./who";
 
 // Profile data (change perfil-do-politico, design D2). Only Cobra's own database.
@@ -349,4 +350,66 @@ async function cachedCandidacies(
 /** TSE candidacies, most recent first (change ingestao-tse-candidaturas, D5). */
 export async function getCandidacies(id: number): Promise<CandidacyRow[]> {
   return unwrap(await cachedCandidacies(id));
+}
+
+export type AssetsData = {
+  declarations: Declaration[];
+  collectedAt: string | null;
+};
+
+async function cachedAssets(id: number): Promise<DbResult<AssetsData>> {
+  "use cache";
+  const result = await tryDb(async (sql) => {
+    // One line per election since 2006 with a candidacy, whether or not it declared assets.
+    const rows = await sql<
+      {
+        year: number;
+        office: string;
+        total: string | null;
+        imoveis: string;
+        veiculos: string;
+        dinheiro: string;
+        outros: string;
+        collected: string | null;
+      }[]
+    >`
+      select c.election_year as year, min(c.office) as office,
+             sum(a.value) as total,
+             coalesce(sum(a.value) filter (where a.category = 'imoveis'), 0) as imoveis,
+             coalesce(sum(a.value) filter (where a.category = 'veiculos'), 0) as veiculos,
+             coalesce(sum(a.value) filter (where a.category = 'dinheiro'), 0) as dinheiro,
+             coalesce(sum(a.value) filter (where a.category = 'outros'), 0) as outros,
+             to_char(max(a.collected_at) at time zone 'America/Sao_Paulo', 'YYYY-MM-DD')
+               as collected
+      from (select distinct election_year, tse_candidate_id, office from core.candidacies
+            where politician_id = ${id} and election_year >= 2006) c
+      left join core.declared_assets a
+        on a.election_year = c.election_year and a.tse_candidate_id = c.tse_candidate_id
+      group by c.election_year
+      order by c.election_year desc`;
+    return {
+      declarations: rows.map((r) => ({
+        year: Number(r.year),
+        office: r.office,
+        total: r.total === null ? null : Number(r.total),
+        imoveis: Number(r.imoveis),
+        veiculos: Number(r.veiculos),
+        dinheiro: Number(r.dinheiro),
+        outros: Number(r.outros),
+      })),
+      collectedAt:
+        rows
+          .map((r) => r.collected)
+          .filter(Boolean)
+          .sort()
+          .at(-1) ?? null,
+    };
+  });
+  cache(result.ok);
+  return result;
+}
+
+/** Declared assets per election since 2006 (change ingestao-tse-patrimonio, D4). */
+export async function getAssets(id: number): Promise<AssetsData> {
+  return unwrap(await cachedAssets(id));
 }

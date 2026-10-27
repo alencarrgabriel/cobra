@@ -131,6 +131,10 @@ Limites iniciais (conservadores; cada change de fonte confirma na documentação
 - Tarefa `votes`: soma `QT_VOTOS_NOMINAIS` de todas as zonas por candidatura e turno.
 - Download em streaming direto para `RAW_DATA_DIR` (`Context.fetch_file`), com o SHA-256 calculado durante a cópia: o arquivo nunca fica inteiro na memória.
 - Volume: cerca de 3,5 GB para a série completa.
+- Tarefa `assets`, uma por eleição de 2006 a 2024 (`bem_candidato/bem_candidato_<ano>.zip`, 2 a 82 MB; antes de 2006 não existe):
+  - guarda só tipo e valor de cada bem das candidaturas do cadastro em `core.declared_assets`; a descrição do bem (que traz endereço) não é lida;
+  - categoria pela tabela fixa de códigos (imóveis 1–19, veículos 21–23, dinheiro e aplicações 41–49 e 61–79, outros); em 2006 todos os bens vêm com o código 99;
+  - valor como a fonte informa (há registro negativo em 2020); em 2018 e 2022, exige bens de ao menos 300 candidaturas.
 
 ### IBGE, municípios (`ibge`)
 

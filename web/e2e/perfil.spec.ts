@@ -62,6 +62,24 @@ test("trajetória eleitoral do TSE, da mais recente à mais antiga", async ({
   );
 });
 
+test("patrimônio declarado com composição e variação", async ({ page }) => {
+  await openProfile(page);
+  const block = page.getByTestId("patrimonio");
+  const rows = block.locator("tbody tr");
+  await expect(rows.locator("td:first-child")).toHaveText([
+    "2022",
+    "2014",
+    "2010",
+  ]);
+  await expect(rows.nth(0)).toContainText("R$ 1,5 mi");
+  await expect(rows.nth(0)).toContainText("R$ 1,2 mi");
+  await expect(rows.nth(0)).toContainText("+R$ 500 mil (+50%)");
+  await expect(rows.nth(1)).toContainText("+R$ 1 mi");
+  await expect(rows.nth(2)).toContainText("Nenhum bem declarado ao TSE");
+  await expect(rows.nth(2).locator("td").last()).toHaveText("—");
+  await expect(block).toContainText("sem correção pela inflação");
+});
+
 test("o que ainda não foi coletado aparece com traço, nunca zero", async ({
   page,
 }) => {

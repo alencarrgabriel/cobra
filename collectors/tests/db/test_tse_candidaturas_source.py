@@ -9,7 +9,15 @@ import pytest
 
 from cobra_collectors import queue, runner
 from cobra_collectors.sources.tse import TseSource
-from tests.tse_files import CANDIDACY_HEADER, VOTE_HEADER, candidacy, tse_zip, vote
+from tests.tse_files import (
+    ASSET_HEADER,
+    CANDIDACY_HEADER,
+    VOTE_HEADER,
+    asset,
+    candidacy,
+    tse_zip,
+    vote,
+)
 
 pytestmark = pytest.mark.db
 
@@ -43,9 +51,24 @@ VOTES = tse_zip(
 )  # fmt: skip
 
 
+ASSETS = tse_zip(
+    "bem_candidato_2022",
+    ASSET_HEADER,
+    {
+        "DF": [asset(year=2022, sq="70001", order=1, code="11", value="800000,00"),
+               asset(year=2022, sq="70001", order=2, code="21", value="90000,50"),
+               asset(year=2022, sq="70003", order=1, code="12", value="1,00")],
+    },
+)  # fmt: skip
+
+
 def handler(request: httpx.Request) -> httpx.Response:
     name = request.url.path.rsplit("/", 1)[-1]
-    files = {"consulta_cand_2022.zip": CANDIDACIES, "votacao_candidato_munzona_2022.zip": VOTES}
+    files = {
+        "consulta_cand_2022.zip": CANDIDACIES,
+        "votacao_candidato_munzona_2022.zip": VOTES,
+        "bem_candidato_2022.zip": ASSETS,
+    }
     if name in files:
         return httpx.Response(200, content=files[name], headers={"content-type": "application/zip"})
     return httpx.Response(404)
@@ -58,6 +81,7 @@ def clean(autocommit_conn: psycopg.Connection) -> Iterator[psycopg.Connection]:
             "delete from raw.responses",
             "delete from ops.jobs",
             "delete from ops.runs",
+            "delete from core.declared_assets",
             "delete from core.candidacies",
             "delete from restricted.politician_private_ids where source_id like 'tse-test-%'",
             "delete from core.politicians where source_id like 'tse-test-%'",
@@ -96,7 +120,7 @@ def clean(autocommit_conn: psycopg.Connection) -> Iterator[psycopg.Connection]:
 
 def collect(db: psycopg.Connection, url: str, tmp_path: Path) -> runner.RunSummary:
     def make() -> TseSource:
-        source = TseSource(min_recent=1)
+        source = TseSource(min_recent=1, min_recent_assets=1)
         source.rate_per_second, source.burst = 1000.0, 1000
         return source
 
@@ -170,3 +194,36 @@ def test_too_few_matches_in_a_recent_election_publishes_nothing(
     )
     assert summary.failed == 1
     assert clean.execute("select count(*) from core.candidacies").fetchone() == (0,)
+
+
+def test_assets_keep_type_and_value_but_not_the_description(
+    clean: psycopg.Connection, test_database_url: str, tmp_path: Path
+) -> None:
+    collect(clean, test_database_url, tmp_path)
+
+    def make() -> TseSource:
+        source = TseSource(min_recent=1, min_recent_assets=1)
+        source.rate_per_second, source.burst = 1000.0, 1000
+        return source
+
+    for _ in range(2):  # running it twice does not duplicate
+        queue.enqueue(clean, "tse", "assets", "2022", {"year": 2022})
+        summary = runner.work(
+            test_database_url, {"tse": make}, tmp_path, transport=httpx.MockTransport(handler)
+        )
+        assert summary.failed == 0
+    rows = clean.execute(
+        """
+        select p.source_id, a.item_order, a.type_label, a.category, a.value::text
+        from core.declared_assets a join core.politicians p on p.id = a.politician_id
+        order by a.item_order
+        """
+    ).fetchall()
+    assert rows == [
+        ("tse-test-1", 1, "Apartamento", "imoveis", "800000.00"),
+        ("tse-test-1", 2, "Veículo automotor terrestre", "veiculos", "90000.50"),
+    ]
+    leaks = clean.execute(
+        "select count(*) from core.declared_assets a where row_to_json(a)::text like '%QL 14%'"
+    ).fetchone()
+    assert leaks == (0,)

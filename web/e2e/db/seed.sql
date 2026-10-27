@@ -177,3 +177,16 @@ from core.politicians p,
     (2010, 'DEPUTADO DISTRITAL', 'PSB', '40123', 'NÃO ELEITO', null, '990000000010')
   ) as c (year, office, party, number, result, votes, sq)
 where p.source_id = '9001';
+
+-- Declared assets (change ingestao-tse-patrimonio): Senadora Teste Um, 2014 and 2022.
+insert into core.declared_assets (politician_id, election_year, tse_candidate_id, item_order,
+  type_code, type_label, category, value, source, source_id, collected_at)
+select p.id, a.year, a.sq, a.ord, a.code, a.label, a.category, a.value, 'tse',
+       a.year || '-' || a.sq || '-' || a.ord, now()
+from core.politicians p,
+  (values
+    (2022, '990000000022', 1, 11, 'Apartamento', 'imoveis', 1200000.00),
+    (2022, '990000000022', 2, 21, 'Veículo automotor terrestre', 'veiculos', 300000.00),
+    (2014, '990000000014', 1, 45, 'Aplicação de renda fixa', 'dinheiro', 1000000.00)
+  ) as a (year, sq, ord, code, label, category, value)
+where p.source_id = '9001';

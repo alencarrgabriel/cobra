@@ -56,3 +56,26 @@ def tse_zip(prefix: str, header: str, rows_by_uf: dict[str, list[str]]) -> bytes
             text = "\n".join(['"' + header.replace(";", '";"') + '"', *rows]) + "\n"
             archive.writestr(f"{prefix}_{uf}.csv", text.encode("latin1"))
     return buffer.getvalue()
+
+
+ASSET_HEADER = ("DT_GERACAO;HH_GERACAO;ANO_ELEICAO;CD_TIPO_ELEICAO;NM_TIPO_ELEICAO;CD_ELEICAO;"
+    "DS_ELEICAO;DT_ELEICAO;SG_UF;SG_UE;NM_UE;SQ_CANDIDATO;NR_ORDEM_BEM_CANDIDATO;"
+    "CD_TIPO_BEM_CANDIDATO;DS_TIPO_BEM_CANDIDATO;DS_BEM_CANDIDATO;VR_BEM_CANDIDATO;"
+    "DT_ULT_ATUAL_BEM_CANDIDATO;HH_ULT_ATUAL_BEM_CANDIDATO")  # fmt: skip
+
+
+def asset(  # noqa: PLR0913 - one keyword per CSV field a test may change
+    *,
+    year: int,
+    sq: str,
+    order: int,
+    code: str,
+    value: str,
+    label: str = "Casa",
+    description: str = "CASA NA QL 14 CONJUNTO 5",
+    kind: str = "2",
+) -> str:
+    fields = ["27/10/2026", "10:00:00", str(year), kind, "ELEIÇÃO ORDINÁRIA", "1",
+              f"ELEIÇÕES {year}", "02/10/2022", "DF", "DF", "DISTRITO FEDERAL", sq, str(order),
+              code, label, description, value, "01/09/2022", "10:00:00"]  # fmt: skip
+    return ";".join(f'"{f}"' for f in fields)

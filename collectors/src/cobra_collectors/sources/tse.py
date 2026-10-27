@@ -8,6 +8,7 @@ from collections.abc import Iterable
 import psycopg
 
 from cobra_collectors.pipeline import Context, JobSpec
+from cobra_collectors.sources.tse_bens_model import ASSET_YEARS, Asset, assets_url, read_assets
 from cobra_collectors.sources.tse_candidaturas_model import (
     CANDIDACY_COLUMNS,
     ELECTION_YEARS,
@@ -28,6 +29,8 @@ from cobra_collectors.sources.tse_planos import SOURCE, TsePlanosSource
 # members were elected in them), or the file or the matching is wrong.
 RECENT_GENERAL = (2018, 2022)
 MIN_RECENT = 400
+# Recent general elections must have the assets of at least this many candidacies.
+MIN_RECENT_ASSETS = 300
 
 
 class TseSource:
@@ -35,14 +38,18 @@ class TseSource:
     rate_per_second = 1.0  # large public files
     burst = 1
 
-    def __init__(self, min_recent: int = MIN_RECENT) -> None:
+    def __init__(
+        self, min_recent: int = MIN_RECENT, min_recent_assets: int = MIN_RECENT_ASSETS
+    ) -> None:
         self._plans = TsePlanosSource()
         self._min_recent = min_recent
+        self._min_recent_assets = min_recent_assets
 
     def plan(self) -> Iterable[JobSpec]:
         return [
             *self._plans.plan(),
             *(JobSpec("candidacies", str(y), {"year": y}) for y in ELECTION_YEARS),
+            *(JobSpec("assets", str(y), {"year": y}) for y in ASSET_YEARS),
         ]
 
     def handle(self, ctx: Context) -> None:
@@ -53,6 +60,8 @@ class TseSource:
             self._candidacies(ctx, int(ctx.job.payload["year"]))
         elif kind == "votes":
             self._votes(ctx, int(ctx.job.payload["year"]))
+        elif kind == "assets":
+            self._assets(ctx, int(ctx.job.payload["year"]))
         else:
             raise ValueError(f"unknown job kind {kind!r}")
 
@@ -115,6 +124,58 @@ class TseSource:
                 """,
                 (votes, year, tse_id, round_),
             )
+
+    def _assets(self, ctx: Context, year: int) -> None:
+        """Type and value of each declared asset, never the description (patrimônio, D3)."""
+        owners = {
+            str(r[0]): int(r[1])
+            for r in ctx.db.execute(
+                """
+                select distinct tse_candidate_id, politician_id from core.candidacies
+                where election_year = %s
+                """,
+                (year,),
+            )
+        }
+        if not owners:
+            return  # candidacies of the year not collected yet
+        url = assets_url(year)
+        saved = ctx.fetch_file(url)
+        if saved.file_path is None:  # pragma: no cover - fetch_file always writes a file
+            raise RuntimeError("download without a file")
+        ctx.db.execute(
+            "delete from core.declared_assets where source = 'tse' and election_year = %s",
+            (year,),
+        )
+        with_assets: set[str] = set()
+        try:
+            with zipfile.ZipFile(saved.file_path) as archive:
+                for a in read_assets(archive):
+                    owner = owners.get(a.tse_id) if a.year == year else None
+                    if owner:
+                        _save_asset(ctx.db, a, owner, url)
+                        with_assets.add(a.tse_id)
+        except (MissingColumnsError, ValueError) as error:
+            ctx.validate(False, str(error))
+        if year in RECENT_GENERAL:
+            ctx.validate(
+                len(with_assets) >= self._min_recent_assets,
+                f"bens de só {len(with_assets)} candidaturas do cadastro em {year}",
+            )
+
+
+def _save_asset(db: psycopg.Connection, a: Asset, politician_id: int, url: str) -> None:
+    db.execute(
+        """
+        insert into core.declared_assets (politician_id, election_year, tse_candidate_id,
+          item_order, type_code, type_label, category, value, source, source_id, source_url,
+          collected_at)
+        values (%s, %s, %s, %s, %s, %s, %s, %s, 'tse', %s, %s, now())
+        on conflict (source, source_id) do nothing
+        """,
+        (politician_id, a.year, a.tse_id, a.order, a.type_code, a.type_label, a.category,
+         a.value, a.source_id, url),
+    )  # fmt: skip
 
 
 def _people(db: psycopg.Connection) -> list[Person]:

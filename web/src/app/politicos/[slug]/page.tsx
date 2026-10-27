@@ -15,14 +15,17 @@ import { UfFlag } from "@/components/UfFlag/UfFlag";
 import { WorkStatus } from "@/components/WorkStatus/WorkStatus";
 import { shareMetadata } from "@/lib/cards/metadata";
 import { FLAGS } from "@/lib/geo/flags";
+import { formatPercent, withVariation } from "@/lib/politicians/assets";
 import {
   officeLabel,
   partyTimeline,
   resultLabel,
 } from "@/lib/politicians/elections";
 import {
+  type AssetsData,
   type CandidacyRow,
   getAmendments,
+  getAssets,
   getCandidacies,
   getLinkedWorks,
   getPolitician,
@@ -112,7 +115,7 @@ const NOT_YET: [string, string][] = [
   ["Projetos de autoria e relatoria", "vem com a coleta de proposições"],
   ["Presença nas sessões", "vem com a coleta de presença"],
   ["Gastos da cota parlamentar", "vem com a coleta de despesas"],
-  ["Patrimônio declarado e doadores", "vem com a coleta do TSE"],
+  ["Doadores de campanha", "vem com a coleta das contas de campanha do TSE"],
 ];
 
 export default function ProfilePage({
@@ -133,13 +136,22 @@ async function load(id: number) {
   const current =
     politician.mandates.find((m) => m.endedOn === null) ??
     politician.mandates[0];
-  const [amendments, works, related, candidacies] = await Promise.all([
+  const [amendments, works, related, candidacies, assets] = await Promise.all([
     getAmendments(id),
     getLinkedWorks(id),
     getRelated(id, current?.ufCode ?? null, politician.party?.acronym ?? null),
     getCandidacies(id),
+    getAssets(id),
   ]);
-  return { politician, current, amendments, works, related, candidacies };
+  return {
+    politician,
+    current,
+    amendments,
+    works,
+    related,
+    candidacies,
+    assets,
+  };
 }
 
 async function Profile({ params }: { params: Promise<{ slug: string }> }) {
@@ -161,6 +173,7 @@ async function Profile({ params }: { params: Promise<{ slug: string }> }) {
     works,
     related,
     candidacies,
+    assets,
   } = data;
   const who = sentence(p);
   const total = amendments.reduce(
@@ -278,6 +291,8 @@ async function Profile({ params }: { params: Promise<{ slug: string }> }) {
       </Card>
 
       <Trajectory candidacies={candidacies} />
+
+      <Assets data={assets} />
 
       <Card aria-labelledby="emendas" data-testid="emendas">
         <h2 id="emendas" className={styles.h2}>
@@ -481,6 +496,100 @@ function Trajectory({ candidacies }: { candidacies: CandidacyRow[] }) {
       <p className={styles.source}>
         Fonte: Tribunal Superior Eleitoral (TSE), dados abertos
         {collected ? `, coletados pelo Cobra em ${formatDate(collected)}` : ""}.
+      </p>
+    </Card>
+  );
+}
+
+const CATEGORIES = [
+  ["imoveis", "Imóveis"],
+  ["veiculos", "Veículos"],
+  ["dinheiro", "Dinheiro e aplicações"],
+  ["outros", "Outros"],
+] as const;
+
+function variationText(v: { value: number; percent: number | null }): string {
+  const sign = v.value >= 0 ? "+" : "−";
+  const percent = formatPercent(v.percent);
+  return `${sign}${formatBRLCompact(Math.abs(v.value))}${percent ? ` (${percent})` : ""}`;
+}
+
+function Assets({ data }: { data: AssetsData }) {
+  const rows = withVariation(data.declarations);
+  const has2006 = rows.some((r) => r.year === 2006 && r.total !== null);
+  return (
+    <Card aria-labelledby="patrimonio" data-testid="patrimonio">
+      <h2 id="patrimonio" className={styles.h2}>
+        Patrimônio declarado
+      </h2>
+      {rows.length ? (
+        <>
+          <p className={styles.note}>
+            Valores declarados pelo candidato ao TSE em cada eleição desde 2006,
+            sem correção pela inflação. A variação compara com a declaração
+            anterior.
+            {has2006
+              ? " Em 2006 o TSE não informa o tipo dos bens: todos aparecem em Outros."
+              : ""}
+          </p>
+          <div
+            className={styles.tableWrap}
+            // Scrolls sideways on small screens, so it must be reachable by keyboard (axe
+            // scrollable-region-focusable).
+            // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+            tabIndex={0}
+            role="region"
+            aria-label="Tabela do patrimônio declarado"
+          >
+            <table className={styles.table}>
+              <thead>
+                <tr>
+                  <th scope="col">Ano</th>
+                  <th scope="col">Cargo</th>
+                  <th scope="col">Total</th>
+                  {CATEGORIES.map(([key, label]) => (
+                    <th key={key} scope="col">
+                      {label}
+                    </th>
+                  ))}
+                  <th scope="col">Variação</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((r) => (
+                  <tr key={r.year}>
+                    <td>{r.year}</td>
+                    <td>{officeLabel(r.office)}</td>
+                    {r.total === null ? (
+                      <td colSpan={5}>Nenhum bem declarado ao TSE</td>
+                    ) : (
+                      <>
+                        <td>{formatBRLCompact(r.total)}</td>
+                        {CATEGORIES.map(([key]) => (
+                          <td key={key}>{formatBRLCompact(r[key])}</td>
+                        ))}
+                      </>
+                    )}
+                    <td>{r.variation ? variationText(r.variation) : "—"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      ) : (
+        <p>
+          O Cobra não tem declarações de bens deste político: o TSE publica os
+          bens a partir de 2006, e não há candidatura dele desde então nos
+          arquivos.
+        </p>
+      )}
+      <p className={styles.source}>
+        Fonte: Tribunal Superior Eleitoral (TSE), bens de candidatos
+        {data.collectedAt
+          ? `, coletados pelo Cobra em ${formatDate(data.collectedAt)}`
+          : ""}
+        .
       </p>
     </Card>
   );
