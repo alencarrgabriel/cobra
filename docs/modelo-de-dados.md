@@ -67,6 +67,12 @@ Chaves: `id bigint generated always as identity`, exceto `core.localities` (chav
 | `core.plan_themes` | Temas fixos com palavras e áreas de obra correspondentes | Curadoria do Cobra, sem IA; mudar é migração nova |
 | `core.plan_page_themes` | Temas de cada página, com a contagem de palavras | Tema atribuído com 2 ocorrências ou mais |
 
+### Trajetória eleitoral (change `ingestao-tse-candidaturas`)
+
+| Tabela | O que guarda | Regras |
+|---|---|---|
+| `core.candidacies` | Candidaturas em eleições ordinárias desde 1994 de políticos do cadastro, uma linha por turno, com votos somados | Ligadas pelo CPF ou por nome civil e nascimento (`match_rule`); sem CPF, e-mail, título, gênero, cor ou raça; `source_id` = `<SQ_CANDIDATO>-<turno>` |
+
 ## Papéis e usuários
 
 As migrações criam os papéis `cobra_web_reader` e `cobra_collector` sem login e sem senha, e dão a eles os privilégios, inclusive para tabelas futuras (`alter default privileges`).

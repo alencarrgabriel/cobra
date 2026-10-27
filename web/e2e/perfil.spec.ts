@@ -38,6 +38,30 @@ test("emendas com a soma e obra com vínculo direto", async ({ page }) => {
   await expect(works).toContainText("vínculo direto");
 });
 
+test("trajetória eleitoral do TSE, da mais recente à mais antiga", async ({
+  page,
+}) => {
+  await openProfile(page);
+  const block = page.getByTestId("trajetoria");
+  await expect(block.locator("tbody tr td:first-child")).toHaveText([
+    "2022",
+    "2014",
+    "2010",
+  ]);
+  const first = block.locator("tbody tr").first();
+  await expect(first).toContainText("Senador");
+  await expect(first).toContainText("714.562");
+  await expect(first).toContainText("Eleito(a)");
+  await expect(block.locator("tbody tr").nth(2)).toContainText("—");
+  await expect(page.getByTestId("partidos-disputados")).toHaveText(
+    "PSB (2010 a 2014) → PL (2022)",
+  );
+  await expect(block).toContainText("Fonte: Tribunal Superior Eleitoral");
+  await expect(page.getByTestId("ainda-nao")).not.toContainText(
+    "Trajetória eleitoral",
+  );
+});
+
 test("o que ainda não foi coletado aparece com traço, nunca zero", async ({
   page,
 }) => {

@@ -163,3 +163,17 @@ select id, t.page, t.theme, t.hits, 'tse', 'teste-plano-df-' || t.page || '-' ||
 from core.government_plans,
   (values (1, 'saude', 3), (2, 'educacao', 3)) as t (page, theme, hits)
 where source_id = 'teste-plano-df';
+
+-- Electoral history (change ingestao-tse-candidaturas): Senadora Teste Um.
+insert into core.candidacies (politician_id, election_year, round, office, uf, unit_name,
+  party_acronym, ballot_name, ballot_number, candidacy_status, result, votes, tse_candidate_id,
+  match_rule, source, source_id, collected_at)
+select p.id, c.year, 1, c.office, 'DF', 'DISTRITO FEDERAL', c.party, 'SENADORA TESTE UM',
+       c.number, 'APTO', c.result, c.votes, c.sq, 'nome-e-nascimento', 'tse', c.sq || '-1', now()
+from core.politicians p,
+  (values
+    (2022, 'SENADOR', 'PL', '222', 'ELEITO', 714562::bigint, '990000000022'),
+    (2014, 'DEPUTADO FEDERAL', 'PSB', '4040', 'SUPLENTE', 30120::bigint, '990000000014'),
+    (2010, 'DEPUTADO DISTRITAL', 'PSB', '40123', 'NÃO ELEITO', null, '990000000010')
+  ) as c (year, office, party, number, result, votes, sq)
+where p.source_id = '9001';

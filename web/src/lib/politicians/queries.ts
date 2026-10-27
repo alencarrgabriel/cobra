@@ -293,3 +293,60 @@ export async function getRelated(
 ) {
   return unwrap(await cachedRelated(id, ufCode, acronym));
 }
+
+export type CandidacyRow = {
+  year: number;
+  round: number;
+  office: string;
+  uf: string | null;
+  unit: string | null;
+  party: string | null;
+  result: string | null;
+  votes: number | null;
+  collectedAt: string;
+};
+
+async function cachedCandidacies(
+  id: number,
+): Promise<DbResult<CandidacyRow[]>> {
+  "use cache";
+  const result = await tryDb(async (sql) => {
+    const rows = await sql<
+      {
+        year: number;
+        round: number;
+        office: string;
+        uf: string | null;
+        unit: string | null;
+        party: string | null;
+        result: string | null;
+        votes: string | null;
+        collected: string;
+      }[]
+    >`
+      select election_year as year, round, office, uf, unit_name as unit,
+             party_acronym as party, result, votes,
+             to_char(collected_at at time zone 'America/Sao_Paulo', 'YYYY-MM-DD') as collected
+      from core.candidacies
+      where politician_id = ${id}
+      order by election_year desc, round desc`;
+    return rows.map((r) => ({
+      year: Number(r.year),
+      round: Number(r.round),
+      office: r.office,
+      uf: r.uf,
+      unit: r.unit,
+      party: r.party,
+      result: r.result,
+      votes: r.votes === null ? null : Number(r.votes),
+      collectedAt: r.collected,
+    }));
+  });
+  cache(result.ok);
+  return result;
+}
+
+/** TSE candidacies, most recent first (change ingestao-tse-candidaturas, D5). */
+export async function getCandidacies(id: number): Promise<CandidacyRow[]> {
+  return unwrap(await cachedCandidacies(id));
+}

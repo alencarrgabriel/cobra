@@ -46,6 +46,12 @@ class Context:
         self.save_raw(response)
         return response
 
+    def fetch_file(self, url: str) -> SavedRaw:
+        """GET a large file straight to the raw directory, in chunks; fails on a non-2xx."""
+        with self.http.stream(url) as response:
+            response.raise_for_status()
+            return self.raw.save_stream(self.source, response, job_id=self.job.id)
+
     def save_raw(self, response: httpx.Response) -> SavedRaw:
         return self.raw.save_response(self.source, response, job_id=self.job.id)
 

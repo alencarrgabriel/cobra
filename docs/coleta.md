@@ -117,6 +117,21 @@ Limites iniciais (conservadores; cada change de fonte confirma na documentação
 - Coleta mínima: do arquivo de candidatos só se leem número, nome de urna, cargo, partido, turno, situação e coligação. CPF, e-mail e título não são guardados. O ZIP bruto fica em `raw`, que o site não lê.
 - Volume: cerca de 40 MB por carga, um arquivo por segundo.
 
+### TSE, candidaturas e votos (`tse`)
+
+- Arquivos públicos, sem chave (conferidos em 2026-10-27; catálogo `dadosabertos.tse.jus.br`):
+  - `consulta_cand/consulta_cand_<ano>.zip` (1 a 140 MB);
+  - `votacao_candidato_munzona/votacao_candidato_munzona_<ano>.zip` (19 a 565 MB).
+- Um CSV por UF, latin-1, separado por `;`, com o mesmo cabeçalho de 1994 a 2024. Ausente vem como `#NE`, `#NULO#`, `-1`, `-3` ou `-4`. Eleição ordinária: `CD_TIPO_ELEICAO = 2`, exceto 2006, que vem com `0` e `NM_TIPO_ELEICAO = ORDINÁRIA`.
+- Tarefa `candidacies`, uma por eleição (1994 a 2024, de dois em dois anos):
+  - liga cada candidatura ao cadastro pelo CPF (quando o Cobra conhece) ou pelo nome civil e data de nascimento iguais a exatamente um político; CPF diferente impede;
+  - guarda só ano, turno, cargo, local, partido, nome de urna, número, situação e resultado em `core.candidacies`;
+  - em 2018 e 2022, exige ao menos 400 ligações;
+  - enfileira `votes` do mesmo ano.
+- Tarefa `votes`: soma `QT_VOTOS_NOMINAIS` de todas as zonas por candidatura e turno.
+- Download em streaming direto para `RAW_DATA_DIR` (`Context.fetch_file`), com o SHA-256 calculado durante a cópia: o arquivo nunca fica inteiro na memória.
+- Volume: cerca de 3,5 GB para a série completa.
+
 ### IBGE, municípios (`ibge`)
 
 - API de localidades (`servicodados.ibge.gov.br/api/v1/localidades/municipios?view=nivelado`, conferida em 2026-10-26): os 5.571 municípios numa única resposta, sem chave.

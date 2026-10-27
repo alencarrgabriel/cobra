@@ -10,7 +10,7 @@ from cobra_collectors.sources.ibge import IbgeSource
 from cobra_collectors.sources.obrasgov import ObrasgovSource
 from cobra_collectors.sources.senado import SenadoSource
 from cobra_collectors.sources.transparencia import TransparenciaSource
-from cobra_collectors.sources.tse_planos import TsePlanosSource
+from cobra_collectors.sources.tse import TseSource
 
 REGISTRY: dict[str, SourceFactory] = {
     "camara": CamaraSource,
@@ -19,7 +19,7 @@ REGISTRY: dict[str, SourceFactory] = {
     "obrasgov": ObrasgovSource,
     "senado": SenadoSource,
     "transparencia": TransparenciaSource,
-    "tse": TsePlanosSource,
+    "tse": TseSource,
 }
 
 # Kept for the `sources` command.

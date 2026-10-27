@@ -82,3 +82,29 @@ def test_same_file_is_not_written_twice(
 def test_requires_autocommit(session_conn: psycopg.Connection, tmp_path: Path) -> None:
     with pytest.raises(ValueError, match="autocommit"):
         RawStore(session_conn, tmp_path)
+
+
+def test_streamed_file_goes_to_disk_with_size_and_hash(
+    autocommit_conn: psycopg.Connection, tmp_path: Path
+) -> None:
+    content = b"PK\x03\x04" + bytes(range(256)) * 9000  # about 2.3 MB, several chunks
+    url = "https://cdn.example/votacao_candidato_munzona_2022.zip"
+    transport = httpx.MockTransport(
+        lambda request: httpx.Response(
+            200, content=content, headers={"content-type": "application/zip"}
+        )
+    )
+    store = RawStore(autocommit_conn, tmp_path)
+    with httpx.Client(transport=transport) as client, client.stream("GET", url) as streamed:
+        saved = store.save_stream("tse", streamed)
+    sha = hashlib.sha256(content).hexdigest()
+    assert saved.sha256 == sha
+    assert saved.file_path is not None
+    assert saved.file_path.read_bytes() == content
+    assert saved.file_path.name == f"{sha}.zip"
+    row = autocommit_conn.execute(
+        "select file_size, url, body_json, body_text from raw.responses where id = %s",
+        (saved.id,),
+    ).fetchone()
+    assert row == (len(content), url, None, None)
+    assert not list(saved.file_path.parent.glob(".part-*"))

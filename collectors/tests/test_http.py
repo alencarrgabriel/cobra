@@ -117,3 +117,14 @@ def test_every_attempt_goes_through_the_rate_limiter() -> None:
 @pytest.mark.parametrize(("header", "expected"), [("5", 5.0), (None, None), ("not a date", None)])
 def test_retry_after_parsing(header: str | None, expected: float | None) -> None:
     assert retry_after_seconds(header) == expected
+
+
+def test_stream_retries_then_hands_the_body_in_chunks() -> None:
+    waits: list[float] = []
+    body = b"x" * 5000
+    client, seen = client_with([httpx.Response(503), httpx.Response(200, content=body)], waits)
+    with client.stream(URL) as response:
+        assert response.status_code == 200
+        assert b"".join(response.iter_bytes(1024)) == body
+    assert len(seen) == 2
+    assert waits == [1.0]

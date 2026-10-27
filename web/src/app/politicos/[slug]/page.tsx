@@ -16,7 +16,14 @@ import { WorkStatus } from "@/components/WorkStatus/WorkStatus";
 import { shareMetadata } from "@/lib/cards/metadata";
 import { FLAGS } from "@/lib/geo/flags";
 import {
+  officeLabel,
+  partyTimeline,
+  resultLabel,
+} from "@/lib/politicians/elections";
+import {
+  type CandidacyRow,
   getAmendments,
+  getCandidacies,
   getLinkedWorks,
   getPolitician,
   getRelated,
@@ -106,7 +113,6 @@ const NOT_YET: [string, string][] = [
   ["Presença nas sessões", "vem com a coleta de presença"],
   ["Gastos da cota parlamentar", "vem com a coleta de despesas"],
   ["Patrimônio declarado e doadores", "vem com a coleta do TSE"],
-  ["Trajetória eleitoral", "vem com a coleta do TSE"],
 ];
 
 export default function ProfilePage({
@@ -127,12 +133,13 @@ async function load(id: number) {
   const current =
     politician.mandates.find((m) => m.endedOn === null) ??
     politician.mandates[0];
-  const [amendments, works, related] = await Promise.all([
+  const [amendments, works, related, candidacies] = await Promise.all([
     getAmendments(id),
     getLinkedWorks(id),
     getRelated(id, current?.ufCode ?? null, politician.party?.acronym ?? null),
+    getCandidacies(id),
   ]);
-  return { politician, current, amendments, works, related };
+  return { politician, current, amendments, works, related, candidacies };
 }
 
 async function Profile({ params }: { params: Promise<{ slug: string }> }) {
@@ -147,7 +154,14 @@ async function Profile({ params }: { params: Promise<{ slug: string }> }) {
     throw error;
   }
   if (!data) return <DataUnavailable />;
-  const { politician: p, current, amendments, works, related } = data;
+  const {
+    politician: p,
+    current,
+    amendments,
+    works,
+    related,
+    candidacies,
+  } = data;
   const who = sentence(p);
   const total = amendments.reduce(
     (s, a) => ({ committed: s.committed + a.committed, paid: s.paid + a.paid }),
@@ -262,6 +276,8 @@ async function Profile({ params }: { params: Promise<{ slug: string }> }) {
           .
         </p>
       </Card>
+
+      <Trajectory candidacies={candidacies} />
 
       <Card aria-labelledby="emendas" data-testid="emendas">
         <h2 id="emendas" className={styles.h2}>
@@ -383,6 +399,90 @@ async function Profile({ params }: { params: Promise<{ slug: string }> }) {
         />
       </Card>
     </>
+  );
+}
+
+function Trajectory({ candidacies }: { candidacies: CandidacyRow[] }) {
+  const parties = partyTimeline(candidacies);
+  const collected = candidacies
+    .map((c) => c.collectedAt)
+    .sort()
+    .at(-1);
+  return (
+    <Card aria-labelledby="trajetoria" data-testid="trajetoria">
+      <h2 id="trajetoria" className={styles.h2}>
+        Trajetória eleitoral
+      </h2>
+      {candidacies.length ? (
+        <>
+          <p className={styles.note}>
+            Eleições ordinárias desde 1994, da mais recente para a mais antiga,
+            como o TSE informa.
+          </p>
+          <div
+            className={styles.tableWrap}
+            // Scrolls sideways on small screens, so it must be reachable by keyboard (axe
+            // scrollable-region-focusable).
+            // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+            tabIndex={0}
+            role="region"
+            aria-label="Tabela da trajetória eleitoral"
+          >
+            <table className={styles.table}>
+              <thead>
+                <tr>
+                  <th scope="col">Ano</th>
+                  <th scope="col">Cargo</th>
+                  <th scope="col">Local</th>
+                  <th scope="col">Partido</th>
+                  <th scope="col">Votos</th>
+                  <th scope="col">Resultado</th>
+                </tr>
+              </thead>
+              <tbody>
+                {candidacies.map((c) => (
+                  <tr key={`${c.year}-${c.round}-${c.office}`}>
+                    <td>
+                      {c.year}
+                      {c.round === 2 ? " (2º turno)" : ""}
+                    </td>
+                    <td>{officeLabel(c.office)}</td>
+                    <td>{c.unit ?? c.uf ?? "—"}</td>
+                    <td>{c.party ?? "—"}</td>
+                    <td>{c.votes === null ? "—" : formatInteger(c.votes)}</td>
+                    <td>{resultLabel(c.result)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {parties.length ? (
+            <>
+              <h3 className={styles.h3}>Partidos pelos quais disputou</h3>
+              <p data-testid="partidos-disputados">
+                {parties
+                  .map((p) =>
+                    p.from === p.to
+                      ? `${p.party} (${p.from})`
+                      : `${p.party} (${p.from} a ${p.to})`,
+                  )
+                  .join(" → ")}
+              </p>
+            </>
+          ) : null}
+        </>
+      ) : (
+        <p>
+          O Cobra não encontrou candidaturas deste político nos arquivos do TSE.
+          A ligação usa o CPF ou o nome civil e a data de nascimento; um nome
+          civil diferente em eleições antigas pode impedir que elas apareçam.
+        </p>
+      )}
+      <p className={styles.source}>
+        Fonte: Tribunal Superior Eleitoral (TSE), dados abertos
+        {collected ? `, coletados pelo Cobra em ${formatDate(collected)}` : ""}.
+      </p>
+    </Card>
   );
 }
 

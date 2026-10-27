@@ -17,6 +17,7 @@ from psycopg.types.json import Jsonb
 MAX_INLINE_BYTES = 2_000_000
 TEXT_TYPES = ("text/", "application/xml", "application/csv")
 MAX_EXTENSION_LENGTH = 6  # ".json", ".zip"; longer suffixes are not real extensions
+CHUNK_BYTES = 1 << 20
 
 
 @dataclass(frozen=True)
@@ -78,6 +79,57 @@ class RawStore:
         if row is None:  # pragma: no cover - insert ... returning always yields a row
             raise RuntimeError("insert into raw.responses returned nothing")
         return SavedRaw(int(row[0]), sha, file_path)
+
+    def save_stream(
+        self, source: str, response: httpx.Response, *, job_id: int | None = None
+    ) -> SavedRaw:
+        """Copies a streamed body to disk in chunks, hashing it on the way (large files)."""
+        content_type = response.headers.get("content-type", "").split(";")[0].strip().lower()
+        ext = _extension(content_type, response.url)
+        now = datetime.now(UTC)
+        folder = self._files_dir / source / f"{now:%Y}" / f"{now:%m}"
+        folder.mkdir(parents=True, exist_ok=True)
+        digest = hashlib.sha256()
+        size = 0
+        fd, tmp = tempfile.mkstemp(dir=folder, prefix=".part-")
+        try:
+            with os.fdopen(fd, "wb") as handle:
+                for chunk in response.iter_bytes(CHUNK_BYTES):
+                    digest.update(chunk)
+                    size += len(chunk)
+                    handle.write(chunk)
+            sha = digest.hexdigest()
+            target = folder / f"{sha}{ext}"
+            if target.exists():
+                Path(tmp).unlink()
+            else:
+                Path(tmp).replace(target)
+        except BaseException:
+            Path(tmp).unlink(missing_ok=True)
+            raise
+        row = self._conn.execute(
+            """
+            insert into raw.responses (source, method, url, params, status_code, content_type,
+                                       sha256, file_path, file_size, job_id)
+            values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            returning id
+            """,
+            (
+                source,
+                response.request.method,
+                str(response.url.copy_with(query=None)),
+                Jsonb(dict(response.url.params)),
+                response.status_code,
+                content_type or None,
+                sha,
+                str(target),
+                size,
+                job_id,
+            ),
+        ).fetchone()
+        if row is None:  # pragma: no cover - insert ... returning always yields a row
+            raise RuntimeError("insert into raw.responses returned nothing")
+        return SavedRaw(int(row[0]), sha, target)
 
     def _write_file(self, source: str, sha: str, ext: str, content: bytes) -> Path:
         now = datetime.now(UTC)

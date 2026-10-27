@@ -2,7 +2,8 @@
 
 import random
 import time
-from collections.abc import Callable, Mapping
+from collections.abc import Callable, Iterator, Mapping
+from contextlib import contextmanager
 from dataclasses import dataclass
 from email.utils import parsedate_to_datetime
 from importlib.metadata import version
@@ -81,17 +82,32 @@ class HttpClient:
 
     def get(self, url: str, params: Mapping[str, Any] | None = None) -> httpx.Response:
         """GET retrying 429/502/503/504 and network errors; other statuses are returned as is."""
+        return self._send(url, params, stream=False)
+
+    @contextmanager
+    def stream(self, url: str) -> Iterator[httpx.Response]:
+        """GET with the same retries as `get`, leaving the body to be read in chunks by the
+        caller: large files go straight to disk (change ingestao-tse-candidaturas, D1)."""
+        response = self._send(url, None, stream=True)
+        try:
+            yield response
+        finally:
+            response.close()
+
+    def _send(self, url: str, params: Mapping[str, Any] | None, *, stream: bool) -> httpx.Response:
         last_error: str = ""
         for attempt in range(1, self.policy.max_attempts + 1):
             self.limiter.acquire()
             try:
-                response = self._client.get(url, params=params)
+                request = self._client.build_request("GET", url, params=params)
+                response = self._client.send(request, stream=stream)
             except httpx.TransportError as error:
                 last_error = f"{type(error).__name__}: {error}"
                 retry_after = None
             else:
                 if response.status_code not in RETRY_STATUS:
                     return response
+                response.close()
                 last_error = f"HTTP {response.status_code}"
                 retry_after = retry_after_seconds(response.headers.get("Retry-After"))
             if attempt == self.policy.max_attempts:
