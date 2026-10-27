@@ -566,3 +566,67 @@ async function cachedBallots(id: number): Promise<DbResult<BallotRow[]>> {
 export async function getRecentBallots(id: number): Promise<BallotRow[]> {
   return unwrap(await cachedBallots(id));
 }
+
+export type ExpenseYear = {
+  year: number;
+  total: number;
+  hasRefunds: boolean;
+  byCategory: { category: string; total: number }[];
+};
+
+export type ExpensesData = { years: ExpenseYear[]; collectedAt: string | null };
+
+async function cachedExpenses(id: number): Promise<DbResult<ExpensesData>> {
+  "use cache";
+  const result = await tryDb(async (sql) => {
+    const rows = await sql<
+      {
+        year: number;
+        category: string;
+        total: string;
+        refunds: boolean;
+        collected: string;
+      }[]
+    >`
+      with recent as (
+        select distinct year from core.expenses
+        where politician_id = ${id} order by year desc limit 3
+      )
+      select e.year, e.category, sum(e.value) as total, bool_or(e.value < 0) as refunds,
+             to_char(max(e.collected_at) at time zone 'America/Sao_Paulo', 'YYYY-MM-DD')
+               as collected
+      from core.expenses e join recent r on r.year = e.year
+      where e.politician_id = ${id}
+      group by e.year, e.category
+      order by e.year desc, sum(e.value) desc`;
+    const years = new Map<number, ExpenseYear>();
+    for (const r of rows) {
+      const year = Number(r.year);
+      const y = years.get(year) ?? {
+        year,
+        total: 0,
+        hasRefunds: false,
+        byCategory: [],
+      };
+      y.total += Number(r.total);
+      y.hasRefunds ||= r.refunds;
+      y.byCategory.push({ category: r.category, total: Number(r.total) });
+      years.set(year, y);
+    }
+    return {
+      years: [...years.values()],
+      collectedAt:
+        rows
+          .map((r) => r.collected)
+          .sort()
+          .at(-1) ?? null,
+    };
+  });
+  cache(result.ok);
+  return result;
+}
+
+/** Quota expenses of the three latest years (change ingestao-despesas, D4). */
+export async function getExpenses(id: number): Promise<ExpensesData> {
+  return unwrap(await cachedExpenses(id));
+}

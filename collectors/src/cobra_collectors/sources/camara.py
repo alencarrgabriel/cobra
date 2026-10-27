@@ -25,6 +25,7 @@ from cobra_collectors.sources.camara_model import (
 )
 from cobra_collectors.sources.camara_votacoes import collect_votes
 from cobra_collectors.sources.camara_votacoes_model import FIRST_YEAR
+from cobra_collectors.sources.despesas import collect_camara
 
 SOURCE = "camara"
 ELECTORAL_NUMBERS = range(10, 100)
@@ -55,7 +56,8 @@ class CamaraSource:
         # `uf` narrows the listing (tests); the real collection covers every state.
         self.uf = uf
         self.page_size = page_size
-        # Years of plenary votes to collect; by default the legislature up to this year.
+        # Years of plenary votes and quota expenses to collect; by default the legislature
+        # up to this year.
         self.vote_years = (
             tuple(vote_years)
             if vote_years is not None
@@ -67,6 +69,7 @@ class CamaraSource:
             JobSpec("deputies-page", "p1", {"page": 1}),
             JobSpec("close-mandates", "run", {}),
             *(JobSpec("votes", str(year), {"year": year}) for year in self.vote_years),
+            *(JobSpec("expenses", str(year), {"year": year}) for year in self.vote_years),
         ]
 
     def handle(self, ctx: Context) -> None:
@@ -79,6 +82,8 @@ class CamaraSource:
             self._close_mandates(ctx)
         elif kind == "votes":
             collect_votes(ctx, int(ctx.job.payload["year"]))
+        elif kind == "expenses":
+            collect_camara(ctx, int(ctx.job.payload["year"]))
         else:
             raise ValueError(f"unknown job kind {kind!r}")
 

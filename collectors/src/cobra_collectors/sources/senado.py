@@ -12,6 +12,7 @@ import structlog
 
 from cobra_collectors.pipeline import Context, JobSpec, ValidationError
 from cobra_collectors.sources.camara_votacoes_model import MAX_MISMATCH_SHARE, UnknownValueError
+from cobra_collectors.sources.despesas import collect_senado
 from cobra_collectors.sources.identity import same_person
 from cobra_collectors.sources.senado_model import (
     API_BASE,
@@ -55,7 +56,8 @@ class SenadoSource:
     burst = 4
 
     def __init__(self, vote_years: Iterable[int] | None = None) -> None:
-        # Years of plenary votes to collect; by default the legislature up to this year.
+        # Years of plenary votes and quota expenses to collect; by default the legislature
+        # up to this year.
         self.vote_years = (
             tuple(vote_years)
             if vote_years is not None
@@ -66,6 +68,7 @@ class SenadoSource:
         return [
             JobSpec("senators", "run", {}),
             *(JobSpec("votes", str(year), {"year": year}) for year in self.vote_years),
+            *(JobSpec("expenses", str(year), {"year": year}) for year in self.vote_years),
         ]
 
     def handle(self, ctx: Context) -> None:
@@ -76,6 +79,8 @@ class SenadoSource:
             self._senator(ctx)
         elif kind == "votes":
             self._votes(ctx, int(ctx.job.payload["year"]))
+        elif kind == "expenses":
+            collect_senado(ctx, int(ctx.job.payload["year"]))
         else:
             raise ValueError(f"unknown job kind {kind!r}")
 

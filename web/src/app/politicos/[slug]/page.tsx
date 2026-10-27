@@ -24,11 +24,13 @@ import {
 import {
   type AssetsData,
   type BallotRow,
+  type ExpensesData,
   type ReceiptsData,
   type CandidacyRow,
   getAmendments,
   getAssets,
   getCandidacies,
+  getExpenses,
   getRecentBallots,
   getReceipts,
   getLinkedWorks,
@@ -115,10 +117,8 @@ const OFFICIAL: Record<HouseSlug, (id: string) => string | null> = {
 
 // Blocks that need data not collected yet (DDR §9.1: "—" with the reason, never zero).
 const NOT_YET: [string, string][] = [
-  ["Como votou", "vem com a coleta das votações da Câmara e do Senado"],
   ["Projetos de autoria e relatoria", "vem com a coleta de proposições"],
   ["Presença nas sessões", "vem com a coleta de presença"],
-  ["Gastos da cota parlamentar", "vem com a coleta de despesas"],
 ];
 
 export default function ProfilePage({
@@ -139,20 +139,25 @@ async function load(id: number) {
   const current =
     politician.mandates.find((m) => m.endedOn === null) ??
     politician.mandates[0];
-  const [amendments, works, related, candidacies, assets, receipts, ballots] =
-    await Promise.all([
-      getAmendments(id),
-      getLinkedWorks(id),
-      getRelated(
-        id,
-        current?.ufCode ?? null,
-        politician.party?.acronym ?? null,
-      ),
-      getCandidacies(id),
-      getAssets(id),
-      getReceipts(id),
-      getRecentBallots(id),
-    ]);
+  const [
+    amendments,
+    works,
+    related,
+    candidacies,
+    assets,
+    receipts,
+    ballots,
+    expenses,
+  ] = await Promise.all([
+    getAmendments(id),
+    getLinkedWorks(id),
+    getRelated(id, current?.ufCode ?? null, politician.party?.acronym ?? null),
+    getCandidacies(id),
+    getAssets(id),
+    getReceipts(id),
+    getRecentBallots(id),
+    getExpenses(id),
+  ]);
   return {
     politician,
     current,
@@ -163,6 +168,7 @@ async function load(id: number) {
     assets,
     receipts,
     ballots,
+    expenses,
   };
 }
 
@@ -188,6 +194,7 @@ async function Profile({ params }: { params: Promise<{ slug: string }> }) {
     assets,
     receipts,
     ballots,
+    expenses,
   } = data;
   const who = sentence(p);
   const total = amendments.reduce(
@@ -306,6 +313,12 @@ async function Profile({ params }: { params: Promise<{ slug: string }> }) {
 
       <HowVoted ballots={ballots} house={current?.house} />
 
+      <Expenses
+        data={expenses}
+        house={current?.house}
+        externalId={current ? p.externalIds[current.house] : undefined}
+      />
+
       <Trajectory candidacies={candidacies} />
 
       <Assets data={assets} />
@@ -386,18 +399,16 @@ async function Profile({ params }: { params: Promise<{ slug: string }> }) {
           Ainda não está no Cobra
         </h2>
         <dl className={styles.notYet} data-testid="ainda-nao">
-          {NOT_YET.filter(([label]) => label !== "Como votou").map(
-            ([label, why]) => (
-              <div key={label}>
-                <dt>{label}</dt>
-                <dd>
-                  <span aria-hidden="true">—</span>
-                  <span className="sr-only">Sem dado.</span> Ainda não está no
-                  Cobra: {why}.
-                </dd>
-              </div>
-            ),
-          )}
+          {NOT_YET.map(([label, why]) => (
+            <div key={label}>
+              <dt>{label}</dt>
+              <dd>
+                <span aria-hidden="true">—</span>
+                <span className="sr-only">Sem dado.</span> Ainda não está no
+                Cobra: {why}.
+              </dd>
+            </div>
+          ))}
         </dl>
       </Card>
 
@@ -716,6 +727,83 @@ function HowVoted({
             ? `, coletados pelo Cobra em ${formatDate(collected)}`
             : ""}
           .
+        </p>
+      ) : null}
+    </Card>
+  );
+}
+
+const EXPENSES_PAGE: Partial<Record<HouseSlug, (id: string) => string>> = {
+  camara: (id) => `https://www.camara.leg.br/deputados/${id}`,
+  senado: (id) => `https://www6g.senado.leg.br/transparencia/sen/${id}/`,
+};
+
+function Expenses({
+  data,
+  house,
+  externalId,
+}: {
+  data: ExpensesData;
+  house: HouseSlug | undefined;
+  externalId: string | undefined;
+}) {
+  const official =
+    house && externalId ? EXPENSES_PAGE[house]?.(externalId) : undefined;
+  return (
+    <Card aria-labelledby="gastos" data-testid="gastos">
+      <h2 id="gastos" className={styles.h2}>
+        Gastos da cota parlamentar
+      </h2>
+      {house === "cldf" ? (
+        <p>
+          <span aria-hidden="true">—</span>
+          <span className="sr-only">Sem dado.</span> Ainda não está no Cobra: os
+          gastos dos deputados distritais não são coletados.
+        </p>
+      ) : data.years.length ? (
+        <>
+          <p className={styles.note}>
+            Despesas reembolsadas pela cota para o exercício do mandato, como a
+            casa informa, nos anos mais recentes. Fornecedores pessoas físicas
+            não são identificados.
+          </p>
+          {data.years.map((y) => (
+            <section key={y.year} aria-labelledby={`gastos-${y.year}`}>
+              <h3 id={`gastos-${y.year}`} className={styles.h3}>
+                {y.year}: {formatBRLCompact(y.total)}
+              </h3>
+              <ul className={styles.list}>
+                {y.byCategory.map((c) => (
+                  <li key={c.category}>
+                    {c.category}: {formatBRLCompact(c.total)}
+                  </li>
+                ))}
+              </ul>
+              {y.hasRefunds ? (
+                <p className={styles.note}>
+                  Inclui estornos informados pela casa.
+                </p>
+              ) : null}
+            </section>
+          ))}
+        </>
+      ) : (
+        <p>O Cobra não tem despesas da cota deste parlamentar desde 2023.</p>
+      )}
+      {house !== "cldf" ? (
+        <p className={styles.source}>
+          Fonte:{" "}
+          {house === "senado" ? "Senado Federal" : "Câmara dos Deputados"}, cota
+          parlamentar
+          {data.collectedAt
+            ? `, dados coletados pelo Cobra em ${formatDate(data.collectedAt)}`
+            : ""}
+          .{" "}
+          {official ? (
+            <a href={official} rel="noopener noreferrer">
+              Ver os gastos no site oficial
+            </a>
+          ) : null}
         </p>
       ) : null}
     </Card>

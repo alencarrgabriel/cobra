@@ -135,12 +135,36 @@ test("como votou: deputado e senadora com votos, distrital com traço", async ({
   );
 });
 
+test("gastos da cota por tipo, sem fornecedor pessoa física", async ({
+  page,
+}) => {
+  await page.goto("/representantes/5300108");
+  await page
+    .getByTestId("secao-camara")
+    .getByRole("button", { name: /Deputado Teste A/ })
+    .click();
+  await page.getByRole("link", { name: "Ver perfil completo" }).click();
+  const block = page.getByTestId("gastos");
+  await expect(
+    block.getByRole("heading", { name: "2026: R$ 40 mil" }),
+  ).toBeVisible();
+  await expect(block.getByRole("listitem").first()).toHaveText(
+    "COMBUSTÍVEIS E LUBRIFICANTES.: R$ 30 mil",
+  );
+  await expect(block).toContainText(
+    "Fornecedores pessoas físicas não são identificados",
+  );
+  await expect(
+    block.getByRole("link", { name: "Ver os gastos no site oficial" }),
+  ).toHaveAttribute("href", "https://www.camara.leg.br/deputados/8001");
+});
+
 test("o que ainda não foi coletado aparece com traço, nunca zero", async ({
   page,
 }) => {
   await openProfile(page);
   const block = page.getByTestId("ainda-nao");
-  await expect(block).toContainText("Gastos da cota parlamentar");
+  await expect(block).toContainText("Presença nas sessões");
   await expect(block).toContainText("Ainda não está no Cobra");
   await expect(block).not.toContainText("R$ 0");
 });

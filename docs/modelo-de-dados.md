@@ -83,6 +83,12 @@ Chaves: `id bigint generated always as identity`, exceto `core.localities` (chav
 | `core.vote_ballots` | Voto de cada parlamentar em votação nominal, com partido e UF na data | Inclui quem não está no cadastro (`politician_id` nulo), para o placar; opção `sim`, `nao`, `abstencao`, `obstrucao`, `art17`, `presidente`, `presente_sem_voto`, `ausente` (motivo do Senado em `option_detail`), `nao_informado` |
 | `core.vote_orientations` | Orientação de cada liderança ou bancada | Como a casa escreve o nome da bancada |
 
+### Despesas da cota (change `ingestao-despesas`)
+
+| Tabela | O que guarda | Regras |
+|---|---|---|
+| `core.expenses` | Despesas da cota parlamentar da Câmara e do Senado desde 2023 | Fornecedor pessoa física sem nome nem CPF; passageiro e trecho nunca lidos; valor líquido como a casa informa (estorno negativo) |
+
 ## Papéis e usuários
 
 As migrações criam os papéis `cobra_web_reader` e `cobra_collector` sem login e sem senha, e dão a eles os privilégios, inclusive para tabelas futuras (`alter default privileges`).

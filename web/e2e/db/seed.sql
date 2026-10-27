@@ -243,3 +243,15 @@ select v.id, '9001', 'Senadora Teste Um', 'PL', 'DF', 'ausente', 'Licença saúd
        '97001:9001', now()
 from core.votes v, core.politicians p
 where v.source_id = '97001' and v.source = 'senado' and p.source_id = '9001';
+
+-- Quota expenses (change ingestao-despesas): Deputado Teste A in 2026.
+insert into core.expenses (house_id, external_id, politician_id, year, month, category,
+  supplier_kind, supplier_name, supplier_cnpj, issued_on, value, source, source_id, collected_at)
+select h.id, '8001', p.id, 2026, 6, e.category, e.kind, e.name, e.cnpj, '2026-06-10', e.value,
+       'camara', 'camara-' || e.doc || '-8001', now()
+from core.legislative_houses h, core.politicians p,
+  (values
+    ('1', 'COMBUSTÍVEIS E LUBRIFICANTES.', 'empresa', 'POSTO TESTE LTDA', '12345678000190', 30000.00),
+    ('2', 'DIVULGAÇÃO DA ATIVIDADE PARLAMENTAR.', 'pessoa_fisica', null, null, 10000.00)
+  ) as e (doc, category, kind, name, cnpj, value)
+where h.slug = 'camara' and p.source_id = '8001';

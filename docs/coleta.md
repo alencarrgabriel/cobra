@@ -97,6 +97,14 @@ Limites iniciais (conservadores; cada change de fonte confirma na documentação
 - Contagem conferida com `qtdVotosSim`/`qtdVotosNao` das orientações, com a mesma regra da Câmara.
 - Volume em 2026-10-27: 426 votações (186 nominais, 240 secretas), 13 mil votos, nenhuma divergência.
 
+### Cota parlamentar (`camara` e `senado`, tarefa `expenses`)
+
+- Câmara: `https://www.camara.leg.br/cotas/Ano-<ano>.csv.zip` (UTF-8 com BOM, `;`); Senado: `https://adm.senado.gov.br/adm-dadosabertos/api/v1/senadores/despesas_ceaps/<ano>` (JSON com `codSenador`; o CSV do portal de transparência não tem o código). Conferidos em 2026-10-27.
+- Uma tarefa por casa e ano, de 2023 ao ano corrente; o ano é regravado inteiro. Lideranças (sem id de parlamentar) ficam fora.
+- Fornecedor com CPF: só "pessoa física" e o valor; nome do passageiro, trecho e detalhamento não são lidos. Empresa: nome e CNPJ.
+- Valor líquido como a casa informa, inclusive estornos negativos.
+- Volume em 2026-10-27: 790 mil despesas da Câmara e 80 mil do Senado (2023 a 2026).
+
 ### Câmara Legislativa do DF (`cldf`)
 
 - A CLDF não tem API de deputados. O portal `dados.cl.df.gov.br` (CKAN, conferido em 2026-10-26) só traz os deputados misturados à lista nominal de cerca de 2.400 servidores, sem partido. Essa lista não é coletada (coleta mínima).
