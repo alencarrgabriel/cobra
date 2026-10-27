@@ -105,9 +105,10 @@ context: |
   18a ingestao-tse-candidaturas (trajetória 1994–2024 com votos, no perfil);
   18b ingestao-tse-patrimonio (bens por tipo e variação desde 2006, sem descrição do bem);
   18c ingestao-tse-doadores (receitas 2018–2024 por origem e fonte; pessoas físicas só
-  somadas, decisão de 2026-10-27).
+  somadas, decisão de 2026-10-27); 19 ingestao-camara-votacoes (Plenário desde 2023 por
+  arquivos anuais; "Como votou" no perfil de deputado).
   Próximas:
-  19 ingestao-camara-votacoes; 20 ingestao-senado-votacoes; 21 ingestao-despesas-presenca;
+  20 ingestao-senado-votacoes; 21 ingestao-despesas-presenca;
   22 relevancia-e-eventos; 23 painel-editorial; 24 feed-e-pagina-votacao; 25 alertas-email;
   26 seguir-politicos; 27 metodologia-e-reporte-de-erro (com "É você nesta página?");
   28 saude-integracoes.

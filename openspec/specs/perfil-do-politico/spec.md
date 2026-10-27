@@ -46,11 +46,15 @@ O perfil SHALL listar as emendas de autoria do político guardadas pelo Cobra (n
 - **THEN** o perfil diz que não há emendas com destino ao DF guardadas, sem mostrar zero como se fosse total
 
 ### Requirement: Dado ainda não coletado
-Blocos que dependem de dados ainda não coletados (votos, projetos, presença e gastos da cota) SHALL aparecer com "—" e a explicação do motivo, nunca com zero.
+Blocos que dependem de dados ainda não coletados (votos de senadores, projetos, presença e gastos da cota) SHALL aparecer com "—" e a explicação do motivo, nunca com zero.
 
 #### Scenario: Gastos ainda não coletados
 - **WHEN** o perfil é aberto antes da coleta de gastos
 - **THEN** o bloco de gastos mostra "—" e diz que esse dado ainda não está no Cobra
+
+#### Scenario: Votos de senador
+- **WHEN** o perfil de um senador é aberto antes da coleta das votações do Senado
+- **THEN** o bloco "Como votou" mostra "—" e diz que vem com a coleta das votações do Senado
 
 ### Requirement: Perguntas frequentes e relacionados
 O perfil SHALL ter perguntas frequentes factuais respondidas só com os dados mostrados, e uma lista de políticos relacionados (mesma UF e mesmo partido), em ordem alfabética e sem destaque. A página SHALL publicar dados estruturados (schema.org `Person` e `FAQPage`) para buscadores.
