@@ -32,11 +32,11 @@ Todas as páginas SHALL passar na verificação automática de acessibilidade WC
 - **THEN** nenhuma violação de nível A ou AA é encontrada
 
 ### Requirement: Navegação no computador e no celular
-Em telas largas o site SHALL mostrar as seções numa barra superior; em telas de celular SHALL mostrar uma barra inferior fixa com Início, Representantes, Votações e Obras. Seções ainda não disponíveis SHALL aparecer marcadas como "em breve" e não SHALL levar a página vazia.
+Em telas largas o site SHALL mostrar as seções numa barra superior; em telas de celular SHALL mostrar uma barra inferior fixa com Início, Representantes, Votações, Obras e Planos. Seções ainda não disponíveis SHALL aparecer marcadas como "em breve" e não SHALL levar a página vazia.
 
 #### Scenario: Celular
 - **WHEN** o site é aberto numa tela de 360 px de largura
-- **THEN** a barra inferior com as quatro seções está visível e não cobre o conteúdo final da página
+- **THEN** a barra inferior com as cinco seções está visível, cabe na largura e não cobre o conteúdo final da página
 
 #### Scenario: Seção ainda não entregue
 - **WHEN** o usuário vê uma seção que ainda não existe
