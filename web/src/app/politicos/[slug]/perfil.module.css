@@ -1,0 +1,110 @@
+.page {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding-block: var(--space-5) var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.header {
+  display: grid;
+  grid-template-columns: minmax(120px, 200px) 1fr;
+  gap: var(--space-5);
+  align-items: start;
+}
+
+@media (max-width: 560px) {
+  .header {
+    grid-template-columns: 1fr;
+  }
+
+  .portrait {
+    max-width: 180px;
+  }
+}
+
+.identity {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.title {
+  font-size: var(--text-display);
+}
+
+.badges {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: var(--text-sm);
+}
+
+.who {
+  font-size: var(--text-lg);
+  max-width: 62ch;
+}
+
+.h2 {
+  font-size: var(--text-xl);
+  font-weight: 600;
+}
+
+.h3 {
+  font-size: var(--text-md);
+  font-weight: 600;
+  margin-top: var(--space-2);
+}
+
+.list {
+  margin: 0;
+  padding-left: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.related {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+}
+
+.note {
+  font-size: var(--text-sm);
+  color: var(--muted);
+  max-width: 68ch;
+}
+
+.code {
+  font-size: var(--text-xs);
+  color: var(--muted);
+}
+
+.source {
+  font-size: var(--text-xs);
+  color: var(--muted);
+}
+
+.notYet,
+.faq {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.notYet dt,
+.faq dt {
+  font-weight: 600;
+}
+
+.notYet dd,
+.faq dd {
+  margin: 0;
+  color: var(--muted);
+}

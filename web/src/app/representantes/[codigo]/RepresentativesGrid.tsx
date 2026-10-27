@@ -1,11 +1,13 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 
 import { RepresentativeCard } from "@/components/RepresentativeCard/RepresentativeCard";
 import { SidePanel } from "@/components/SidePanel/SidePanel";
 import { UfFlag } from "@/components/UfFlag/UfFlag";
 import { NEUTRAL_PARTY_COLOR } from "@/lib/party-color";
+import { profilePath } from "@/lib/politicians/who";
 import type { House, Representative } from "@/lib/representatives/queries";
 import { formatDate } from "@/lib/works/format";
 
@@ -79,6 +81,14 @@ export function RepresentativesGrid({ people }: { people: Representative[] }) {
             <div>
               <dt>No mandato desde</dt>
               <dd>{formatDate(person.since)}</dd>
+            </div>
+            <div>
+              <dt>Perfil</dt>
+              <dd>
+                <Link href={profilePath(person.id, person.name)}>
+                  Ver perfil completo
+                </Link>
+              </dd>
             </div>
             {person.officialUrl ? (
               <div>

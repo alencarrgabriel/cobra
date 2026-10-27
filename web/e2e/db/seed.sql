@@ -121,3 +121,21 @@ from (values ('9001','PL'), ('9002','PT'), ('9003','PSB'), ('8001','PL'), ('8002
              ('distrital-teste-c','PL'), ('distrital-teste-d','PSB'), ('8003','PT')) as f (sid, party)
 join core.politicians p on p.source_id = f.sid
 join core.parties pa on pa.acronym = f.party;
+
+-- Profile (change perfil-do-politico): an amendment by Senadora Teste Um paying a seeded work.
+insert into core.amendment_authors (name, kind, politician_id, source, source_id, collected_at)
+select 'SENADORA TESTE UM', 'individual', id, 'transparencia', '9901', now()
+from core.politicians where source_id = '9001';
+
+insert into core.amendments (year, number, type, author_id, locality, uf_code, main_function,
+  functions, committed, liquidated, paid, source, source_id, collected_at)
+select 2025, '0001', 'Emenda Individual - Transferências com Finalidade Definida', id,
+       'DISTRITO FEDERAL (UF)', '53', 'Saúde', '{Saúde}', 1500000, 900000, 600000,
+       'transparencia', '202599010001', now()
+from core.amendment_authors where source_id = '9901';
+
+insert into core.work_commitments (work_id, issued_on, value, primary_result, amendment_ref_raw,
+  amendment_code, source, source_id, collected_at)
+select id, '2025-03-10', 1500000, '6', '99010001', '202599010001', 'obrasgov', '2025NE000001',
+       now()
+from core.works where source_id = '900002.53-02';
