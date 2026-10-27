@@ -1,19 +1,22 @@
 import { type NextRequest, NextResponse } from "next/server";
 
 import { placeExists } from "@/lib/places/exists";
+import { planExists } from "@/lib/plans/exists";
 import { politicianName } from "@/lib/politicians/exists";
 import { profilePath } from "@/lib/politicians/who";
 import { workExists } from "@/lib/works/exists";
 
 // Pages with a code in the address stream after a static shell, so `notFound()` there can no
 // longer change the status. Unknown codes are answered here, before rendering, with a real
-// 404 (specs obras-na-cidade, busca-de-representantes and perfil-do-politico).
+// 404 (specs obras-na-cidade, busca-de-representantes, perfil-do-politico and
+// tela-de-planos-de-governo).
 const CHECKS: [
   prefix: string,
   exists: (code: string) => Promise<boolean | null>,
 ][] = [
   ["/obras/", workExists],
   ["/representantes/", placeExists],
+  ["/planos/", planExists],
 ];
 
 const notFound = (request: NextRequest) =>
@@ -56,5 +59,10 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/obras/:codigo", "/representantes/:codigo", "/politicos/:slug"],
+  matcher: [
+    "/obras/:codigo",
+    "/representantes/:codigo",
+    "/politicos/:slug",
+    "/planos/:plano",
+  ],
 };

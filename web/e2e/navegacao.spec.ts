@@ -5,15 +5,25 @@ import { expect, test } from "@playwright/test";
 test.describe("celular (360 px)", () => {
   test.use({ viewport: { width: 360, height: 740 } });
 
-  test("mostra a barra inferior com as quatro seções", async ({ page }) => {
+  test("mostra a barra inferior com as cinco seções", async ({ page }) => {
     await page.goto("/");
     const bar = page.getByRole("navigation", {
       name: "Seções (barra inferior)",
     });
     await expect(bar).toBeVisible();
-    for (const label of ["Início", "Representantes", "Votações", "Obras"]) {
+    for (const label of [
+      "Início",
+      "Representantes",
+      "Votações",
+      "Obras",
+      "Planos",
+    ]) {
       await expect(bar.locator("li", { hasText: label })).toBeVisible();
     }
+    // Five sections fit the width without scrolling sideways.
+    expect(await bar.evaluate((el) => el.scrollWidth <= el.clientWidth)).toBe(
+      true,
+    );
     await expect(
       page.getByRole("navigation", { name: "Seções", exact: true }),
     ).toBeHidden();

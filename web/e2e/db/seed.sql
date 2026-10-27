@@ -139,3 +139,27 @@ insert into core.work_commitments (work_id, issued_on, value, primary_result, am
 select id, '2025-03-10', 1500000, '6', '99010001', '202599010001', 'obrasgov', '2025NE000001',
        now()
 from core.works where source_id = '900002.53-02';
+
+-- Government plan (change plano-de-governo): a fictitious ticket with two pages of text.
+insert into core.government_plans (election_year, office, uf_code, holder_name,
+  running_mate_name, party, tse_candidate_id, pdf, pdf_sha256, pdf_pages, source, source_id,
+  source_url, collected_at)
+select 2022, 'governador', '53', 'GOVERNADORA TESTE', 'VICE TESTE', 'PL', '990000000001', b,
+       encode(sha256(b), 'hex'), 2, 'tse', 'teste-plano-df', null, now()
+from (select convert_to('%PDF-1.4 plano de governo de teste', 'UTF8') as b) as pdf;
+
+insert into core.government_plan_pages (plan_id, page, text, has_text, source, source_id,
+  collected_at)
+select id, p.page, p.text, true, 'tse', 'teste-plano-df-' || p.page, now()
+from core.government_plans,
+  (values
+    (1, E'Mais Saúde para o DF: novas UBS\ne um hospital regional.'),
+    (2, 'Educação em tempo integral, com novas creches e escolas.')
+  ) as p (page, text)
+where source_id = 'teste-plano-df';
+
+insert into core.plan_page_themes (plan_id, page, theme, hits, source, source_id, collected_at)
+select id, t.page, t.theme, t.hits, 'tse', 'teste-plano-df-' || t.page || '-' || t.theme, now()
+from core.government_plans,
+  (values (1, 'saude', 3), (2, 'educacao', 3)) as t (page, theme, hits)
+where source_id = 'teste-plano-df';

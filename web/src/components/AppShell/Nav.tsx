@@ -20,6 +20,7 @@ const ICONS: Record<Section["icon"], ReactNode> = {
   ),
   votes: <path d="M4 20V10M10 20V4M16 20v-7M22 20H2" />,
   works: <path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6" />,
+  plans: <path d="M6 3h9l4 4v14H6zM14 3v5h5M9 12h7M9 16h7" />,
 };
 
 // A section stays marked on its inner pages, e.g. /obras/<code>.
