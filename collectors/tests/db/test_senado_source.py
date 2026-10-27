@@ -18,6 +18,8 @@ pytestmark = pytest.mark.db
 
 FIXTURES = Path(__file__).parent.parent / "fixtures" / "senado"
 CURRENT = {"6335", "4770", "5977", "6358"}
+# Titular on temporary leave (LCS) in the recorded list of senators out of office.
+LICENSED = "5976"
 DF = {"6335", "4770", "5977"}
 
 
@@ -152,12 +154,15 @@ def counts(db: psycopg.Connection) -> tuple[int, ...]:
 def test_full_load(clean: psycopg.Connection, test_database_url: str, tmp_path: Path) -> None:
     summary = collect(clean, test_database_url, tmp_path, FakeSenado())
     assert summary.failed == 0
-    assert summary.done == 1 + len(CURRENT)
+    assert summary.done == 1 + len(CURRENT) + 1
     assert in_office(clean) == CURRENT
     assert in_office(clean, "53") == DF
     assert mandate_of(clean, "6335") == ("titular", "2023-02-01", None, 57)
     assert mandate_of(clean, "4770") == ("titular", "2019-02-01", None, 56)
     assert mandate_of(clean, "6358") == ("suplente", "2026-10-06", None, 57)
+    # The titular on leave holds the mandate, outside the current bench.
+    licensed = mandate_of(clean, LICENSED)
+    assert licensed is not None and licensed[0] == "licenciado" and licensed[2] is None
     name = clean.execute(
         "select p.civil_name, p.birth_date::text from core.politicians p "
         "join core.politician_external_ids e on e.politician_id = p.id "
@@ -254,7 +259,7 @@ def test_titular_who_resigns_has_the_mandate_ended(
     leaves_office(fake, "4770", entry)
     collect(clean, test_database_url, tmp_path, fake)
     assert mandate_of(clean, "4770") == ("titular", "2019-02-01", "2026-10-15", 56)
-    assert counts(clean)[0] == len(CURRENT)  # nothing deleted
+    assert counts(clean)[0] == len(CURRENT) + 1  # nothing deleted
 
 
 def test_substitute_back_to_substitute_has_the_mandate_ended(
@@ -311,7 +316,7 @@ def test_former_deputy_is_linked_to_the_same_politician(
         (row[0],),
     ).fetchall()
     assert systems == [("camara",), ("senado",)]
-    assert counts(clean)[0] == len(CURRENT) - 1
+    assert counts(clean)[0] == len(CURRENT)  # one linked, one licensed added
 
 
 def test_unknown_uf_blocks_only_that_senator(

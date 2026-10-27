@@ -13,10 +13,12 @@ from cobra_collectors.sources.obrasgov_model import (
     normalize_events,
     normalize_progress,
     normalize_work,
+    parse_date,
     validate_progress,
     validate_work,
     work_url,
 )
+from cobra_collectors.sources.transparencia_model import recognize_code
 
 PAGE_SIZE = 200
 SOURCE = "obrasgov"
@@ -43,6 +45,8 @@ class ObrasgovSource:
             self._projects(ctx)
         elif kind == "detail":
             self._detail(ctx)
+        elif kind == "commitments":
+            self._commitments(ctx)
         elif kind == "geometry":
             self._geometry(ctx)
         else:
@@ -130,6 +134,7 @@ class ObrasgovSource:
             )  # fmt: skip
             # Details only exist once the work is published (design D3).
             ctx.enqueue("detail", work.source_id, {"id": work.source_id})
+            ctx.enqueue("commitments", work.source_id, {"id": work.source_id})
 
     def _all_pages(self, ctx: Context, path: str, source_id: str) -> list[dict[str, Any]]:
         rows: list[dict[str, Any]] = []
@@ -203,6 +208,43 @@ class ObrasgovSource:
                 (
                     work_id, e.status, e.occurred_on, e.justification, e.in_negotiation,
                     e.negotiation_phase, e.source_id, url, updated_at,
+                ),
+            )  # fmt: skip
+
+    def _commitments(self, ctx: Context) -> None:
+        """Commitments of a work, with the amendment that paid them (change ingestao-emendas)."""
+        source_id = ctx.job.payload["id"]
+        row = ctx.db.execute(
+            "select id from core.works where source = 'obrasgov' and source_id = %s", (source_id,)
+        ).fetchone()
+        if row is None:
+            raise ValidationError(f"obra {source_id} ainda não publicada")
+        updated_at = self.base_date(ctx)
+        url = f"{API_BASE}/empenho?id_projeto_investimento={source_id}"
+        for item in self._all_pages(ctx, "empenho", source_id):
+            number = item.get("nr_empenho")
+            if not number:
+                continue
+            issued_on = parse_date(item.get("data_emissao"))
+            raw = item.get("codigo_autor_emenda")
+            ctx.db.execute(
+                """
+                insert into core.work_commitments (work_id, issued_on, value, primary_result,
+                  amendment_ref_raw, amendment_code, source, source_id, source_url,
+                  collected_at, source_updated_at)
+                values (%s, %s, %s, %s, %s, %s, 'obrasgov', %s, %s, now(), %s)
+                on conflict (source, source_id, work_id) do update set
+                  issued_on = excluded.issued_on, value = excluded.value,
+                  primary_result = excluded.primary_result,
+                  amendment_ref_raw = excluded.amendment_ref_raw,
+                  amendment_code = excluded.amendment_code,
+                  collected_at = excluded.collected_at,
+                  source_updated_at = excluded.source_updated_at
+                """,
+                (
+                    int(row[0]), issued_on, item.get("valor_empenho"),
+                    item.get("resultado_primario") or None, raw,
+                    recognize_code(raw, issued_on, number), number, url, updated_at,
                 ),
             )  # fmt: skip
 

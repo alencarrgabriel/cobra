@@ -92,6 +92,19 @@ def test_titular_who_died_has_the_mandate_ended() -> None:
     assert result.ended_on == date(2020, 10, 21)
 
 
+def test_titular_who_resigned_after_an_earlier_leave_has_the_mandate_ended() -> None:
+    # Real pattern (Flávio Dino): a first period ended by a minister post, a later one by
+    # resignation. The latest period decides.
+    entry = copy.deepcopy(out_of_office("5976"))
+    entry["Mandato"]["Exercicios"]["Exercicio"] = [
+        {"DataInicio": "2023-02-01", "DataFim": "2023-02-02", "SiglaCausaAfastamento": "AFO"},
+        {"DataInicio": "2024-02-01", "DataFim": "2024-02-20", "SiglaCausaAfastamento": "REN"},
+    ]
+    result = departure_for(entry, date(2023, 2, 1), TODAY)
+    assert not result.keep_open
+    assert result.ended_on == date(2024, 2, 20)
+
+
 def test_substitute_back_to_substitute_has_the_mandate_ended() -> None:
     result = departure_for(out_of_office("6366"), date(2024, 6, 20), TODAY)
     assert not result.keep_open

@@ -74,6 +74,9 @@ class FakeObrasgov:
             name = "execucao" if path == "execucao-fisica" else "historico"
             fixture = FIXTURES / f"{name}-{params['id_projeto_investimento']}.json"
             body = json.loads(fixture.read_text(encoding="utf-8")) if fixture.exists() else page([])
+        elif path == "empenho":
+            fixture = FIXTURES / f"empenho-{params['id_projeto_investimento']}.json"
+            body = json.loads(fixture.read_text(encoding="utf-8")) if fixture.exists() else page([])
         elif path == "geometria":
             body = page([geometry(p, i) for i, p in enumerate(self.projects)])
         else:
@@ -109,8 +112,8 @@ def collect(
 def test_full_load(clean: psycopg.Connection, test_database_url: str, tmp_path: Path) -> None:
     summary = collect(clean, test_database_url, tmp_path, FakeObrasgov())
     assert summary.failed == 0
-    # 1 projects page + 1 geometry page + 4 detail jobs
-    assert summary.done == 6
+    # 1 projects page + 1 geometry page + 4 detail jobs + 4 commitment jobs
+    assert summary.done == 10
 
     works: dict[str, str] = dict(
         clean.execute(

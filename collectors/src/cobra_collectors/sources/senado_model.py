@@ -157,8 +157,13 @@ def departure_for(off: dict[str, Any] | None, started_on: date, collected_on: da
     if off is None:
         return Departure(keep_open=False, status=None, ended_on=collected_on, approximate=True)
     periods = _exercises(off)
-    same = [p for p in periods if _date(p["DataInicio"]) == started_on]
-    period = same[-1] if same else (periods[-1] if periods else {})
+    if participation(off) == "titular":
+        # A titular's mandate spans several periods in office; the latest one says how it ended.
+        period = periods[-1] if periods else {}
+    else:
+        # A substitute's mandate is one period: the one that started with it.
+        same = [p for p in periods if _date(p["DataInicio"]) == started_on]
+        period = same[-1] if same else (periods[-1] if periods else {})
     ended = _date(period.get("DataFim"))
     cause = period.get("SiglaCausaAfastamento")
     if participation(off) == "titular" and cause not in FINAL_CAUSES:

@@ -1,0 +1,38 @@
+{
+ "data": [
+  {
+   "ug_emitente": 170394,
+   "id_projeto_investimento": "10930.53-87",
+   "programa_trabalho": "288450903000053",
+   "plano_interno": null,
+   "fonte": "3129",
+   "natureza_despesa": 449051,
+   "valor_empenho": 71371.23,
+   "sistema_origem_empenho": "CIPI",
+   "bd_origem_empenho": "modulo_siafi",
+   "id_minuta": "2025NME000046351",
+   "organizacao_empenho": "CORPO DE BOMBEIROS MILITAR DO DISTRITO FEDERAL",
+   "data_emissao": "2025-07-16",
+   "nome_situacao_minuta": "ENVIADO",
+   "unidade_orcamentaria": "73901",
+   "programa_trabalho_resumido": "250002",
+   "resultado_primario": "1",
+   "acao_orcamentaria": "0",
+   "codigo_autor_emenda": "0",
+   "nr_empenho": "2025NE000397",
+   "credor": null,
+   "aliquidar": null,
+   "liquidado": null,
+   "pago": null,
+   "rpinscrito": null,
+   "rpaliquidar": null,
+   "rpaliquidado": null,
+   "rppago": null,
+   "descricao_empenho": "CONTRATO 30/2024 - CBC - CONSTRUTORA BRASIL CENTRAL LTDA-, CNPJ: 04.496.605/0001-76, ue tem por objeto a Contratação de empresa especializada para a construção do 42º Grupamento de Bombeiro Militar (42º GBM), situado no SHSN TRECHO 01 QD 500 AREA ESPECIAL 03, SETOR HABITACIONAL SOL NASCENTE - DF, CONFORME Solicitação de Retorno da Obra (172742767), Declaração de Orçamento 173279968. PROCESSO: 00053-00179789/2021-01."
+  }
+ ],
+ "total_pages": 1,
+ "total_items": 1,
+ "page_number": 1,
+ "page_size": 1
+}

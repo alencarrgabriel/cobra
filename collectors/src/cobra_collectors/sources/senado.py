@@ -2,6 +2,7 @@
 `ingestao-senado-senadores`."""
 
 from collections.abc import Iterable
+from dataclasses import replace
 from datetime import date, datetime, timedelta
 from typing import Any
 from zoneinfo import ZoneInfo
@@ -20,6 +21,7 @@ from cobra_collectors.sources.senado_model import (
     departure_for,
     mandate_for,
     normalize_senator,
+    participation,
     senator_url,
     validate_senator,
 )
@@ -77,7 +79,16 @@ class SenadoSource:
         )
         for item in current:
             ctx.enqueue("senator", _code(item), {"item": item})
-        self._not_in_office(ctx, {_code(i) for i in current}, {_code(i): i for i in off})
+        # A titular on temporary leave still holds the mandate: registered as licenciado, so
+        # their amendments can be linked to them (change ingestao-emendas).
+        listed = {_code(i) for i in current}
+        for item in off:
+            if _code(item) in listed or participation(item) != "titular":
+                continue
+            started_on = mandate_for(item).started_on
+            if departure_for(item, started_on, today()).keep_open:
+                ctx.enqueue("senator", _code(item), {"item": item, "licensed": True})
+        self._not_in_office(ctx, listed, {_code(i): i for i in off})
 
     def _not_in_office(
         self, ctx: Context, current: set[str], off: dict[str, dict[str, Any]]
@@ -106,8 +117,13 @@ class SenadoSource:
                 continue
             if result.approximate:
                 log.warning("senado.approximate_end", senator=code, ended_on=str(result.ended_on))
+            # An ended mandate is no longer "on leave": it was a titular's mandate that ended.
             ctx.db.execute(
-                "update core.mandates set ended_on = %s, collected_at = now() where id = %s",
+                """
+                update core.mandates set ended_on = %s, collected_at = now(),
+                  status = case when status = 'licenciado' then 'titular' else status end
+                where id = %s
+                """,
                 (result.ended_on, mandate_id),
             )
 
@@ -129,7 +145,10 @@ class SenadoSource:
         for warning in warnings:
             log.warning("senado.affiliation_dropped", senator=code, reason=warning)
         self._affiliations(ctx.db, politician_id, own, code, history)
-        self._mandate(ctx.db, politician_id, uf_code[0], senator, mandate_for(item))
+        mandate = mandate_for(item)
+        if ctx.job.payload.get("licensed"):
+            mandate = replace(mandate, status="licenciado")
+        self._mandate(ctx.db, politician_id, uf_code[0], senator, mandate)
 
     def _politician(self, db: psycopg.Connection, senator: Senator) -> tuple[int, bool]:
         """Returns (politician id, whether the record belongs to the Senate source)."""

@@ -1,0 +1,38 @@
+{
+ "data": [
+  {
+   "ug_emitente": 250107,
+   "id_projeto_investimento": "28349.53-45",
+   "programa_trabalho": "222684",
+   "plano_interno": null,
+   "fonte": "1001000000",
+   "natureza_despesa": 443042,
+   "valor_empenho": 129530865.0,
+   "sistema_origem_empenho": "Transferegov.br",
+   "bd_origem_empenho": "cipiws",
+   "id_minuta": "",
+   "organizacao_empenho": "",
+   "data_emissao": null,
+   "nome_situacao_minuta": "",
+   "unidade_orcamentaria": "",
+   "programa_trabalho_resumido": "",
+   "resultado_primario": "",
+   "acao_orcamentaria": "",
+   "codigo_autor_emenda": "71080013",
+   "nr_empenho": "2023NE000117",
+   "credor": null,
+   "aliquidar": null,
+   "liquidado": null,
+   "pago": null,
+   "rpinscrito": null,
+   "rpaliquidar": null,
+   "rpaliquidado": null,
+   "rppago": null,
+   "descricao_empenho": null
+  }
+ ],
+ "total_pages": 1,
+ "total_items": 1,
+ "page_number": 1,
+ "page_size": 1
+}

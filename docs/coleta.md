@@ -32,7 +32,7 @@ Limites iniciais (conservadores; cada change de fonte confirma na documentação
 | Fonte | Limite oficial | Limite usado |
 |---|---|---|
 | Senado | 10 req/s (acima disso, HTTP 429; evitar horários redondos) | 8 req/s |
-| Portal da Transparência | 400/min (06h–24h), 700/min (00h–06h) | 5 req/s |
+| Portal da Transparência | 400/min (06h–24h), 700/min (00h–06h) na API; o download em massa não tem limite publicado | 1 req/s (um arquivo por carga) |
 | Câmara | não documentado (respostas trazem `Retry-After: 30`) | 2 req/s |
 | TSE (arquivos) | — | 1 req/s |
 | Obrasgov | não documentado | 2 req/s |
@@ -46,7 +46,8 @@ Limites iniciais (conservadores; cada change de fonte confirma na documentação
 - Escopo: obras com UF principal DF (piloto). Tarefas: `projects` (páginas de 200 obras), `detail` (execução física e histórico de cada obra, criada quando a obra é publicada) e `geometry` (município de cada obra).
 - A data da base (`/data-atualizacao`) vira `source_updated_at` de todas as linhas.
 - Qualidade da fonte, tratada na normalização: coordenadas lidas do texto do ponto (os campos `latitude`/`longitude` da API às vezes vêm cortados) e descartadas fora do Brasil; eventos de paralisação repetidos guardados uma vez; fotos só indicadas (a API não traz as imagens).
-- Volume no DF: cerca de 2.300 requisições por atualização completa, ~20 minutos a 2 req/s.
+- Empenhos: tarefa `commitments` por obra (`/empenho`), com o identificador da emenda guardado como veio e reconhecido (change `ingestao-emendas`).
+- Volume no DF: cerca de 3.450 requisições por atualização completa, ~30 minutos a 2 req/s.
 
 ### Câmara dos Deputados (`camara`)
 
@@ -67,7 +68,8 @@ Limites iniciais (conservadores; cada change de fonte confirma na documentação
   - `senators`: busca a lista em exercício e a de afastados, enfileira um `senator` por senador e trata quem não está em exercício;
   - `senator`: detalhe (data de nascimento) e filiações de cada senador.
 - O que fica guardado: político e identificador do Senado, partidos e o histórico de filiações com as datas do Senado, mandato de senador pela primeira legislatura do mandato. A API não informa CPF.
-- Afastados: a causa decide.
+- Titular afastado temporariamente que ainda não estava no cadastro é cadastrado como `licenciado`: continua titular e pode ser autor de emendas.
+- Afastados: a causa do último período de exercício decide.
   - Titular afastado por licença ou cargo de ministro ou secretário fica `licenciado`.
   - Renúncia, falecimento, cassação ou perda do mandato encerram o mandato.
   - Suplente que volta para a suplência tem o mandato encerrado na data do fim do exercício.
@@ -89,6 +91,19 @@ Limites iniciais (conservadores; cada change de fonte confirma na documentação
 - Limitação: o site não distingue titular de suplente nem informa a data de posse. Todos ficam como titulares desde 01/01 do início da legislatura, até `ingestao-tse` corrigir com os eleitos.
 - Mesmo político em outra casa: nome civil sem acentos e data de nascimento (`sources/identity.py`, também usado pelo Senado).
 - Volume: 25 páginas por atualização, cerca de 30 segundos a 1 req/s.
+
+### Portal da Transparência (`transparencia`)
+
+- Download em massa, público e sem chave (conferido em 2026-10-26): `https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/emendas-parlamentares/EmendasParlamentares.zip`, cerca de 32 MB, atualizado diariamente. O ZIP inteiro fica no armazenamento bruto.
+- Tarefa única `amendments`:
+  - lê `EmendasParlamentares.csv` (Latin-1, `;`) e guarda as emendas com destino ao DF ("DISTRITO FEDERAL (UF)" ou "BRASÍLIA - DF"), uma por código de 12 dígitos, com os valores somados das linhas;
+  - linhas sem código ("Sem informação", comuns em 2014) não viram emenda, e o log conta quantas foram.
+- Autor: ligado ao político quando o nome casa com o nome parlamentar de exatamente um deputado federal ou senador. Bancada, comissão e relator ficam sem político.
+- Vínculo com obras: os empenhos de cada obra vêm do Obrasgov (tarefa `commitments` do adaptador `obrasgov`). A visão `core.work_amendment_links` liga obra e emenda com grau "direto" quando o empenho identifica uma emenda guardada. Identificador reconhecido:
+  - código de 12 dígitos;
+  - 8 dígitos (autor e número) com o ano do empenho.
+
+  Outros formatos não ligam: `"0"`, texto, ou `"20264268000.0"`, em que o código perdeu um dígito.
 
 ## Comandos
 

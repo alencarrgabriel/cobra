@@ -47,6 +47,17 @@ O teste `collectors/tests/db/test_provenance.py` reprova qualquer tabela desses 
 
 Chaves: `id bigint generated always as identity`, exceto `core.localities` (chave = `ibge_code`) e `restricted.politician_private_ids` (chave = `politician_id`). Chaves estrangeiras usam `on delete restrict`: dado oficial não some em cascata.
 
+### Emendas (change `ingestao-emendas`)
+
+| Tabela | O que guarda | Regras |
+|---|---|---|
+| `core.amendment_authors` | Autor de emenda no orçamento federal (código, nome, tipo) | `kind` individual, bancada, comissão ou relator; `politician_id` só quando o nome casa com exatamente um deputado ou senador |
+| `core.amendments` | Emenda com destino ao DF, uma por código de 12 dígitos (ano, autor, número) | Valores empenhado, liquidado e pago somados das linhas da fonte; `main_function` = função da linha de maior valor |
+| `core.work_commitments` | Empenhos de cada obra (Obrasgov) | `amendment_ref_raw` como veio; `amendment_code` reconhecido (12 dígitos) ou nulo |
+| `core.work_amendment_links` (visão) | Vínculo obra–emenda, grau "direto" | Empenho da obra que identifica uma emenda guardada |
+| `core.amendments_by_function(uf)` (função) | Emendas de um lugar por área | Contagem e somas; não liga cada obra a cada emenda |
+
+
 ## Papéis e usuários
 
 As migrações criam os papéis `cobra_web_reader` e `cobra_collector` sem login e sem senha, e dão a eles os privilégios, inclusive para tabelas futuras (`alter default privileges`).
