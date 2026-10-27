@@ -10,6 +10,7 @@ import psycopg
 import structlog
 
 from cobra_collectors.pipeline import Context, JobSpec, ValidationError
+from cobra_collectors.sources.identity import same_person
 from cobra_collectors.sources.senado_model import (
     API_BASE,
     Mandate,
@@ -18,7 +19,6 @@ from cobra_collectors.sources.senado_model import (
     as_list,
     departure_for,
     mandate_for,
-    normalize_name,
     normalize_senator,
     senator_url,
     validate_senator,
@@ -153,7 +153,7 @@ class SenadoSource:
                 (*values, known[0]),
             )
             return int(known[0]), known[1] == SOURCE
-        politician_id = self._same_person(db, senator)
+        politician_id = same_person(db, SOURCE, senator.civil_name, senator.birth_date)
         own = politician_id is None
         if politician_id is None:
             row = db.execute(
@@ -183,26 +183,6 @@ class SenadoSource:
             (politician_id, senator.source_id, senator.source_id, url),
         )
         return politician_id, own
-
-    @staticmethod
-    def _same_person(db: psycopg.Connection, senator: Senator) -> int | None:
-        """A politician from another source with the same civil name and birth date (D6)."""
-        if senator.birth_date is None or not senator.civil_name:
-            return None
-        rows = db.execute(
-            """
-            select p.id, p.civil_name from core.politicians p
-            where p.birth_date = %s and p.source <> 'senado'
-              and not exists (select 1 from core.politician_external_ids e
-                              where e.politician_id = p.id and e.system = 'senado')
-            """,
-            (senator.birth_date,),
-        ).fetchall()
-        target = normalize_name(senator.civil_name)
-        matches = [int(r[0]) for r in rows if normalize_name(r[1]) == target]
-        if len(matches) > 1:
-            log.warning("senado.ambiguous_identity", senator=senator.source_id, count=len(matches))
-        return matches[0] if len(matches) == 1 else None
 
     def _party(self, db: psycopg.Connection, code: str, acronym: str, name: str) -> int:
         row = db.execute("select id from core.parties where acronym = %s", (acronym,)).fetchone()

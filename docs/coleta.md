@@ -36,6 +36,7 @@ Limites iniciais (conservadores; cada change de fonte confirma na documentação
 | Câmara | não documentado (respostas trazem `Retry-After: 30`) | 2 req/s |
 | TSE (arquivos) | — | 1 req/s |
 | Obrasgov | não documentado | 2 req/s |
+| CLDF (site) | — (site, não API) | 1 req/s |
 
 ## Fontes ativas
 
@@ -74,6 +75,20 @@ Limites iniciais (conservadores; cada change de fonte confirma na documentação
 - Mesmo político na Câmara e no Senado: ligado pelo nome civil sem acentos e pela data de nascimento, só quando há exatamente um candidato.
 - Qualidade da fonte, tratada na normalização: itens únicos vêm como objeto, não como lista; `/senador/afastados` redireciona para `/dados/AfastamentoAtual.json`.
 - Volume: cerca de 164 requisições por atualização completa, menos de 1 minuto a 8 req/s.
+
+### Câmara Legislativa do DF (`cldf`)
+
+- A CLDF não tem API de deputados. O portal `dados.cl.df.gov.br` (CKAN, conferido em 2026-10-26) só traz os deputados misturados à lista nominal de cerca de 2.400 servidores, sem partido. Essa lista não é coletada (coleta mínima).
+- Fonte: o site oficial, lido como HTML.
+  - Página `/deputados-2023-2026`, bloco "Legislatura Atual": nome, partido, foto e perfil de cada um dos 24.
+  - Perfil de cada deputado: nome completo, nascimento e partido.
+- Tarefas:
+  - `list`: lê e valida a lista; com menos de 20 deputados reconhecíveis falha sem mexer em nada. Enfileira um `deputy` por deputado e encerra o mandato de quem saiu da lista, na data da coleta.
+  - `deputy`: perfil e publicação.
+- Partido: sigla entre parênteses ou nome por extenso de um partido em atividade. Partido extinto ou desconhecido (o site ainda mostra "Democrata" para um deputado) fica sem filiação atual, com aviso no log.
+- Limitação: o site não distingue titular de suplente nem informa a data de posse. Todos ficam como titulares desde 01/01 do início da legislatura, até `ingestao-tse` corrigir com os eleitos.
+- Mesmo político em outra casa: nome civil sem acentos e data de nascimento (`sources/identity.py`, também usado pelo Senado).
+- Volume: 25 páginas por atualização, cerca de 30 segundos a 1 req/s.
 
 ## Comandos
 
