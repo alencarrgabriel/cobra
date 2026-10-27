@@ -72,3 +72,10 @@ Em votação nominal do Senado, a coleta SHALL guardar também quem estava prese
 #### Scenario: Missão oficial
 - **WHEN** o arquivo traz "MIS" para um senador
 - **THEN** o voto dele fica como ausente, com o motivo "Missão da Casa no País/exterior", como o Senado descreve
+
+### Requirement: Proposição da votação da Câmara
+A votação da Câmara SHALL ter como proposição a que o arquivo de votações indica, quando ela está listada e não é requerimento; senão a primeira matéria listada que não seja requerimento; senão a primeira listada.
+
+#### Scenario: Requerimento de urgência
+- **WHEN** a votação é de um requerimento de urgência e o arquivo lista o REQ e o PL a que ele se refere
+- **THEN** a proposição da votação é o PL
