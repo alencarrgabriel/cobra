@@ -9,6 +9,10 @@
   flex-direction: column;
   gap: 10px;
   min-width: 0;
+  /* Same size for every card, whatever the name or party (DDR §9.1). */
+  width: 100%;
+  height: 100%;
+  font: inherit;
   text-decoration: none;
   cursor: pointer;
 }

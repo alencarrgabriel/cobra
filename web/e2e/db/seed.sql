@@ -63,3 +63,61 @@ insert into core.work_progress
 select id, physical_progress, actual_start, actual_end, progress_updated_on, 'obrasgov',
        '80000' || right(source_id, 1), source_url, now(), '2026-10-23'
 from core.works where physical_progress is not null;
+
+-- Representatives (change busca-geografica): fictitious people with the real shape.
+insert into core.localities (ibge_code, kind, name, uf_code, uf_abbr, search_name, source,
+  source_id, source_url, collected_at)
+values
+  ('2201903', 'municipality', 'Bom Jesus', '22', 'PI', 'bom jesus', 'ibge', '2201903', null, now()),
+  ('4302303', 'municipality', 'Bom Jesus', '43', 'RS', 'bom jesus', 'ibge', '4302303', null, now()),
+  ('3550308', 'municipality', 'São Paulo', '35', 'SP', 'sao paulo', 'ibge', '3550308', null, now())
+on conflict (ibge_code) do nothing;
+update core.localities set search_name = 'brasilia' where ibge_code = '5300108';
+
+insert into core.parties (acronym, name, source, source_id, collected_at) values
+  ('PL', 'Partido Liberal', 'camara', 'teste-pl', now()),
+  ('PT', 'Partido dos Trabalhadores', 'camara', 'teste-pt', now()),
+  ('PSB', 'Partido Socialista Brasileiro', 'camara', 'teste-psb', now());
+
+insert into core.politicians (civil_name, parliamentary_name, source, source_id, collected_at)
+values
+  ('Senadora Teste Um', 'Senadora Teste Um', 'senado', '9001', now()),
+  ('Senador Teste Dois', 'Senador Teste Dois', 'senado', '9002', now()),
+  ('Senadora Teste Três', 'Senadora Teste Três', 'senado', '9003', now()),
+  ('Deputado Federal Teste A', 'Deputado Teste A', 'camara', '8001', now()),
+  ('Deputada Federal Teste B', 'Deputada Teste B', 'camara', '8002', now()),
+  ('Deputada Distrital Teste C', 'Distrital Teste C', 'cldf', 'distrital-teste-c', now()),
+  ('Deputado Distrital Teste D', 'Distrital Teste D', 'cldf', 'distrital-teste-d', now()),
+  ('Deputado Paulista Teste', 'Paulista Teste', 'camara', '8003', now());
+
+insert into core.politician_external_ids (politician_id, system, external_id, source, source_id,
+  collected_at)
+select id, source::text::core.external_system, source_id, source, source_id, now()
+from core.politicians where source_id in ('9001','9002','9003','8001','8002','8003',
+  'distrital-teste-c','distrital-teste-d');
+
+insert into core.mandates (politician_id, house_id, office, locality_code, legislature,
+  started_on, status, source, source_id, source_url, collected_at)
+select p.id, h.id, o.office::core.office, o.uf, o.leg, o.started::date, o.status::core.mandate_status,
+       p.source, p.source_id || '-m', o.url, now()
+from (values
+  ('9001', 'senado', 'senador', '53', 57, '2023-02-01', 'titular', null),
+  ('9002', 'senado', 'senador', '53', 56, '2019-02-01', 'titular', null),
+  ('9003', 'senado', 'senador', '53', 57, '2026-10-06', 'suplente', null),
+  ('8001', 'camara', 'deputado_federal', '53', 57, '2023-02-01', 'titular', null),
+  ('8002', 'camara', 'deputado_federal', '53', 57, '2023-02-01', 'titular', null),
+  ('distrital-teste-c', 'cldf', 'deputado_distrital', '53', 2023, '2023-01-01', 'titular',
+   'https://www.cl.df.gov.br/distrital-teste-c'),
+  ('distrital-teste-d', 'cldf', 'deputado_distrital', '53', 2023, '2023-01-01', 'titular',
+   'https://www.cl.df.gov.br/distrital-teste-d'),
+  ('8003', 'camara', 'deputado_federal', '35', 57, '2023-02-01', 'titular', null)
+) as o (sid, house, office, uf, leg, started, status, url)
+join core.politicians p on p.source_id = o.sid
+join core.legislative_houses h on h.slug = o.house;
+
+insert into core.party_affiliations (politician_id, party_id, source, source_id, collected_at)
+select p.id, pa.id, 'camara', p.source_id || '-f', now()
+from (values ('9001','PL'), ('9002','PT'), ('9003','PSB'), ('8001','PL'), ('8002','PT'),
+             ('distrital-teste-c','PL'), ('distrital-teste-d','PSB'), ('8003','PT')) as f (sid, party)
+join core.politicians p on p.source_id = f.sid
+join core.parties pa on pa.acronym = f.party;

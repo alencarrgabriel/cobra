@@ -59,7 +59,7 @@ test("seções ainda não entregues aparecem como em breve e não são links", a
   page,
 }) => {
   await page.goto("/");
-  for (const label of ["Representantes", "Votações"]) {
+  for (const label of ["Votações"]) {
     await expect(
       page.getByRole("link", { name: new RegExp(label) }),
     ).toHaveCount(0);

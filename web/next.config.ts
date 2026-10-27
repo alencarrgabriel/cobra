@@ -10,6 +10,34 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
   poweredByHeader: false,
+  // Official photos go through the site's image proxy, so visitors never contact the
+  // houses' servers (change busca-geografica, design D6). Only these addresses.
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "www.camara.leg.br",
+        port: "",
+        pathname: "/internet/deputado/bandep/**",
+        search: "",
+      },
+      {
+        protocol: "https",
+        hostname: "legis.senado.leg.br",
+        port: "",
+        pathname: "/senadores/fotos-oficiais/**",
+        search: "",
+      },
+      {
+        protocol: "https",
+        hostname: "www.cl.df.gov.br",
+        port: "",
+        pathname: "/documents/**",
+      },
+    ],
+    maximumRedirects: 0,
+    minimumCacheTTL: 604800,
+  },
   async headers() {
     return [
       {

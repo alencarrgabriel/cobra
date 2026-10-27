@@ -11,7 +11,7 @@ export const SECTIONS: Section[] = [
   {
     label: "Representantes",
     href: "/representantes",
-    available: false,
+    available: true,
     icon: "people",
   },
   { label: "Votações", href: "/votacoes", available: false, icon: "votes" },

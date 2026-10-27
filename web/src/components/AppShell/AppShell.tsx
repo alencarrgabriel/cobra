@@ -1,9 +1,9 @@
 import Link from "next/link";
-import type { ReactNode } from "react";
+import { type ReactNode, Suspense } from "react";
 
 import { ThemeToggle } from "../ThemeToggle/ThemeToggle";
 import styles from "./AppShell.module.css";
-import { Nav } from "./Nav";
+import { Nav, NavList } from "./Nav";
 
 /** Top bar with sections (wide screens) and a fixed bottom tab bar (phones). */
 export function AppShell({ children }: { children: ReactNode }) {
@@ -29,14 +29,18 @@ export function AppShell({ children }: { children: ReactNode }) {
             </svg>
             Cobra
           </Link>
-          <Nav variant="top" />
+          <Suspense fallback={<NavList variant="top" pathname={null} />}>
+            <Nav variant="top" />
+          </Suspense>
           <div className={styles.actions}>
             <ThemeToggle />
           </div>
         </div>
       </header>
       <div className={styles.content}>{children}</div>
-      <Nav variant="bottom" />
+      <Suspense fallback={<NavList variant="bottom" pathname={null} />}>
+        <Nav variant="bottom" />
+      </Suspense>
     </>
   );
 }

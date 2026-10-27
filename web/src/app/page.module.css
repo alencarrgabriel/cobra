@@ -28,35 +28,6 @@
   max-width: 50ch;
 }
 
-.search {
-  margin-top: var(--space-3);
-  display: flex;
-  gap: var(--space-2);
-  background: var(--surface);
-  border: 1.5px solid var(--fg);
-  border-radius: var(--radius-pill);
-  padding: 6px 6px 6px 18px;
-  max-width: 540px;
-}
-
-.search input {
-  flex: 1;
-  min-width: 0;
-  border: 0;
-  background: none;
-  font-size: 1rem;
-  outline: none;
-}
-
-.search input:disabled {
-  cursor: not-allowed;
-}
-
-.hint {
-  font-size: var(--text-sm);
-  color: var(--muted);
-}
-
 .h2 {
   font-family: var(--font-display);
   font-weight: 500;
@@ -70,16 +41,5 @@
 @media (max-width: 420px) {
   .hero {
     padding: var(--space-5);
-  }
-
-  .search {
-    flex-wrap: wrap;
-    border-radius: 18px;
-    padding: var(--space-2);
-  }
-
-  .search input {
-    flex-basis: 100%;
-    padding: 6px 8px;
   }
 }

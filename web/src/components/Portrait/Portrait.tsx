@@ -38,7 +38,6 @@ export function Portrait({
           alt={`Foto de ${name}`}
           fill
           sizes="(max-width: 820px) 45vw, 200px"
-          unoptimized
           className={styles.photo}
         />
       ) : (

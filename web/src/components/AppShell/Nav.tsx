@@ -26,8 +26,21 @@ const ICONS: Record<Section["icon"], ReactNode> = {
 const isCurrent = (pathname: string, href: string) =>
   pathname === href || (href !== "/" && pathname.startsWith(`${href}/`));
 
-export function Nav({ variant }: { variant: "top" | "bottom" }) {
-  const pathname = usePathname();
+type Variant = "top" | "bottom";
+
+/** The current page is marked once the path is known (inside <Suspense>, see AppShell). */
+export function Nav({ variant }: { variant: Variant }) {
+  return <NavList variant={variant} pathname={usePathname()} />;
+}
+
+/** Sections; without a path (prerendered shell) nothing is marked as current. */
+export function NavList({
+  variant,
+  pathname,
+}: {
+  variant: Variant;
+  pathname: string | null;
+}) {
   return (
     <nav
       aria-label={variant === "top" ? "Seções" : "Seções (barra inferior)"}
@@ -54,7 +67,7 @@ export function Nav({ variant }: { variant: "top" | "bottom" }) {
                   href={s.href}
                   className={styles.item}
                   aria-current={
-                    isCurrent(pathname, s.href) ? "page" : undefined
+                    pathname && isCurrent(pathname, s.href) ? "page" : undefined
                   }
                 >
                   {icon}
