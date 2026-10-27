@@ -1,0 +1,35 @@
+{
+ "dados": {
+  "id": 36851,
+  "sigla": "PV",
+  "nome": "Partido Verde",
+  "uri": "https://dadosabertos.camara.leg.br/api/v2/partidos/36851",
+  "status": {
+   "data": "2022-10-25T18:27",
+   "idLegislatura": "57",
+   "situacao": "Ativo",
+   "totalPosse": "6",
+   "totalMembros": "6",
+   "uriMembros": "https://dadosabertos.camara.leg.br/api/v2/deputados?idLegislatura=57&siglaPartido=PV",
+   "lider": {
+    "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/73586",
+    "nome": "Júlio Delgado",
+    "siglaPartido": "PV",
+    "uriPartido": "https://dadosabertos.camara.leg.br/api/v2/partidos/36851",
+    "uf": "MG",
+    "idLegislatura": 57,
+    "urlFoto": "https://www.camara.leg.br/internet/deputado/bandep/73586.jpg"
+   }
+  },
+  "numeroEleitoral": null,
+  "urlLogo": "https://www.camara.leg.br/internet/Deputado/img/partidos/PV.gif",
+  "urlWebSite": null,
+  "urlFacebook": null
+ },
+ "links": [
+  {
+   "rel": "self",
+   "href": "https://dadosabertos.camara.leg.br/api/v2/partidos/36851"
+  }
+ ]
+}

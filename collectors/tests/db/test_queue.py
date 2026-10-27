@@ -50,6 +50,13 @@ def test_claim_filters_by_source(q: psycopg.Connection) -> None:
     assert job.source == "senado"
 
 
+def test_claim_tolerates_the_clock_stepping_back(q: psycopg.Connection) -> None:
+    # As if the clock went back 1 s between enqueue and claim (seen on Docker Desktop).
+    queue.enqueue(q, "camara", "page", "p1")
+    q.execute("update ops.jobs set run_after = now() + interval '1 second'")
+    assert queue.claim(q) is not None
+
+
 def test_failure_reschedules_with_backoff(q: psycopg.Connection) -> None:
     queue.enqueue(q, "camara", "page", "a")
     job = queue.claim(q)

@@ -1,0 +1,35 @@
+{
+ "dados": {
+  "id": 37908,
+  "sigla": "REPUBLICANOS",
+  "nome": "Republicanos",
+  "uri": "https://dadosabertos.camara.leg.br/api/v2/partidos/37908",
+  "status": {
+   "data": "2026-09-10T08:19",
+   "idLegislatura": "57",
+   "situacao": "Ativo",
+   "totalPosse": "40",
+   "totalMembros": "43",
+   "uriMembros": "https://dadosabertos.camara.leg.br/api/v2/deputados?idLegislatura=57&siglaPartido=REPUBLICANOS",
+   "lider": {
+    "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/160665",
+    "nome": "Augusto Coutinho",
+    "siglaPartido": "REPUBLICANOS",
+    "uriPartido": "https://dadosabertos.camara.leg.br/api/v2/partidos/37908",
+    "uf": "PE",
+    "idLegislatura": 57,
+    "urlFoto": "https://www.camara.leg.br/internet/deputado/bandep/160665.jpg"
+   }
+  },
+  "numeroEleitoral": null,
+  "urlLogo": "https://www.camara.leg.br/internet/Deputado/img/partidos/REPUBLICANOS.gif",
+  "urlWebSite": null,
+  "urlFacebook": null
+ },
+ "links": [
+  {
+   "rel": "self",
+   "href": "https://dadosabertos.camara.leg.br/api/v2/partidos/37908"
+  }
+ ]
+}

@@ -18,6 +18,7 @@ O registro bruto é gravado numa conexão separada, já confirmado: se a valida�
 - O trabalhador pega a próxima tarefa pronta com `FOR UPDATE SKIP LOCKED`: duas execuções em paralelo nunca pegam a mesma.
 - Falhou? Volta para a fila com espera crescente (1 min, 2 min, 4 min… até 6 h). Depois de `max_attempts` (padrão 5), fica como `failed`.
 - Tarefas presas em `running` há mais de 30 min (processo que morreu) voltam para a fila no início de cada execução.
+- Uma tarefa recém-enfileirada já conta como pronta mesmo que o relógio do banco volte até 2 s (no Docker Desktop ele chega a voltar ~1,2 s); sem essa folga, o trabalhador achava a fila vazia e parava antes da hora.
 
 ## Limites e retentativas
 
@@ -32,7 +33,7 @@ Limites iniciais (conservadores; cada change de fonte confirma na documentação
 |---|---|---|
 | Senado | 10 req/s | 8 req/s |
 | Portal da Transparência | 400/min (06h–24h), 700/min (00h–06h) | 5 req/s |
-| Câmara | não documentado | 4 req/s |
+| Câmara | não documentado (respostas trazem `Retry-After: 30`) | 2 req/s |
 | TSE (arquivos) | — | 1 req/s |
 | Obrasgov | não documentado | 2 req/s |
 
@@ -45,6 +46,18 @@ Limites iniciais (conservadores; cada change de fonte confirma na documentação
 - A data da base (`/data-atualizacao`) vira `source_updated_at` de todas as linhas.
 - Qualidade da fonte, tratada na normalização: coordenadas lidas do texto do ponto (os campos `latitude`/`longitude` da API às vezes vêm cortados) e descartadas fora do Brasil; eventos de paralisação repetidos guardados uma vez; fotos só indicadas (a API não traz as imagens).
 - Volume no DF: cerca de 2.300 requisições por atualização completa, ~20 minutos a 2 req/s.
+
+### Câmara dos Deputados (`camara`)
+
+- API: `https://dadosabertos.camara.leg.br/api/v2` (OpenAPI 0.4.347 verificado em 2026-10-26), sem chave. No máximo 100 itens por página.
+- Escopo: deputados federais em exercício, todas as UFs (513 em 2026-10-26). Tarefas:
+  - `deputies-page`: páginas de 100 deputados da lista em exercício;
+  - `deputy`: detalhe e histórico de cada deputado e, se o partido for novo, o partido;
+  - `close-mandates`: busca a lista de novo e trata quem saiu dela.
+- O que fica guardado: político e identificador da Câmara, CPF só em `restricted`, partido atual e filiação, mandato de deputado federal da legislatura 57.
+- Licença não encerra mandato: o titular licenciado fica com situação `licenciado` e volta a `titular` quando reassume. Suplente que sai do exercício, ou fim de mandato, encerra o mandato na data da Câmara. Se a lista falhar, nenhum mandato é encerrado.
+- Qualidade da fonte, tratada na normalização: o histórico vem desordenado e mistura legislaturas, e as linhas "Nome/Partido no início da legislatura" são ignoradas; o detalhe traz `uriPartido` nulo, então o partido vem da lista.
+- Volume: cerca de 1.030 requisições por atualização completa, ~9 minutos a 2 req/s.
 
 ## Comandos
 

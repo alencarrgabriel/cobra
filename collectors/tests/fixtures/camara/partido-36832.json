@@ -1,0 +1,35 @@
+{
+ "dados": {
+  "id": 36832,
+  "sigla": "PSB",
+  "nome": "Partido Socialista Brasileiro",
+  "uri": "https://dadosabertos.camara.leg.br/api/v2/partidos/36832",
+  "status": {
+   "data": "2026-01-02T14:23",
+   "idLegislatura": "57",
+   "situacao": "Ativo",
+   "totalPosse": "15",
+   "totalMembros": "17",
+   "uriMembros": "https://dadosabertos.camara.leg.br/api/v2/deputados?idLegislatura=57&siglaPartido=PSB",
+   "lider": {
+    "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/160548",
+    "nome": "Jonas Donizette",
+    "siglaPartido": "PSB",
+    "uriPartido": "https://dadosabertos.camara.leg.br/api/v2/partidos/36832",
+    "uf": "SP",
+    "idLegislatura": 57,
+    "urlFoto": "https://www.camara.leg.br/internet/deputado/bandep/160548.jpg"
+   }
+  },
+  "numeroEleitoral": null,
+  "urlLogo": "https://www.camara.leg.br/internet/Deputado/img/partidos/PSB.gif",
+  "urlWebSite": null,
+  "urlFacebook": null
+ },
+ "links": [
+  {
+   "rel": "self",
+   "href": "https://dadosabertos.camara.leg.br/api/v2/partidos/36832"
+  }
+ ]
+}

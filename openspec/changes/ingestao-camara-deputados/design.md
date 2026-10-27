@@ -20,26 +20,29 @@ API conferida em 2026-10-26 (`https://dadosabertos.camara.leg.br/api/v2`, OpenAP
 ## Decisions
 
 ### D1. Tarefas
-- `camara/deputies-page` (dedupe `p<N>`): `GET /deputados?itens=100&pagina=N&ordem=ASC&ordenarPor=id`. Grava o bruto, enfileira a próxima página de forma independente (como no Obrasgov) e um `camara/deputy` por deputado.
-- `camara/deputy` (dedupe `<id>`): `GET /deputados/{id}` e `GET /deputados/{id}/historico`. Publica político, ids, CPF, partido, filiação e mandato numa transação.
-- `camara/close-mandates` (dedupe `<data da coleta>`): enfileirado pela última página. Roda depois dos detalhes (`run_after` alguns minutos à frente) e encerra os mandatos abertos de quem não está mais na lista (D4).
-- `plan()` enfileira só a página 1. Limite: 2 req/s, rajada 2 (mesmo critério do Obrasgov).
+- `camara/deputies-page` (dedupe `p<N>`): `GET /deputados?itens=100&pagina=N&ordem=ASC&ordenarPor=id`. Grava o bruto, enfileira a próxima página de forma independente (como no Obrasgov), pelo link `next` da resposta, e um `camara/deputy` por deputado, com o id do partido tirado do `uriPartido` da lista.
+- `camara/deputy` (dedupe `<id>`): `GET /deputados/{id}` e `GET /deputados/{id}/historico` e, se o partido ainda não estiver no banco, `GET /partidos/{id}`. Publica político, ids, CPF, partido, filiação e mandato numa transação.
+- `camara/close-mandates` (dedupe `run`): enfileirado pelo `plan()` junto com a página 1. Busca de novo a lista inteira de deputados em exercício e trata os mandatos abertos de quem não está nela (D4). Não depende da ordem das outras tarefas: só mexe em quem saiu da lista.
+- Limite: 2 req/s, rajada 2 (mesmo critério do Obrasgov).
 
 ### D2. Normalização (`camara_model.py`)
 - Político: `nomeCivil`, `ultimoStatus.nomeEleitoral` (ou `nome`), `dataNascimento`, `ultimoStatus.urlFoto`. Fonte `camara`, `source_id` = id da Câmara, `source_url` = URL do detalhe.
 - Partido: chave = sigla. Se a sigla já existe, atualiza o nome; senão cria, com `source_id` = id do partido na Câmara (do `uriPartido` da lista, porque o detalhe às vezes vem com `uriPartido` nulo).
 - UF: `siglaUf` convertida no código IBGE pela tabela de localidades. Sigla desconhecida bloqueia o deputado (D5).
-- Situação do mandato: `condicaoEleitoral` "Titular" → `titular`, "Suplente" → `suplente`; `situacao` "Licença" → `licenciado`. Valor desconhecido bloqueia o deputado.
+- Situação do mandato: `condicaoEleitoral` "Titular" → `titular`, "Efetivado" (suplente que assumiu a vaga de vez, "Posse como Titular"; 19 casos na carga real) → `titular`, "Suplente" → `suplente`; `situacao` "Licença" de titular → `licenciado`. Valor desconhecido bloqueia o deputado.
 
-### D3. Início do mandato
-- Do histórico, as entradas da legislatura atual com `situacao` "Exercício", ignorando as linhas "início da legislatura" de outras legislaturas. A data de início é a mais antiga dessas entradas, limitada ao início da legislatura (01/02/2023).
-- Sem entrada de exercício na legislatura atual: titular começa no início da legislatura; suplente usa `ultimoStatus.data`.
-- `source_id` do mandato: `<id>-<legislatura>-<início>`. Um deputado que sai e volta tem dois mandatos, sem sobreposição.
+### D3. Início do mandato e situação
+- Linhas do histórico consideradas: só as da legislatura atual com `situacao` preenchida. As linhas "Nome/Partido no início da legislatura" (sem situação) são ignoradas.
+- Titular: o mandato começa na primeira entrada em "Exercício" da legislatura. Licenças não encerram o mandato (artigo 56 da Constituição): mudam a situação para `licenciado`, e a reassunção volta para `titular`.
+- Suplente: o mandato começa na entrada em "Exercício" mais recente que veio depois de uma linha que não é de exercício, ou seja, o início do período de exercício atual.
+- Sem entrada de exercício na legislatura: o início é `ultimoStatus.data`, limitado ao início da legislatura (01/02/2023).
+- `source_id` do mandato: `<id>-<legislatura>-<início>`. Um suplente que sai e volta tem dois mandatos, sem sobreposição. Se o deputado tiver outro mandato aberto da Câmara com outro `source_id` (por exemplo, suplente efetivado como titular), o anterior é encerrado na véspera do novo início.
 
-### D4. Saída de exercício
-- A tarefa `close-mandates` lista os mandatos abertos de deputado federal com fonte `camara` cujo id da Câmara não apareceu nas páginas da coleta atual (os ids vistos ficam no payload da tarefa).
-- Para cada um, busca o histórico e usa como fim a data da entrada mais recente da legislatura atual com `situacao` diferente de "Exercício". Sem essa entrada, usa a data da coleta e registra na tarefa que a data é aproximada.
-- Se a lista veio incompleta (alguma página falhou), `close-mandates` não roda: encerrar mandato por falha de coleta seria inventar uma saída.
+### D4. Quem saiu da lista
+- `close-mandates` busca as páginas da lista atual. Se alguma falhar, a tarefa falha e é repetida depois, sem mexer em nenhum mandato: encerrar por falha de coleta seria inventar uma saída.
+- Para cada mandato aberto de deputado federal da Câmara cujo id não está na lista, busca `GET /deputados/{id}`:
+  - titular com `situacao` "Licença": o mandato continua aberto, com situação `licenciado`;
+  - qualquer outro caso (suplente que saiu, fim de mandato, vacância): o mandato é encerrado em `ultimoStatus.data`. Se a data faltar ou for anterior ao início do mandato, usa a data da coleta e registra na tarefa que a data é aproximada.
 
 ### D5. Validação
 - Estruturais, bloqueiam o deputado: id ausente, nome civil e parlamentar vazios, UF desconhecida, situação desconhecida, data de nascimento inválida. O motivo vai para `last_error` da tarefa; os outros deputados seguem.

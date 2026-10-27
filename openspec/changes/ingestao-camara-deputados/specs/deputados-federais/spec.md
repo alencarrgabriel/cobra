@@ -11,7 +11,7 @@ A coleta da Câmara SHALL registrar todos os deputados federais em exercício, d
 
 #### Scenario: Bancada do DF
 - **WHEN** a coleta termina com a Câmara informando 8 deputados em exercício pelo DF
-- **THEN** a consulta de mandatos atuais de deputado federal da UF 53 retorna esses 8 políticos
+- **THEN** a consulta de mandatos abertos em exercício de deputado federal da UF 53 retorna esses 8 políticos
 
 #### Scenario: Identificador da Câmara
 - **WHEN** um deputado de identificador 73579 é coletado
@@ -28,12 +28,20 @@ Cada deputado em exercício SHALL ter um mandato de deputado federal na Câmara,
 - **WHEN** um suplente entra em exercício durante a legislatura
 - **THEN** o mandato começa na data em que a Câmara registra a entrada em exercício e tem situação suplente
 
-### Requirement: Saída de exercício encerra o mandato
-Quando um deputado deixa de constar entre os deputados em exercício, a coleta SHALL encerrar o mandato aberto dele com a data de saída informada pela Câmara e SHALL manter o registro, nunca o apagar.
+### Requirement: Licença e saída de exercício
+Um titular que se licencia SHALL manter o mandato aberto com situação licenciado e SHALL voltar à situação titular quando reassume. Quando um suplente deixa o exercício, ou quando a Câmara informa o fim do mandato de um titular, a coleta SHALL encerrar o mandato com a data informada pela Câmara. Registros SHALL nunca ser apagados. A bancada atual de uma UF SHALL ser formada pelos mandatos abertos em exercício (titular ou suplente).
 
-#### Scenario: Deputado que se licencia
-- **WHEN** um deputado em exercício na coleta anterior não aparece mais na lista e o histórico da Câmara registra a licença numa data
-- **THEN** o mandato dele passa a ter essa data de fim e deixa de aparecer entre os atuais
+#### Scenario: Titular que se licencia
+- **WHEN** um titular em exercício na coleta anterior aparece licenciado na Câmara
+- **THEN** o mandato dele continua aberto, com situação licenciado, e ele sai da bancada atual da UF
+
+#### Scenario: Titular que reassume
+- **WHEN** um titular licenciado volta ao exercício
+- **THEN** o mesmo mandato volta à situação titular
+
+#### Scenario: Suplente que deixa o exercício
+- **WHEN** um suplente em exercício na coleta anterior não está mais em exercício e a Câmara registra a saída numa data
+- **THEN** o mandato dele passa a ter essa data de fim
 
 ### Requirement: Partido atual
 A coleta SHALL registrar o partido de cada deputado em exercício (sigla e nome informados pela Câmara) e a filiação atual. Quando o deputado troca de partido, a filiação anterior SHALL ser encerrada e uma nova aberta.

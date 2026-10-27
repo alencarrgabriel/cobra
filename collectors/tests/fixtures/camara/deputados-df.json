@@ -1,0 +1,106 @@
+{
+ "dados": [
+  {
+   "id": 73579,
+   "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/73579",
+   "nome": "Alberto Fraga",
+   "siglaPartido": "PL",
+   "uriPartido": "https://dadosabertos.camara.leg.br/api/v2/partidos/37906",
+   "siglaUf": "DF",
+   "idLegislatura": 57,
+   "urlFoto": "https://www.camara.leg.br/internet/deputado/bandep/73579.jpg",
+   "email": "dep.albertofraga@camara.leg.br"
+  },
+  {
+   "id": 141533,
+   "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/141533",
+   "nome": "Rodrigo Rollemberg",
+   "siglaPartido": "PSB",
+   "uriPartido": "https://dadosabertos.camara.leg.br/api/v2/partidos/36832",
+   "siglaUf": "DF",
+   "idLegislatura": 57,
+   "urlFoto": "https://www.camara.leg.br/internet/deputado/bandep/141533.jpg",
+   "email": "dep.rodrigorollemberg@camara.leg.br"
+  },
+  {
+   "id": 160575,
+   "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/160575",
+   "nome": "Erika Kokay",
+   "siglaPartido": "PT",
+   "uriPartido": "https://dadosabertos.camara.leg.br/api/v2/partidos/36844",
+   "siglaUf": "DF",
+   "idLegislatura": 57,
+   "urlFoto": "https://www.camara.leg.br/internet/deputado/bandep/160575.jpg",
+   "email": "dep.erikakokay@camara.leg.br"
+  },
+  {
+   "id": 204372,
+   "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/204372",
+   "nome": "Julio Cesar Ribeiro",
+   "siglaPartido": "REPUBLICANOS",
+   "uriPartido": "https://dadosabertos.camara.leg.br/api/v2/partidos/37908",
+   "siglaUf": "DF",
+   "idLegislatura": 57,
+   "urlFoto": "https://www.camara.leg.br/internet/deputado/bandep/204372.jpg",
+   "email": "dep.juliocesarribeiro@camara.leg.br"
+  },
+  {
+   "id": 204374,
+   "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/204374",
+   "nome": "Bia Kicis",
+   "siglaPartido": "PL",
+   "uriPartido": "https://dadosabertos.camara.leg.br/api/v2/partidos/37906",
+   "siglaUf": "DF",
+   "idLegislatura": 57,
+   "urlFoto": "https://www.camara.leg.br/internet/deputado/bandep/204374.jpg",
+   "email": "dep.biakicis@camara.leg.br"
+  },
+  {
+   "id": 220532,
+   "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/220532",
+   "nome": "Rafael Prudente",
+   "siglaPartido": "MDB",
+   "uriPartido": "https://dadosabertos.camara.leg.br/api/v2/partidos/36899",
+   "siglaUf": "DF",
+   "idLegislatura": 57,
+   "urlFoto": "https://www.camara.leg.br/internet/deputado/bandep/220532.jpg",
+   "email": "dep.rafaelprudente@camara.leg.br"
+  },
+  {
+   "id": 220533,
+   "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/220533",
+   "nome": "Prof. Reginaldo Veras",
+   "siglaPartido": "PV",
+   "uriPartido": "https://dadosabertos.camara.leg.br/api/v2/partidos/36851",
+   "siglaUf": "DF",
+   "idLegislatura": 57,
+   "urlFoto": "https://www.camara.leg.br/internet/deputado/bandep/220533.jpg",
+   "email": "dep.prof.reginaldoveras@camara.leg.br"
+  },
+  {
+   "id": 220534,
+   "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/220534",
+   "nome": "Fred Linhares",
+   "siglaPartido": "REPUBLICANOS",
+   "uriPartido": "https://dadosabertos.camara.leg.br/api/v2/partidos/37908",
+   "siglaUf": "DF",
+   "idLegislatura": 57,
+   "urlFoto": "https://www.camara.leg.br/internet/deputado/bandep/220534.jpg",
+   "email": "dep.fredlinhares@camara.leg.br"
+  }
+ ],
+ "links": [
+  {
+   "rel": "self",
+   "href": "https://dadosabertos.camara.leg.br/api/v2/deputados?siglaUf=DF&ordem=ASC&ordenarPor=id"
+  },
+  {
+   "rel": "first",
+   "href": "https://dadosabertos.camara.leg.br/api/v2/deputados?siglaUf=DF&ordem=ASC&ordenarPor=id&pagina=1&itens=1000"
+  },
+  {
+   "rel": "last",
+   "href": "https://dadosabertos.camara.leg.br/api/v2/deputados?siglaUf=DF&ordem=ASC&ordenarPor=id&pagina=1&itens=1000"
+  }
+ ]
+}

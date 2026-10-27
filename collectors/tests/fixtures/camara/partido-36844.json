@@ -1,0 +1,35 @@
+{
+ "dados": {
+  "id": 36844,
+  "sigla": "PT",
+  "nome": "Partido dos Trabalhadores",
+  "uri": "https://dadosabertos.camara.leg.br/api/v2/partidos/36844",
+  "status": {
+   "data": "2026-04-15T08:37",
+   "idLegislatura": "57",
+   "situacao": "Ativo",
+   "totalPosse": "69",
+   "totalMembros": "66",
+   "uriMembros": "https://dadosabertos.camara.leg.br/api/v2/deputados?idLegislatura=57&siglaPartido=PT",
+   "lider": {
+    "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/74400",
+    "nome": "Paulo Pimenta",
+    "siglaPartido": "PT",
+    "uriPartido": "https://dadosabertos.camara.leg.br/api/v2/partidos/36844",
+    "uf": "RS",
+    "idLegislatura": 57,
+    "urlFoto": "https://www.camara.leg.br/internet/deputado/bandep/74400.jpg"
+   }
+  },
+  "numeroEleitoral": null,
+  "urlLogo": "https://www.camara.leg.br/internet/Deputado/img/partidos/PT.gif",
+  "urlWebSite": null,
+  "urlFacebook": null
+ },
+ "links": [
+  {
+   "rel": "self",
+   "href": "https://dadosabertos.camara.leg.br/api/v2/partidos/36844"
+  }
+ ]
+}

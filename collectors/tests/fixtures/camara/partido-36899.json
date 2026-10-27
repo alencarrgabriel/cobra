@@ -1,0 +1,35 @@
+{
+ "dados": {
+  "id": 36899,
+  "sigla": "MDB",
+  "nome": "Movimento Democrático Brasileiro",
+  "uri": "https://dadosabertos.camara.leg.br/api/v2/partidos/36899",
+  "status": {
+   "data": "2026-10-06T15:47",
+   "idLegislatura": "57",
+   "situacao": "Ativo",
+   "totalPosse": "41",
+   "totalMembros": "38",
+   "uriMembros": "https://dadosabertos.camara.leg.br/api/v2/deputados?idLegislatura=57&siglaPartido=MDB",
+   "lider": {
+    "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/204436",
+    "nome": "Isnaldo Bulhões Jr.",
+    "siglaPartido": "MDB",
+    "uriPartido": "https://dadosabertos.camara.leg.br/api/v2/partidos/36899",
+    "uf": "AL",
+    "idLegislatura": 57,
+    "urlFoto": "https://www.camara.leg.br/internet/deputado/bandep/204436.jpg"
+   }
+  },
+  "numeroEleitoral": null,
+  "urlLogo": "https://www.camara.leg.br/internet/Deputado/img/partidos/MDB.gif",
+  "urlWebSite": null,
+  "urlFacebook": null
+ },
+ "links": [
+  {
+   "rel": "self",
+   "href": "https://dadosabertos.camara.leg.br/api/v2/partidos/36899"
+  }
+ ]
+}

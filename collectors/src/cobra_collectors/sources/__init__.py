@@ -4,9 +4,11 @@ Each ingestion change adds its adapter here.
 """
 
 from cobra_collectors.runner import SourceFactory
+from cobra_collectors.sources.camara import CamaraSource
 from cobra_collectors.sources.obrasgov import ObrasgovSource
 
 REGISTRY: dict[str, SourceFactory] = {
+    "camara": CamaraSource,
     "obrasgov": ObrasgovSource,
 }
 

@@ -1,0 +1,50 @@
+{
+ "dados": {
+  "id": 73806,
+  "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/73806",
+  "nomeCivil": "Roseana Sarney Murad",
+  "ultimoStatus": {
+   "id": 73806,
+   "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/73806",
+   "nome": "Roseana Sarney",
+   "siglaPartido": "MDB",
+   "uriPartido": null,
+   "siglaUf": "MA",
+   "idLegislatura": 57,
+   "urlFoto": "https://www.camara.leg.br/internet/deputado/bandep/73806.jpg",
+   "email": null,
+   "data": "2026-08-31",
+   "nomeEleitoral": "Roseana Sarney",
+   "gabinete": {
+    "nome": null,
+    "predio": null,
+    "sala": null,
+    "andar": null,
+    "telefone": null,
+    "email": null
+   },
+   "situacao": "Licença",
+   "condicaoEleitoral": "Titular",
+   "descricaoStatus": ""
+  },
+  "cpf": "00000000010",
+  "sexo": "F",
+  "urlWebsite": null,
+  "redeSocial": [
+   "https://twitter.com/roseanasarneym",
+   "https://www.facebook.com/roseanasarney",
+   "https://www.instagram.com/roseanasarney"
+  ],
+  "dataNascimento": "1953-06-01",
+  "dataFalecimento": null,
+  "ufNascimento": "MA",
+  "municipioNascimento": "São Luís",
+  "escolaridade": "Superior"
+ },
+ "links": [
+  {
+   "rel": "self",
+   "href": "https://dadosabertos.camara.leg.br/api/v2/deputados/73806"
+  }
+ ]
+}

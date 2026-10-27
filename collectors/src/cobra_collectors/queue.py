@@ -10,6 +10,10 @@ from psycopg.types.json import Jsonb
 
 RETRY_BASE = timedelta(minutes=1)
 RETRY_CAP = timedelta(hours=6)
+# A job queued at now() must be claimable right away even if the database clock steps back a
+# little (measured up to ~1.2 s on Docker Desktop): otherwise the worker sees an empty queue
+# and stops early. Far below RETRY_BASE, so backoff is unaffected.
+CLOCK_SKEW = timedelta(seconds=2)
 STALE_AFTER = timedelta(minutes=30)
 
 
@@ -52,7 +56,8 @@ def claim(conn: psycopg.Connection, source: str | None = None) -> Job | None:
                             updated_at = now()
         where id = (
           select id from ops.jobs
-          where status = 'queued' and run_after <= now() and (%(source)s::core.data_source is null
+          where status = 'queued' and run_after <= now() + %(skew)s
+                and (%(source)s::core.data_source is null
                 or source = %(source)s::core.data_source)
           order by run_after, id
           for update skip locked
@@ -60,7 +65,7 @@ def claim(conn: psycopg.Connection, source: str | None = None) -> Job | None:
         )
         returning id, source::text, kind, payload, attempts, max_attempts
         """,
-        {"source": source},
+        {"source": source, "skew": CLOCK_SKEW},
     ).fetchone()
     if row is None:
         return None

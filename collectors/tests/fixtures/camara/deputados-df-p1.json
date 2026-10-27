@@ -1,0 +1,77 @@
+{
+ "dados": [
+  {
+   "id": 73579,
+   "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/73579",
+   "nome": "Alberto Fraga",
+   "siglaPartido": "PL",
+   "uriPartido": "https://dadosabertos.camara.leg.br/api/v2/partidos/37906",
+   "siglaUf": "DF",
+   "idLegislatura": 57,
+   "urlFoto": "https://www.camara.leg.br/internet/deputado/bandep/73579.jpg",
+   "email": "dep.albertofraga@camara.leg.br"
+  },
+  {
+   "id": 141533,
+   "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/141533",
+   "nome": "Rodrigo Rollemberg",
+   "siglaPartido": "PSB",
+   "uriPartido": "https://dadosabertos.camara.leg.br/api/v2/partidos/36832",
+   "siglaUf": "DF",
+   "idLegislatura": 57,
+   "urlFoto": "https://www.camara.leg.br/internet/deputado/bandep/141533.jpg",
+   "email": "dep.rodrigorollemberg@camara.leg.br"
+  },
+  {
+   "id": 160575,
+   "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/160575",
+   "nome": "Erika Kokay",
+   "siglaPartido": "PT",
+   "uriPartido": "https://dadosabertos.camara.leg.br/api/v2/partidos/36844",
+   "siglaUf": "DF",
+   "idLegislatura": 57,
+   "urlFoto": "https://www.camara.leg.br/internet/deputado/bandep/160575.jpg",
+   "email": "dep.erikakokay@camara.leg.br"
+  },
+  {
+   "id": 204372,
+   "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/204372",
+   "nome": "Julio Cesar Ribeiro",
+   "siglaPartido": "REPUBLICANOS",
+   "uriPartido": "https://dadosabertos.camara.leg.br/api/v2/partidos/37908",
+   "siglaUf": "DF",
+   "idLegislatura": 57,
+   "urlFoto": "https://www.camara.leg.br/internet/deputado/bandep/204372.jpg",
+   "email": "dep.juliocesarribeiro@camara.leg.br"
+  },
+  {
+   "id": 204374,
+   "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/204374",
+   "nome": "Bia Kicis",
+   "siglaPartido": "PL",
+   "uriPartido": "https://dadosabertos.camara.leg.br/api/v2/partidos/37906",
+   "siglaUf": "DF",
+   "idLegislatura": 57,
+   "urlFoto": "https://www.camara.leg.br/internet/deputado/bandep/204374.jpg",
+   "email": "dep.biakicis@camara.leg.br"
+  }
+ ],
+ "links": [
+  {
+   "rel": "self",
+   "href": "https://dadosabertos.camara.leg.br/api/v2/deputados?itens=5&pagina=1&siglaUf=DF&ordem=ASC&ordenarPor=id"
+  },
+  {
+   "rel": "next",
+   "href": "https://dadosabertos.camara.leg.br/api/v2/deputados?siglaUf=DF&ordem=ASC&ordenarPor=id&pagina=2&itens=5"
+  },
+  {
+   "rel": "first",
+   "href": "https://dadosabertos.camara.leg.br/api/v2/deputados?siglaUf=DF&ordem=ASC&ordenarPor=id&pagina=1&itens=5"
+  },
+  {
+   "rel": "last",
+   "href": "https://dadosabertos.camara.leg.br/api/v2/deputados?siglaUf=DF&ordem=ASC&ordenarPor=id&pagina=2&itens=5"
+  }
+ ]
+}
