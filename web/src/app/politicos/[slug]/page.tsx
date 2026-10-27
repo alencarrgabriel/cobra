@@ -23,11 +23,13 @@ import {
 } from "@/lib/politicians/elections";
 import {
   type AssetsData,
+  type BallotRow,
   type ReceiptsData,
   type CandidacyRow,
   getAmendments,
   getAssets,
   getCandidacies,
+  getRecentBallots,
   getReceipts,
   getLinkedWorks,
   getPolitician,
@@ -137,7 +139,7 @@ async function load(id: number) {
   const current =
     politician.mandates.find((m) => m.endedOn === null) ??
     politician.mandates[0];
-  const [amendments, works, related, candidacies, assets, receipts] =
+  const [amendments, works, related, candidacies, assets, receipts, ballots] =
     await Promise.all([
       getAmendments(id),
       getLinkedWorks(id),
@@ -149,6 +151,7 @@ async function load(id: number) {
       getCandidacies(id),
       getAssets(id),
       getReceipts(id),
+      getRecentBallots(id),
     ]);
   return {
     politician,
@@ -159,6 +162,7 @@ async function load(id: number) {
     candidacies,
     assets,
     receipts,
+    ballots,
   };
 }
 
@@ -183,6 +187,7 @@ async function Profile({ params }: { params: Promise<{ slug: string }> }) {
     candidacies,
     assets,
     receipts,
+    ballots,
   } = data;
   const who = sentence(p);
   const total = amendments.reduce(
@@ -299,6 +304,8 @@ async function Profile({ params }: { params: Promise<{ slug: string }> }) {
         </p>
       </Card>
 
+      <HowVoted ballots={ballots} house={current?.house} />
+
       <Trajectory candidacies={candidacies} />
 
       <Assets data={assets} />
@@ -379,16 +386,18 @@ async function Profile({ params }: { params: Promise<{ slug: string }> }) {
           Ainda não está no Cobra
         </h2>
         <dl className={styles.notYet} data-testid="ainda-nao">
-          {NOT_YET.map(([label, why]) => (
-            <div key={label}>
-              <dt>{label}</dt>
-              <dd>
-                <span aria-hidden="true">—</span>
-                <span className="sr-only">Sem dado.</span> Ainda não está no
-                Cobra: {why}.
-              </dd>
-            </div>
-          ))}
+          {NOT_YET.filter(([label]) => label !== "Como votou").map(
+            ([label, why]) => (
+              <div key={label}>
+                <dt>{label}</dt>
+                <dd>
+                  <span aria-hidden="true">—</span>
+                  <span className="sr-only">Sem dado.</span> Ainda não está no
+                  Cobra: {why}.
+                </dd>
+              </div>
+            ),
+          )}
         </dl>
       </Card>
 
@@ -602,6 +611,98 @@ function Assets({ data }: { data: AssetsData }) {
           : ""}
         .
       </p>
+    </Card>
+  );
+}
+
+const OPTION: Record<string, string> = {
+  sim: "Sim",
+  nao: "Não",
+  abstencao: "Abstenção",
+  obstrucao: "Obstrução",
+  art17: "Art. 17",
+  nao_informado: "Não informado",
+};
+
+const NO_VOTES: Partial<Record<HouseSlug, string>> = {
+  senado: "vem com a coleta das votações do Senado",
+  cldf: "as votações da Câmara Legislativa ainda não estão no Cobra",
+};
+
+function HowVoted({
+  ballots,
+  house,
+}: {
+  ballots: BallotRow[];
+  house: HouseSlug | undefined;
+}) {
+  const collected = ballots
+    .map((b) => b.collectedAt)
+    .sort()
+    .at(-1);
+  return (
+    <Card aria-labelledby="como-votou" data-testid="como-votou">
+      <h2 id="como-votou" className={styles.h2}>
+        Como votou
+      </h2>
+      {house !== "camara" ? (
+        <p>
+          <span aria-hidden="true">—</span>
+          <span className="sr-only">Sem dado.</span> Ainda não está no Cobra:{" "}
+          {NO_VOTES[house ?? "senado"] ?? "vem com a coleta das votações"}.
+        </p>
+      ) : ballots.length ? (
+        <>
+          <p className={styles.note}>
+            As 10 votações nominais mais recentes do Plenário da Câmara em que
+            registrou voto. Votações simbólicas não têm voto individual.
+          </p>
+          <ul className={styles.list}>
+            {ballots.map((b) => (
+              <li key={b.voteId}>
+                <strong>{formatDate(b.occurredOn)}</strong> ·{" "}
+                {b.propositionLabel ? (
+                  b.propositionUrl ? (
+                    <a href={b.propositionUrl} rel="noopener noreferrer">
+                      {b.propositionLabel}
+                    </a>
+                  ) : (
+                    b.propositionLabel
+                  )
+                ) : (
+                  "Votação"
+                )}
+                {b.propositionSummary ? `: ${b.propositionSummary}` : ""}{" "}
+                <span className={styles.note}>
+                  ({b.description}
+                  {b.approved === true
+                    ? " Resultado: aprovado."
+                    : b.approved === false
+                      ? " Resultado: rejeitado."
+                      : ""}
+                  )
+                </span>{" "}
+                <span data-testid="voto">
+                  Voto: {OPTION[b.option] ?? b.option}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </>
+      ) : (
+        <p>
+          O Cobra não tem votos nominais deste deputado no Plenário desde 2023.
+        </p>
+      )}
+      {house === "camara" ? (
+        <p className={styles.source}>
+          Fonte: Câmara dos Deputados, dados abertos de votações
+          {collected
+            ? `, coletados pelo Cobra em ${formatDate(collected)}`
+            : ""}
+          .
+        </p>
+      ) : null}
     </Card>
   );
 }

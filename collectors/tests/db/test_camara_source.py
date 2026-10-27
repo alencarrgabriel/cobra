@@ -79,7 +79,7 @@ def clean(autocommit_conn: psycopg.Connection) -> Iterator[psycopg.Connection]:
 
 def factory() -> Callable[[], CamaraSource]:
     def make() -> CamaraSource:
-        source = CamaraSource(uf="DF", page_size=5)
+        source = CamaraSource(uf="DF", page_size=5, vote_years=())
         # The fake API needs no politeness; the real limit is checked in test_rate_limit.
         source.rate_per_second, source.burst = 1000.0, 1000
         return source

@@ -37,7 +37,19 @@ test.describe("celular (360 px)", () => {
 
   test("a barra inferior não cobre o fim do conteúdo", async ({ page }) => {
     await page.goto("/");
+    // The example cards stream in after the first paint and make the page longer.
+    await expect(page.getByTestId("exemplos-de-cards")).toBeVisible();
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await expect
+      .poll(() =>
+        page.evaluate(
+          () =>
+            Math.abs(
+              window.scrollY + window.innerHeight - document.body.scrollHeight,
+            ) < 2,
+        ),
+      )
+      .toBe(true);
     const barTop = await page
       .getByRole("navigation", { name: "Seções (barra inferior)" })
       .evaluate((el) => el.getBoundingClientRect().top);

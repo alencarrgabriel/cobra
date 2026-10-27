@@ -202,3 +202,24 @@ from core.politicians p,
     (2, 'pessoas_fisicas', 'outros', null, 25, 20, 50000.00)
   ) as r (k, origin, fund, donor, n, donors, total)
 where p.source_id = '9001';
+
+-- Plenary votes (change ingestao-camara-votacoes): Deputado Teste A voted "Não" on one.
+insert into core.votes (house_id, occurred_on, registered_at, organ, description, approved, yes,
+  no, other, nominal, proposition_external_id, proposition_label, proposition_type,
+  proposition_summary, proposition_url, source, source_id, source_url, collected_at)
+select h.id, v.day::date, (v.day || 'T14:00:00-03:00')::timestamptz, 'PLEN', v.descr, true,
+       v.yes, v.no, 0, v.nominal, '555', 'PL 11/2003', 'PL', 'Proíbe peças publicitárias de teste.',
+       'https://www.camara.leg.br/propostas-legislativas/555', 'camara', v.sid, null, now()
+from core.legislative_houses h,
+  (values
+    ('9100-1', '2026-06-10', 'Aprovado o projeto de teste.', 300, 150, true),
+    ('9100-2', '2026-06-11', 'Aprovado requerimento simbólico de teste.', 0, 0, false)
+  ) as v (sid, day, descr, yes, no, nominal)
+where h.slug = 'camara';
+
+insert into core.vote_ballots (vote_id, external_id, name, party_acronym, uf, option, voted_at,
+  politician_id, source, source_id, collected_at)
+select v.id, '8001', 'Deputado Teste A', 'PL', 'DF', 'nao', now(), p.id, 'camara',
+       '9100-1:8001', now()
+from core.votes v, core.politicians p
+where v.source_id = '9100-1' and p.source_id = '8001';

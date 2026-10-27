@@ -503,3 +503,63 @@ async function cachedReceipts(id: number): Promise<DbResult<ReceiptsData>> {
 export async function getReceipts(id: number): Promise<ReceiptsData> {
   return unwrap(await cachedReceipts(id));
 }
+
+export type BallotRow = {
+  voteId: string;
+  occurredOn: string;
+  description: string;
+  approved: boolean | null;
+  propositionLabel: string | null;
+  propositionSummary: string | null;
+  option: string;
+  propositionUrl: string | null;
+  sourceUrl: string | null;
+  collectedAt: string;
+};
+
+async function cachedBallots(id: number): Promise<DbResult<BallotRow[]>> {
+  "use cache";
+  const result = await tryDb(async (sql) => {
+    const rows = await sql<
+      {
+        vote_id: string;
+        occurred_on: string;
+        description: string;
+        approved: boolean | null;
+        proposition_label: string | null;
+        proposition_summary: string | null;
+        option: string;
+        proposition_url: string | null;
+        source_url: string | null;
+        collected: string;
+      }[]
+    >`
+      select v.source_id as vote_id, v.occurred_on::text, v.description, v.approved,
+             v.proposition_label, v.proposition_summary, b.option, v.proposition_url,
+             v.source_url,
+             to_char(b.collected_at at time zone 'America/Sao_Paulo', 'YYYY-MM-DD') as collected
+      from core.vote_ballots b join core.votes v on v.id = b.vote_id
+      where b.politician_id = ${id} and v.nominal
+      order by v.occurred_on desc, v.registered_at desc nulls last, v.source_id desc
+      limit 10`;
+    return rows.map((r) => ({
+      voteId: r.vote_id,
+      occurredOn: r.occurred_on,
+      description: r.description,
+      approved: r.approved,
+      propositionLabel: r.proposition_label,
+      propositionSummary: r.proposition_summary,
+      option: r.option,
+      propositionUrl: r.proposition_url,
+      sourceUrl: r.source_url,
+      collectedAt: r.collected,
+    }));
+  });
+  cache(result.ok);
+  return result;
+}
+
+/** The 10 latest plenary nominal votes with a ballot (change ingestao-camara-votacoes, D6). */
+export async function getRecentBallots(id: number): Promise<BallotRow[]> {
+  return unwrap(await cachedBallots(id));
+}

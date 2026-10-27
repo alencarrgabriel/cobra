@@ -61,6 +61,15 @@ Limites iniciais (conservadores; cada change de fonte confirma na documentação
 - Qualidade da fonte, tratada na normalização: o histórico vem desordenado e mistura legislaturas, e as linhas "Nome/Partido no início da legislatura" são ignoradas; o detalhe traz `uriPartido` nulo, então o partido vem da lista.
 - Volume: cerca de 1.030 requisições por atualização completa, ~9 minutos a 2 req/s.
 
+### Câmara dos Deputados, votações do Plenário (`camara`, tarefa `votes`)
+
+- Arquivos anuais (conferidos em 2026-10-27, atualizados todo dia; UTF-8 com BOM, `;`): `dadosabertos.camara.leg.br/arquivos/<conjunto>/csv/<conjunto>-<ano>.csv` com `votacoes`, `votacoesVotos`, `votacoesOrientacoes` e `votacoesProposicoes`. Quatro pedidos por ano em vez de milhares na API.
+- Uma tarefa por ano, de 2023 (57ª legislatura) ao ano corrente; o ano é regravado inteiro.
+- Só o Plenário (`PLEN`). Votação com votos individuais é nominal; sem eles, simbólica, e ninguém recebe voto nela.
+- Voto de todo deputado que votou, com partido e UF na data, mesmo fora do cadastro (para o placar), ligado ao cadastro pelo id da Câmara.
+- Contagem conferida: votação cujos votos individuais "sim" e "não" não somam o placar oficial fica sem votos individuais e com nota de qualidade; acima de 5% das nominais do ano, a tarefa falha.
+- Volume em 2026-10-27: 6.655 votações do Plenário, 1.128 nominais, 456 mil votos, 2 votações com nota.
+
 ### Senado Federal (`senado`)
 
 - API: `https://legis.senado.leg.br/dadosabertos` (OpenAPI 4.1.3.106 em `/v3/api-docs`, verificado em 2026-10-26), sem chave; JSON pedido pelo sufixo `.json` em cada endereço (sem ele, a resposta vem em XML). A documentação pede para evitar rotinas em horários redondos (00:00, 01:15…).

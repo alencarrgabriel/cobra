@@ -1,5 +1,5 @@
-"""Câmara dos Deputados adapter: federal deputies in office. See design D1 to D6 of openspec
-change `ingestao-camara-deputados`."""
+"""Câmara dos Deputados adapter: federal deputies in office (openspec change
+`ingestao-camara-deputados`, design D1 to D6) and plenary votes (`ingestao-camara-votacoes`)."""
 
 from collections.abc import Iterable
 from datetime import date, datetime, timedelta
@@ -23,6 +23,8 @@ from cobra_collectors.sources.camara_model import (
     party_id_from_uri,
     validate_deputy,
 )
+from cobra_collectors.sources.camara_votacoes import collect_votes
+from cobra_collectors.sources.camara_votacoes_model import FIRST_YEAR
 
 SOURCE = "camara"
 ELECTORAL_NUMBERS = range(10, 100)
@@ -44,15 +46,27 @@ class CamaraSource:
     rate_per_second = 2.0  # no documented limit; conservative (design D1)
     burst = 2
 
-    def __init__(self, uf: str | None = None, page_size: int = 100) -> None:
+    def __init__(
+        self,
+        uf: str | None = None,
+        page_size: int = 100,
+        vote_years: Iterable[int] | None = None,
+    ) -> None:
         # `uf` narrows the listing (tests); the real collection covers every state.
         self.uf = uf
         self.page_size = page_size
+        # Years of plenary votes to collect; by default the legislature up to this year.
+        self.vote_years = (
+            tuple(vote_years)
+            if vote_years is not None
+            else tuple(range(FIRST_YEAR, today().year + 1))
+        )
 
     def plan(self) -> Iterable[JobSpec]:
         return [
             JobSpec("deputies-page", "p1", {"page": 1}),
             JobSpec("close-mandates", "run", {}),
+            *(JobSpec("votes", str(year), {"year": year}) for year in self.vote_years),
         ]
 
     def handle(self, ctx: Context) -> None:
@@ -63,6 +77,8 @@ class CamaraSource:
             self._deputy(ctx)
         elif kind == "close-mandates":
             self._close_mandates(ctx)
+        elif kind == "votes":
+            collect_votes(ctx, int(ctx.job.payload["year"]))
         else:
             raise ValueError(f"unknown job kind {kind!r}")
 

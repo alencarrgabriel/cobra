@@ -98,6 +98,31 @@ test("receitas de campanha com pessoas físicas só somadas", async ({
   );
 });
 
+test("como votou: deputado com votos nominais e senadora com traço", async ({
+  page,
+}) => {
+  await page.goto("/representantes/5300108");
+  await page
+    .getByTestId("secao-camara")
+    .getByRole("button", { name: /Deputado Teste A/ })
+    .click();
+  await page.getByRole("link", { name: "Ver perfil completo" }).click();
+  const block = page.getByTestId("como-votou");
+  await expect(block.getByRole("listitem")).toHaveCount(1);
+  await expect(block).toContainText("10/06/2026");
+  await expect(block.getByRole("link", { name: "PL 11/2003" })).toHaveAttribute(
+    "href",
+    "https://www.camara.leg.br/propostas-legislativas/555",
+  );
+  await expect(block.getByTestId("voto")).toHaveText("Voto: Não");
+  await expect(block).not.toContainText("requerimento simbólico");
+
+  await openProfile(page);
+  await expect(page.getByTestId("como-votou")).toContainText(
+    "vem com a coleta das votações do Senado",
+  );
+});
+
 test("o que ainda não foi coletado aparece com traço, nunca zero", async ({
   page,
 }) => {
