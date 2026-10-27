@@ -2,3 +2,5 @@
 *.png binary
 *.jpg binary
 *.docx binary
+# Flags are checked by SHA-256 (web/src/lib/geo/flags.json): keep their bytes as downloaded.
+web/public/bandeiras/*.svg -text
