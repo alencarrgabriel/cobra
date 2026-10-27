@@ -18,6 +18,10 @@ NO_PARTY = "S/Partido"
 FINAL_CAUSES = frozenset({"REN", "FAL", "CAS", "PER"})
 
 
+def photo_url(code: str) -> str | None:
+    return f"https://legis.senado.leg.br/senadores/fotos-oficiais/{code}" if code else None
+
+
 def senator_url(code: str) -> str:
     return f"{API_BASE}/senador/{code}"
 
@@ -65,7 +69,8 @@ def normalize_senator(item: dict[str, Any], detail: dict[str, Any]) -> Senator:
         civil_name=(ident.get("NomeCompletoParlamentar") or "").strip(),
         parliamentary_name=(ident.get("NomeParlamentar") or "").strip(),
         birth_date=_date(basics.get("DataNascimento")),
-        photo_url=ident.get("UrlFotoParlamentar") or None,
+        # The list's http:// address redirects here (change municipios-ibge, design D3).
+        photo_url=photo_url(str(ident.get("CodigoParlamentar") or "")),
         uf=(mandate.get("UfParlamentar") or ident.get("UfParlamentar") or "").strip().upper(),
     )
 

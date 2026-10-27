@@ -49,7 +49,7 @@ def test_senator_from_the_df() -> None:
     assert senator.parliamentary_name == "Damares Alves"
     assert senator.birth_date == date(1964, 3, 11)
     assert senator.uf == "DF"
-    assert senator.photo_url is not None and senator.photo_url.endswith("senador6335.jpg")
+    assert senator.photo_url == "https://legis.senado.leg.br/senadores/fotos-oficiais/6335"
 
 
 def test_titular_mandates_start_with_their_first_legislature() -> None:

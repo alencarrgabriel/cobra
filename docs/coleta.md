@@ -67,7 +67,7 @@ Limites iniciais (conservadores; cada change de fonte confirma na documentação
 - Escopo: senadores em exercício (81 em 2026-10-26). Tarefas:
   - `senators`: busca a lista em exercício e a de afastados, enfileira um `senator` por senador e trata quem não está em exercício;
   - `senator`: detalhe (data de nascimento) e filiações de cada senador.
-- O que fica guardado: político e identificador do Senado, partidos e o histórico de filiações com as datas do Senado, mandato de senador pela primeira legislatura do mandato. A API não informa CPF.
+- O que fica guardado: político e identificador do Senado (foto em `https://legis.senado.leg.br/senadores/fotos-oficiais/<código>`, para onde o endereço da lista redireciona), partidos e o histórico de filiações com as datas do Senado, mandato de senador pela primeira legislatura do mandato. A API não informa CPF.
 - Titular afastado temporariamente que ainda não estava no cadastro é cadastrado como `licenciado`: continua titular e pode ser autor de emendas.
 - Afastados: a causa do último período de exercício decide.
   - Titular afastado por licença ou cargo de ministro ou secretário fica `licenciado`.
@@ -116,6 +116,12 @@ Limites iniciais (conservadores; cada change de fonte confirma na documentação
   - extrai o texto de cada página (`pypdf`) e marca os temas por palavras fixas (`core.plan_themes`).
 - Coleta mínima: do arquivo de candidatos só se leem número, nome de urna, cargo, partido, turno, situação e coligação. CPF, e-mail e título não são guardados. O ZIP bruto fica em `raw`, que o site não lê.
 - Volume: cerca de 40 MB por carga, um arquivo por segundo.
+
+### IBGE, municípios (`ibge`)
+
+- API de localidades (`servicodados.ibge.gov.br/api/v1/localidades/municipios?view=nivelado`, conferida em 2026-10-26): os 5.571 municípios numa única resposta, sem chave.
+- Tarefa única `municipalities`: grava cada município em `core.localities` com o código de 7 dígitos, a UF e `search_name` (nome sem acentos, em minúsculas) para a busca por cidade.
+- Resposta com menos de 5.000 municípios é tratada como quebrada e não grava nada.
 
 ## Comandos
 
