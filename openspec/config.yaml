@@ -92,8 +92,7 @@ context: |
   # Plano de changes da Fase 1 (revisado em 2026-10-26, DDR 3.0: foco "dinheiro e promessas no DF")
   Feitas: 1 fundacao-projeto; 2 modelo-dados-base; 3 identidade-visual; 4 infra-coleta;
   9 ingestao-obrasgov; 13 obras-na-cidade; 13a mapa-de-obras (mapa com ruas próprio,
-  pinos agrupados, links para o Google Maps).
-  Em andamento: 5 ingestao-camara-deputados.
+  pinos agrupados, links para o Google Maps); 5 ingestao-camara-deputados.
   Próximas: 6 ingestao-senado-senadores;
   7 ingestao-cldf-distritais; 8 identidade-de-partidos-e-ufs;
   10 ingestao-emendas (vínculo emenda–obra com grau de confiança); 11 ingestao-planos-de-governo
