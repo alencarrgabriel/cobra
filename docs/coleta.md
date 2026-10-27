@@ -34,7 +34,7 @@ Limites iniciais (conservadores; cada change de fonte confirma na documentação
 | Senado | 10 req/s (acima disso, HTTP 429; evitar horários redondos) | 8 req/s |
 | Portal da Transparência | 400/min (06h–24h), 700/min (00h–06h) na API; o download em massa não tem limite publicado | 1 req/s (um arquivo por carga) |
 | Câmara | não documentado (respostas trazem `Retry-After: 30`) | 2 req/s |
-| TSE (arquivos) | — | 1 req/s |
+| TSE (arquivos) | — (CDN de arquivos) | 1 req/s |
 | Obrasgov | não documentado | 2 req/s |
 | CLDF (site) | — (site, não API) | 1 req/s |
 
@@ -104,6 +104,18 @@ Limites iniciais (conservadores; cada change de fonte confirma na documentação
   - 8 dígitos (autor e número) com o ano do empenho.
 
   Outros formatos não ligam: `"0"`, texto, ou `"20264268000.0"`, em que o código perdeu um dígito.
+
+### TSE, planos de governo (`tse`)
+
+- Arquivos públicos, sem chave (conferidos em 2026-10-26):
+  - `cdn.tse.jus.br/estatistica/sead/odsele/proposta_governo/proposta_governo_<ano>_<UF>.zip`: um PDF por candidatura, `<UF>/<ano><UF><SQ_CANDIDATO>.pdf`;
+  - `consulta_cand_<ano>.zip`: para achar a chapa eleita.
+- Tarefa `plans`, uma por abrangência do piloto (`2022-DF`, governador; `2022-BR`, presidente):
+  - acha o eleito e o vice da mesma coligação;
+  - guarda o PDF oficial byte a byte no banco, com o hash;
+  - extrai o texto de cada página (`pypdf`) e marca os temas por palavras fixas (`core.plan_themes`).
+- Coleta mínima: do arquivo de candidatos só se leem número, nome de urna, cargo, partido, turno, situação e coligação. CPF, e-mail e título não são guardados. O ZIP bruto fica em `raw`, que o site não lê.
+- Volume: cerca de 40 MB por carga, um arquivo por segundo.
 
 ## Comandos
 

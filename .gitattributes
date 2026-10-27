@@ -6,3 +6,4 @@
 web/public/bandeiras/*.svg -text
 # Recorded source files compared byte for byte by the tests.
 collectors/tests/fixtures/transparencia/*.csv -text
+collectors/tests/fixtures/tse/*.csv -text

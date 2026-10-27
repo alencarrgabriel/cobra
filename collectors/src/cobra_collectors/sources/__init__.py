@@ -9,6 +9,7 @@ from cobra_collectors.sources.cldf import CldfSource
 from cobra_collectors.sources.obrasgov import ObrasgovSource
 from cobra_collectors.sources.senado import SenadoSource
 from cobra_collectors.sources.transparencia import TransparenciaSource
+from cobra_collectors.sources.tse_planos import TsePlanosSource
 
 REGISTRY: dict[str, SourceFactory] = {
     "camara": CamaraSource,
@@ -16,6 +17,7 @@ REGISTRY: dict[str, SourceFactory] = {
     "obrasgov": ObrasgovSource,
     "senado": SenadoSource,
     "transparencia": TransparenciaSource,
+    "tse": TsePlanosSource,
 }
 
 # Kept for the `sources` command.

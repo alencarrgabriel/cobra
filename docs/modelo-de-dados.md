@@ -58,6 +58,15 @@ Chaves: `id bigint generated always as identity`, exceto `core.localities` (chav
 | `core.amendments_by_function(uf)` (função) | Emendas de um lugar por área | Contagem e somas; não liga cada obra a cada emenda |
 
 
+### Planos de governo (change `ingestao-planos-de-governo`)
+
+| Tabela | O que guarda | Regras |
+|---|---|---|
+| `core.government_plans` | Plano registrado no TSE pela chapa eleita (presidente; governador por UF) | PDF oficial byte a byte (`pdf`, `pdf_sha256`); única por eleição, cargo e UF |
+| `core.government_plan_pages` | Texto de cada página como extraído do PDF | `search` em português (índice GIN) para a busca por palavra |
+| `core.plan_themes` | Temas fixos com palavras e áreas de obra correspondentes | Curadoria do Cobra, sem IA; mudar é migração nova |
+| `core.plan_page_themes` | Temas de cada página, com a contagem de palavras | Tema atribuído com 2 ocorrências ou mais |
+
 ## Papéis e usuários
 
 As migrações criam os papéis `cobra_web_reader` e `cobra_collector` sem login e sem senha, e dão a eles os privilégios, inclusive para tabelas futuras (`alter default privileges`).
