@@ -16,6 +16,7 @@ import { WorkStatus } from "@/components/WorkStatus/WorkStatus";
 import { shareMetadata } from "@/lib/cards/metadata";
 import { FLAGS } from "@/lib/geo/flags";
 import { formatPercent, withVariation } from "@/lib/politicians/assets";
+import { percent } from "@/lib/politicians/attendance";
 import {
   officeLabel,
   partyTimeline,
@@ -23,12 +24,14 @@ import {
 } from "@/lib/politicians/elections";
 import {
   type AssetsData,
+  type AttendanceData,
   type BallotRow,
   type ExpensesData,
   type ReceiptsData,
   type CandidacyRow,
   getAmendments,
   getAssets,
+  getAttendance,
   getCandidacies,
   getExpenses,
   getRecentBallots,
@@ -118,7 +121,6 @@ const OFFICIAL: Record<HouseSlug, (id: string) => string | null> = {
 // Blocks that need data not collected yet (DDR §9.1: "—" with the reason, never zero).
 const NOT_YET: [string, string][] = [
   ["Projetos de autoria e relatoria", "vem com a coleta de proposições"],
-  ["Presença nas sessões", "vem com a coleta de presença"],
 ];
 
 export default function ProfilePage({
@@ -148,6 +150,7 @@ async function load(id: number) {
     receipts,
     ballots,
     expenses,
+    attendance,
   ] = await Promise.all([
     getAmendments(id),
     getLinkedWorks(id),
@@ -157,6 +160,9 @@ async function load(id: number) {
     getReceipts(id),
     getRecentBallots(id),
     getExpenses(id),
+    current?.house === "camara" || current?.house === "senado"
+      ? getAttendance(id, current.house)
+      : null,
   ]);
   return {
     politician,
@@ -169,6 +175,7 @@ async function load(id: number) {
     receipts,
     ballots,
     expenses,
+    attendance,
   };
 }
 
@@ -195,6 +202,7 @@ async function Profile({ params }: { params: Promise<{ slug: string }> }) {
     receipts,
     ballots,
     expenses,
+    attendance,
   } = data;
   const who = sentence(p);
   const total = amendments.reduce(
@@ -312,6 +320,8 @@ async function Profile({ params }: { params: Promise<{ slug: string }> }) {
       </Card>
 
       <HowVoted ballots={ballots} house={current?.house} />
+
+      <Attendance data={attendance} />
 
       <Expenses
         data={expenses}
@@ -725,6 +735,77 @@ function HowVoted({
           Fonte: {VOTES_OF[house]!.house}, dados abertos de votações
           {collected
             ? `, coletados pelo Cobra em ${formatDate(collected)}`
+            : ""}
+          .
+        </p>
+      ) : null}
+    </Card>
+  );
+}
+
+function Attendance({ data }: { data: AttendanceData | null }) {
+  const senate = data?.house === "senado";
+  return (
+    <Card aria-labelledby="presenca" data-testid="presenca">
+      <h2 id="presenca" className={styles.h2}>
+        Presença
+      </h2>
+      {!data ? (
+        <p>
+          <span aria-hidden="true">—</span>
+          <span className="sr-only">Sem dado.</span> Ainda não está no Cobra: a
+          presença dos deputados distritais não é coletada.
+        </p>
+      ) : data.years.length ? (
+        <>
+          <p className={styles.note}>
+            {senate
+              ? "Comparecimento às votações nominais do Plenário, como o Senado registra. O Senado não publica a presença por sessão."
+              : "Presença registrada nas sessões deliberativas do Plenário realizadas durante o mandato. Períodos de licença não são descontados."}{" "}
+            A mediana da casa serve de referência.
+          </p>
+          <ul className={styles.list}>
+            {data.years.map((y) => (
+              <li key={y.year} data-testid={`presenca-${y.year}`}>
+                <strong>{y.year}</strong>:{" "}
+                {senate
+                  ? `compareceu a ${formatInteger(y.present)} de ${formatInteger(y.total)} votações nominais do Plenário`
+                  : `presente em ${formatInteger(y.present)} de ${formatInteger(y.total)} sessões deliberativas do Plenário`}{" "}
+                ({percent(y.total ? y.present / y.total : 0)}).
+                {y.median !== null ? (
+                  <span className={styles.note}>
+                    {" "}
+                    Mediana dos {senate ? "senadores" : "deputados"}:{" "}
+                    {percent(y.median)}.
+                  </span>
+                ) : null}
+                {y.absences.length ? (
+                  <span className={styles.note}>
+                    {" "}
+                    Ausências:{" "}
+                    {y.absences
+                      .map((a) => `${a.reason}: ${formatInteger(a.count)}`)
+                      .join("; ")}
+                    .
+                  </span>
+                ) : null}
+              </li>
+            ))}
+          </ul>
+        </>
+      ) : (
+        <p>
+          O Cobra não tem registros de presença deste parlamentar desde 2023.
+        </p>
+      )}
+      {data ? (
+        <p className={styles.source}>
+          Fonte:{" "}
+          {senate
+            ? "Senado Federal, votações"
+            : "Câmara dos Deputados, presença em eventos"}
+          {data.collectedAt
+            ? `, dados coletados pelo Cobra em ${formatDate(data.collectedAt)}`
             : ""}
           .
         </p>

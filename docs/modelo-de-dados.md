@@ -89,6 +89,13 @@ Chaves: `id bigint generated always as identity`, exceto `core.localities` (chav
 |---|---|---|
 | `core.expenses` | Despesas da cota parlamentar da Câmara e do Senado desde 2023 | Fornecedor pessoa física sem nome nem CPF; passageiro e trecho nunca lidos; valor líquido como a casa informa (estorno negativo) |
 
+### Presença (change `ingestao-presenca`)
+
+| Tabela | O que guarda | Regras |
+|---|---|---|
+| `core.sessions` | Sessões deliberativas encerradas do Plenário da Câmara desde 2023 | Solenes, canceladas e comissões ficam fora |
+| `core.session_attendance` | Deputados com presença registrada em cada sessão | Ligados ao cadastro pelo id da Câmara; no Senado, o comparecimento vem de `core.vote_ballots` |
+
 ## Papéis e usuários
 
 As migrações criam os papéis `cobra_web_reader` e `cobra_collector` sem login e sem senha, e dão a eles os privilégios, inclusive para tabelas futuras (`alter default privileges`).

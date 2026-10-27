@@ -7,6 +7,7 @@ import { NEUTRAL_PARTY_COLOR } from "@/lib/party-color";
 import type { WorkStatus } from "@/lib/works/filters";
 
 import type { Declaration } from "./assets";
+import { median } from "./attendance";
 import type { HouseSlug } from "./who";
 
 // Profile data (change perfil-do-politico, design D2). Only Cobra's own database.
@@ -629,4 +630,132 @@ async function cachedExpenses(id: number): Promise<DbResult<ExpensesData>> {
 /** Quota expenses of the three latest years (change ingestao-despesas, D4). */
 export async function getExpenses(id: number): Promise<ExpensesData> {
   return unwrap(await cachedExpenses(id));
+}
+
+export type AttendanceYear = {
+  year: number;
+  present: number;
+  total: number;
+  /** Median share (0–1) of the members of the same house that year; null if too few. */
+  median: number | null;
+  /** Senate only: absences by the reason the Senate gives. */
+  absences: { reason: string; count: number }[];
+};
+
+export type AttendanceData = {
+  house: "camara" | "senado";
+  years: AttendanceYear[];
+  collectedAt: string | null;
+};
+
+// Members with fewer than this many sessions or votes in a year stay out of the median (D4).
+const MIN_FOR_MEDIAN = 10;
+
+async function cachedAttendance(
+  id: number,
+  house: "camara" | "senado",
+): Promise<DbResult<AttendanceData>> {
+  "use cache";
+  const result = await tryDb(async (sql) => {
+    const rows =
+      house === "camara"
+        ? await sql<
+            {
+              politician_id: string;
+              year: number;
+              total: number;
+              present: number;
+              collected: string | null;
+            }[]
+          >`
+            with mand as (
+              select m.politician_id, m.started_on, m.ended_on
+              from core.mandates m join core.legislative_houses h on h.id = m.house_id
+              where h.slug = 'camara'
+            ), held as (
+              select distinct m.politician_id, s.id, s.held_on, s.collected_at
+              from core.sessions s join mand m
+                on s.held_on >= m.started_on and (m.ended_on is null or s.held_on <= m.ended_on)
+            )
+            select h.politician_id::text, extract(year from h.held_on)::int as year,
+                   count(*)::int as total,
+                   count(a.id)::int as present,
+                   to_char(max(h.collected_at) at time zone 'America/Sao_Paulo', 'YYYY-MM-DD')
+                     as collected
+            from held h
+            left join core.session_attendance a
+              on a.session_id = h.id and a.politician_id = h.politician_id
+            group by 1, 2`
+        : await sql<
+            {
+              politician_id: string;
+              year: number;
+              total: number;
+              present: number;
+              collected: string | null;
+            }[]
+          >`
+            select b.politician_id::text, extract(year from v.occurred_on)::int as year,
+                   count(*)::int as total,
+                   count(*) filter (where b.option in ('sim', 'nao', 'abstencao', 'obstrucao',
+                     'presidente', 'presente_sem_voto'))::int as present,
+                   to_char(max(b.collected_at) at time zone 'America/Sao_Paulo', 'YYYY-MM-DD')
+                     as collected
+            from core.vote_ballots b
+            join core.votes v on v.id = b.vote_id
+            join core.legislative_houses h on h.id = v.house_id
+            where h.slug = 'senado' and v.nominal and b.politician_id is not null
+            group by 1, 2`;
+    const absences =
+      house === "senado"
+        ? await sql<{ year: number; reason: string; count: number }[]>`
+            select extract(year from v.occurred_on)::int as year,
+                   coalesce(b.option_detail, 'Ausente') as reason, count(*)::int as count
+            from core.vote_ballots b
+            join core.votes v on v.id = b.vote_id
+            where b.politician_id = ${id} and v.nominal and b.option = 'ausente'
+            group by 1, 2
+            order by 1, 3 desc`
+        : [];
+    const medians = new Map<number, number>();
+    const byYear = new Map<number, number[]>();
+    for (const r of rows) {
+      if (r.total < MIN_FOR_MEDIAN) continue;
+      const list = byYear.get(r.year) ?? [];
+      list.push(r.present / r.total);
+      byYear.set(r.year, list);
+    }
+    for (const [year, shares] of byYear) medians.set(year, median(shares));
+    const mine = rows
+      .filter((r) => Number(r.politician_id) === id)
+      .sort((a, b) => b.year - a.year);
+    return {
+      house,
+      years: mine.map((r) => ({
+        year: r.year,
+        present: r.present,
+        total: r.total,
+        median: medians.get(r.year) ?? null,
+        absences: absences
+          .filter((a) => a.year === r.year)
+          .map((a) => ({ reason: a.reason, count: a.count })),
+      })),
+      collectedAt:
+        mine
+          .map((r) => r.collected)
+          .filter(Boolean)
+          .sort()
+          .at(-1) ?? null,
+    };
+  });
+  cache(result.ok);
+  return result;
+}
+
+/** Presence per year since 2023 with the house median (change ingestao-presenca, D2 to D4). */
+export async function getAttendance(
+  id: number,
+  house: "camara" | "senado",
+): Promise<AttendanceData> {
+  return unwrap(await cachedAttendance(id, house));
 }

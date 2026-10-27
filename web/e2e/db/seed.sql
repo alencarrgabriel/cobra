@@ -255,3 +255,18 @@ from core.legislative_houses h, core.politicians p,
     ('2', 'DIVULGAÇÃO DA ATIVIDADE PARLAMENTAR.', 'pessoa_fisica', null, null, 10000.00)
   ) as e (doc, category, kind, name, cnpj, value)
 where h.slug = 'camara' and p.source_id = '8001';
+
+-- Presence (change ingestao-presenca): 12 plenary deliberative sessions in 2026; Deputado Teste A
+-- present in 10, Deputada Teste B in all 12, Paulista Teste in none: the median is 10 of 12.
+insert into core.sessions (house_id, held_on, kind, source, source_id, collected_at)
+select h.id, date '2026-03-02' + n, 'Sessão Deliberativa', 'camara', 'sessao-teste-' || n, now()
+from core.legislative_houses h, generate_series(1, 12) as n
+where h.slug = 'camara';
+
+insert into core.session_attendance (session_id, external_id, politician_id, source, source_id,
+  collected_at)
+select s.id, p.source_id, p.id, 'camara', s.source_id || ':' || p.source_id, now()
+from core.sessions s, core.politicians p
+where s.source_id like 'sessao-teste-%'
+  and (p.source_id = '8002'
+       or (p.source_id = '8001' and s.source_id not in ('sessao-teste-1', 'sessao-teste-2')));

@@ -105,6 +105,12 @@ Limites iniciais (conservadores; cada change de fonte confirma na documentação
 - Valor líquido como a casa informa, inclusive estornos negativos.
 - Volume em 2026-10-27: 790 mil despesas da Câmara e 80 mil do Senado (2023 a 2026).
 
+### Presença (`camara`, tarefa `attendance`)
+
+- Câmara: arquivos anuais `eventos`, `eventosOrgaos` e `eventosPresencaDeputados` (conferidos em 2026-10-27). Só sessões do Plenário com `descricaoTipo = Sessão Deliberativa` e situação "Encerrada"; solenes, canceladas e comissões ficam fora. Ano com sessões exige presença registrada em ao menos 90% delas.
+- Senado: não publica presença por sessão em dados abertos; o perfil mostra o comparecimento às votações nominais, calculado de `core.vote_ballots`.
+- Volume em 2026-10-27: 393 sessões deliberativas da Câmara de 2023 a 2026, 186 mil registros de presença.
+
 ### Câmara Legislativa do DF (`cldf`)
 
 - A CLDF não tem API de deputados. O portal `dados.cl.df.gov.br` (CKAN, conferido em 2026-10-26) só traz os deputados misturados à lista nominal de cerca de 2.400 servidores, sem partido. Essa lista não é coletada (coleta mínima).

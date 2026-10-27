@@ -23,6 +23,7 @@ from cobra_collectors.sources.camara_model import (
     party_id_from_uri,
     validate_deputy,
 )
+from cobra_collectors.sources.camara_presenca import collect_attendance
 from cobra_collectors.sources.camara_votacoes import collect_votes
 from cobra_collectors.sources.camara_votacoes_model import FIRST_YEAR
 from cobra_collectors.sources.despesas import collect_camara
@@ -70,6 +71,7 @@ class CamaraSource:
             JobSpec("close-mandates", "run", {}),
             *(JobSpec("votes", str(year), {"year": year}) for year in self.vote_years),
             *(JobSpec("expenses", str(year), {"year": year}) for year in self.vote_years),
+            *(JobSpec("attendance", str(year), {"year": year}) for year in self.vote_years),
         ]
 
     def handle(self, ctx: Context) -> None:
@@ -84,6 +86,8 @@ class CamaraSource:
             collect_votes(ctx, int(ctx.job.payload["year"]))
         elif kind == "expenses":
             collect_camara(ctx, int(ctx.job.payload["year"]))
+        elif kind == "attendance":
+            collect_attendance(ctx, int(ctx.job.payload["year"]))
         else:
             raise ValueError(f"unknown job kind {kind!r}")
 

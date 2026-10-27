@@ -159,12 +159,32 @@ test("gastos da cota por tipo, sem fornecedor pessoa física", async ({
   ).toHaveAttribute("href", "https://www.camara.leg.br/deputados/8001");
 });
 
+test("presença com a mediana da casa", async ({ page }) => {
+  await page.goto("/representantes/5300108");
+  await page
+    .getByTestId("secao-camara")
+    .getByRole("button", { name: /Deputado Teste A/ })
+    .click();
+  await page.getByRole("link", { name: "Ver perfil completo" }).click();
+  await expect(page.getByTestId("presenca-2026")).toHaveText(
+    "2026: presente em 10 de 12 sessões deliberativas do Plenário (83%). Mediana dos deputados: 83%.",
+  );
+  await expect(page.getByTestId("presenca")).toContainText(
+    "Períodos de licença não são descontados",
+  );
+
+  await openProfile(page);
+  await expect(page.getByTestId("presenca-2026")).toContainText(
+    "compareceu a 0 de 1 votações nominais do Plenário (0%). Ausências: Licença saúde: 1.",
+  );
+});
+
 test("o que ainda não foi coletado aparece com traço, nunca zero", async ({
   page,
 }) => {
   await openProfile(page);
   const block = page.getByTestId("ainda-nao");
-  await expect(block).toContainText("Presença nas sessões");
+  await expect(block).toContainText("Projetos de autoria e relatoria");
   await expect(block).toContainText("Ainda não está no Cobra");
   await expect(block).not.toContainText("R$ 0");
 });
