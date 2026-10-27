@@ -514,6 +514,8 @@ export type BallotRow = {
   propositionSummary: string | null;
   option: string;
   optionDetail: string | null;
+  propositionType: string | null;
+  criteria: string[];
   propositionUrl: string | null;
   sourceUrl: string | null;
   collectedAt: string;
@@ -532,16 +534,20 @@ async function cachedBallots(id: number): Promise<DbResult<BallotRow[]>> {
         proposition_summary: string | null;
         option: string;
         option_detail: string | null;
+        proposition_type: string | null;
+        criteria: string[] | null;
         proposition_url: string | null;
         source_url: string | null;
         collected: string;
       }[]
     >`
       select v.source_id as vote_id, v.occurred_on::text, v.description, v.approved,
-             v.proposition_label, v.proposition_summary, b.option, b.option_detail, v.proposition_url,
+             v.proposition_label, v.proposition_summary, b.option, b.option_detail, v.proposition_type,
+             r.criteria, v.proposition_url,
              v.source_url,
              to_char(b.collected_at at time zone 'America/Sao_Paulo', 'YYYY-MM-DD') as collected
       from core.vote_ballots b join core.votes v on v.id = b.vote_id
+      left join core.vote_relevance r on r.vote_id = v.id
       where b.politician_id = ${id} and v.nominal
       order by v.occurred_on desc, v.registered_at desc nulls last, v.source_id desc
       limit 10`;
@@ -554,6 +560,8 @@ async function cachedBallots(id: number): Promise<DbResult<BallotRow[]>> {
       propositionSummary: r.proposition_summary,
       option: r.option,
       optionDetail: r.option_detail,
+      propositionType: r.proposition_type,
+      criteria: r.criteria ?? [],
       propositionUrl: r.proposition_url,
       sourceUrl: r.source_url,
       collectedAt: r.collected,

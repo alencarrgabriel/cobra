@@ -11,6 +11,10 @@ async function openProfile(page: Page) {
     .click();
   await page.getByRole("link", { name: "Ver perfil completo" }).click();
   await expect(page).toHaveURL(/\/politicos\/\d+-senadora-teste-um$/);
+  // The profile reads many sections; the first one after a cold start can take a while.
+  await expect(page.getByRole("heading", { level: 1 })).toBeVisible({
+    timeout: 15_000,
+  });
 }
 
 test("o painel da grade leva ao perfil, com a frase Quem é", async ({
@@ -115,6 +119,9 @@ test("como votou: deputado e senadora com votos, distrital com traço", async ({
     "https://www.camara.leg.br/propostas-legislativas/555",
   );
   await expect(block.getByTestId("voto")).toHaveText("Voto: Não");
+  await expect(block.getByTestId("relevancia")).toHaveText(
+    "Votação relevante: Governo e Oposição divergiram.",
+  );
   await expect(block).not.toContainText("requerimento simbólico");
 
   await openProfile(page);

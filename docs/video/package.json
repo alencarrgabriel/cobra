@@ -1,0 +1,7 @@
+{
+  "name": "cobra-video-prints",
+  "private": true,
+  "type": "module",
+  "scripts": { "prints": "node capturar-prints.mjs" },
+  "devDependencies": { "playwright": "^1.48.0" }
+}

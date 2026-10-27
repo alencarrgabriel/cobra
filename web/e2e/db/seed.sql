@@ -270,3 +270,9 @@ from core.sessions s, core.politicians p
 where s.source_id like 'sessao-teste-%'
   and (p.source_id = '8002'
        or (p.source_id = '8001' and s.source_id not in ('sessao-teste-1', 'sessao-teste-2')));
+
+-- Relevance (change relevancia-e-eventos): Governo and Oposição diverged on vote 9100-1.
+insert into core.vote_orientations (vote_id, bench, orientation, source, source_id, collected_at)
+select v.id, o.bench, o.orientation, 'camara', '9100-1:' || o.bench, now()
+from core.votes v, (values ('Governo', 'sim'), ('Oposição', 'nao')) as o (bench, orientation)
+where v.source_id = '9100-1';

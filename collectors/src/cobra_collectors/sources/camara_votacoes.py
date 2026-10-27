@@ -7,6 +7,7 @@ from cobra_collectors.sources.camara_votacoes_model import (
     UnknownValueError,
     apply_ballots,
     file_url,
+    main_proposition,
     mismatch_share,
     read_ballots,
     read_orientations,
@@ -54,7 +55,7 @@ def collect_votes(ctx: Context, year: int) -> None:
 
     records = []
     for v in votes.values():
-        prop = propositions.get((v.id, v.main_proposition)) if v.main_proposition else None
+        prop = main_proposition(v.main_proposition, propositions.get(v.id, []))
         records.append(
             VoteRecord(
                 source_id=v.id,

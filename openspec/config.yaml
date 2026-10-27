@@ -109,9 +109,9 @@ context: |
   arquivos anuais; "Como votou" no perfil de deputado); 20 ingestao-senado-votacoes (Plenário
   desde 2023; secretas só com totais; ausências com o motivo oficial); 21a ingestao-despesas
   (cota da Câmara e do Senado; fornecedor pessoa física sem nome nem CPF); 21b ingestao-presenca
-  (sessões da Câmara; comparecimento às votações do Senado; mediana da casa).
-  Próximas:
-  22 relevancia-e-eventos; 23 painel-editorial; 24 feed-e-pagina-votacao; 25 alertas-email;
+  (sessões da Câmara; comparecimento às votações do Senado; mediana da casa); 22
+  relevancia-e-eventos (critérios do §9.2 em visão; eventos para o feed).
+  Próximas: 23 painel-editorial; 24 feed-e-pagina-votacao; 25 alertas-email;
   26 seguir-politicos; 27 metodologia-e-reporte-de-erro (com "É você nesta página?");
   28 saude-integracoes.
   Fase 2: obras e emendas em todo o Brasil; planos dos prefeitos (2024); comparador de políticos;

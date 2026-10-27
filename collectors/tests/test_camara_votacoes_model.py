@@ -6,8 +6,10 @@ import pytest
 
 from cobra_collectors.sources.camara_votacoes_model import (
     MISMATCH_NOTE,
+    Proposition,
     UnknownValueError,
     apply_ballots,
+    main_proposition,
     mismatch_share,
     read_ballots,
     read_orientations,
@@ -57,3 +59,13 @@ def test_unknown_values_fail(tmp_path: Path) -> None:
     assert read_orientations(tmp_path / "o.csv", {"1-1"}) == {
         "1-1": {"Governo": "sim", "Oposição": "nao_informada"}
     }
+
+
+def test_main_proposition_prefers_the_matter_over_a_request() -> None:
+    req = Proposition("95", "REQ 95/2026", "REQ", None)
+    pl = Proposition("6132", "PL 6132/2025", "PL", None)
+    assert main_proposition("95", [pl, req]) == pl
+    assert main_proposition(None, [req, pl]) == pl
+    assert main_proposition("6132", [pl]) == pl
+    assert main_proposition(None, [req]) == req
+    assert main_proposition(None, []) is None

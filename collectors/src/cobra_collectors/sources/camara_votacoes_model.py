@@ -171,17 +171,35 @@ PROPOSITION_COLUMNS = ("idVotacao", "proposicao_id", "proposicao_titulo", "propo
                        "proposicao_siglaTipo")  # fmt: skip
 
 
-def read_propositions(path: Path, wanted: set[str]) -> dict[tuple[str, str], Proposition]:
-    out: dict[tuple[str, str], Proposition] = {}
+def read_propositions(path: Path, wanted: set[str]) -> dict[str, list[Proposition]]:
+    """Vote → propositions listed for it, in file order."""
+    out: dict[str, list[Proposition]] = {}
     for r in _rows(path, PROPOSITION_COLUMNS):
         if r["idVotacao"] in wanted and r["proposicao_id"]:
-            out[(r["idVotacao"], r["proposicao_id"])] = Proposition(
-                id=r["proposicao_id"],
-                label=r["proposicao_titulo"] or None,
-                type=r["proposicao_siglaTipo"] or None,
-                summary=r["proposicao_ementa"] or None,
+            out.setdefault(r["idVotacao"], []).append(
+                Proposition(
+                    id=r["proposicao_id"],
+                    label=r["proposicao_titulo"] or None,
+                    type=r["proposicao_siglaTipo"] or None,
+                    summary=r["proposicao_ementa"] or None,
+                )
             )
     return out
+
+
+# Procedural propositions: a vote on one of them is about the matter listed with it.
+PROCEDURAL = frozenset({"REQ", "RCP", "INC", "RIC"})
+
+
+def main_proposition(main_id: str | None, listed: list[Proposition]) -> Proposition | None:
+    """The vote's main proposition: the one the file names, if listed; else the matter (not a
+    request); else the first listed. Half of the 2026 nominal votes do not name one."""
+    if main_id:
+        named = next((p for p in listed if p.id == main_id), None)
+        if named and named.type not in PROCEDURAL:
+            return named
+    matter = next((p for p in listed if p.type not in PROCEDURAL), None)
+    return matter or (listed[0] if listed else None)
 
 
 def matches_count(vote: Vote, ballots: dict[str, Ballot]) -> bool:

@@ -82,6 +82,9 @@ Chaves: `id bigint generated always as identity`, exceto `core.localities` (chav
 | `core.votes` | Votações do Plenário da Câmara e do Senado: data, descrição, resultado, contagem oficial, proposição principal | `nominal = false` para simbólica; `secret = true` para secreta do Senado (só totais); nenhuma das duas tem voto individual; `quality_notes` quando os votos não conferem |
 | `core.vote_ballots` | Voto de cada parlamentar em votação nominal, com partido e UF na data | Inclui quem não está no cadastro (`politician_id` nulo), para o placar; opção `sim`, `nao`, `abstencao`, `obstrucao`, `art17`, `presidente`, `presente_sem_voto`, `ausente` (motivo do Senado em `option_detail`), `nao_informado` |
 | `core.vote_orientations` | Orientação de cada liderança ou bancada | Como a casa escreve o nome da bancada |
+| `core.vote_curation` | Inclusão manual de votação no feed, com justificativa publicada (painel editorial) | Justificativa de ao menos 20 caracteres, quem e quando |
+| `core.vote_relevance` (visão) | Critérios atendidos por votação nominal: `divergencia`, `placar_disputado`, `tipo_de_materia`, `curadoria` | DDR §9.2; "liberado" não é posição; simbólica e secreta ficam fora |
+| `core.events` (visão) | O que o feed lê: `votacao_relevante` e `votacao_simbolica` (evento da proposição, sem voto individual) | Calculada das tabelas, sem cópia |
 
 ### Despesas da cota (change `ingestao-despesas`)
 

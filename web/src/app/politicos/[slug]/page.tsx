@@ -17,6 +17,7 @@ import { shareMetadata } from "@/lib/cards/metadata";
 import { FLAGS } from "@/lib/geo/flags";
 import { formatPercent, withVariation } from "@/lib/politicians/assets";
 import { percent } from "@/lib/politicians/attendance";
+import { relevanceText } from "@/lib/politicians/relevance";
 import {
   officeLabel,
   partyTimeline,
@@ -720,6 +721,12 @@ function HowVoted({
                   )
                 </span>{" "}
                 <span data-testid="voto">Voto: {optionText(b)}</span>
+                {relevanceText(b.criteria, b.propositionType) ? (
+                  <span className={styles.note} data-testid="relevancia">
+                    {" "}
+                    {relevanceText(b.criteria, b.propositionType)}.
+                  </span>
+                ) : null}
               </li>
             ))}
           </ul>
