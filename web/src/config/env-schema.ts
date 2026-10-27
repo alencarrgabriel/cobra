@@ -17,6 +17,9 @@ export const serverEnvSchema = z.object({
     .string()
     .regex(/^postgres(ql)?:\/\//, "must be a postgres:// URL")
     .optional(),
+  // Public address of the site, used in link previews and on share cards (change
+  // compartilhamento). Optional: defaults to http://localhost:3000.
+  SITE_URL: z.url({ protocol: /^https?$/ }).optional(),
 });
 
 /**

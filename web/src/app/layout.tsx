@@ -2,11 +2,14 @@ import type { Metadata, Viewport } from "next";
 
 import { AppShell } from "@/components/AppShell";
 import { themeScript } from "@/components/ThemeToggle";
+import { siteUrl } from "@/lib/site";
 
 import { newsreader, onest } from "./fonts";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  // Absolute addresses for link previews (change compartilhamento, design D5).
+  metadataBase: siteUrl(),
   title: {
     default: "Cobra — o que fazem os políticos que representam você",
     template: "%s | Cobra",

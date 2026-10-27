@@ -9,7 +9,10 @@ import {
 import { Card } from "@/components/Card/Card";
 import { PlaceSearch } from "@/components/PlaceSearch/PlaceSearch";
 import { RememberPlace } from "@/components/RememberedPlace/RememberedPlace";
+import { SharePanel } from "@/components/SharePanel/SharePanel";
 import { UfFlag } from "@/components/UfFlag/UfFlag";
+import { placeTitle } from "@/lib/cards/content";
+import { shareMetadata } from "@/lib/cards/metadata";
 import { DF_UF } from "@/lib/geo/cep";
 import { FLAGS } from "@/lib/geo/flags";
 import { getPlace, type PlaceDetail } from "@/lib/places/queries";
@@ -25,11 +28,28 @@ import { formatDate } from "@/lib/works/format";
 import styles from "../representantes.module.css";
 import { RepresentativesGrid } from "./RepresentativesGrid";
 
-export const metadata: Metadata = {
-  title: "Seus representantes",
-  description:
-    "Senadores, deputados federais e, no DF, deputados distritais do lugar.",
-};
+const DESCRIPTION =
+  "Senadores, deputados federais e, no DF, deputados distritais do lugar.";
+
+export async function generateMetadata({
+  params,
+}: PageProps<"/representantes/[codigo]">): Promise<Metadata> {
+  const { codigo } = await params;
+  let place: PlaceDetail | null = null;
+  try {
+    place = await getPlace(codigo);
+  } catch (error) {
+    if (!isDataUnavailable(error)) throw error;
+  }
+  if (!place) return { title: "Seus representantes", description: DESCRIPTION };
+  return shareMetadata({
+    title: placeTitle(place),
+    description: `${placeTitle(place)} no Senado, na Câmara${place.ufCode === DF_UF ? " e na Câmara Legislativa" : ""}, com fonte oficial.`,
+    // The IBGE code, never the CEP (RF-60).
+    path: `/representantes/${place.code}`,
+    card: ["representantes", place.code, "link"],
+  });
+}
 
 const HOUSE_NAMES: Record<House, string> = {
   senado: "Senado Federal",
@@ -119,6 +139,11 @@ async function Content({
           por bairro. Por isso todos os eleitores {ufOf(place)} têm os mesmos
           representantes no Congresso.
         </p>
+        <SharePanel
+          path={base}
+          text={`${placeTitle(place)} no Senado, na Câmara${isDf ? " e na Câmara Legislativa" : ""}, no Cobra.`}
+          card={{ kind: "representantes", id: place.code }}
+        />
       </header>
 
       {parties.length > 1 ? (

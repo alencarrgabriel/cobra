@@ -10,8 +10,10 @@ import {
 import { Card } from "@/components/Card/Card";
 import { PartyBadge } from "@/components/PartyBadge/PartyBadge";
 import { Portrait } from "@/components/Portrait/Portrait";
+import { SharePanel } from "@/components/SharePanel/SharePanel";
 import { UfFlag } from "@/components/UfFlag/UfFlag";
 import { WorkStatus } from "@/components/WorkStatus/WorkStatus";
+import { shareMetadata } from "@/lib/cards/metadata";
 import { FLAGS } from "@/lib/geo/flags";
 import {
   getAmendments,
@@ -36,11 +38,44 @@ import {
 
 import styles from "./perfil.module.css";
 
-export const metadata: Metadata = {
-  title: "Perfil",
-  description:
-    "Mandato, partido, emendas e obras de um político, com fonte oficial.",
-};
+const DESCRIPTION =
+  "Mandato, partido, emendas e obras de um político, com fonte oficial.";
+
+export async function generateMetadata({
+  params,
+}: PageProps<"/politicos/[slug]">): Promise<Metadata> {
+  const id = Number(/^\d+/.exec((await params).slug)?.[0] ?? NaN);
+  let p: Politician | null = null;
+  try {
+    p = Number.isFinite(id) ? await getPolitician(id) : null;
+  } catch (error) {
+    if (!isDataUnavailable(error)) throw error;
+  }
+  if (!p) return { title: "Perfil", description: DESCRIPTION };
+  return shareMetadata({
+    title: p.name,
+    description: sentence(p),
+    path: profilePath(p.id, p.name),
+    card: ["politico", p.id, "link"],
+    type: "profile",
+  });
+}
+
+/** The "Quem é" sentence of the current (or latest) mandate. */
+function sentence(p: Politician): string {
+  const current = p.mandates.find((m) => m.endedOn === null) ?? p.mandates[0];
+  return current
+    ? whoIs({
+        name: p.name,
+        house: current.house,
+        uf: current.uf,
+        status: current.status,
+        startedOn: current.startedOn,
+        endedOn: current.endedOn,
+        party: p.party,
+      })
+    : `${p.name} está no cadastro do Cobra.`;
+}
 
 const HOUSE: Record<HouseSlug, string> = {
   senado: "Senado Federal",
@@ -113,17 +148,7 @@ async function Profile({ params }: { params: Promise<{ slug: string }> }) {
   }
   if (!data) return <DataUnavailable />;
   const { politician: p, current, amendments, works, related } = data;
-  const who = current
-    ? whoIs({
-        name: p.name,
-        house: current.house,
-        uf: current.uf,
-        status: current.status,
-        startedOn: current.startedOn,
-        endedOn: current.endedOn,
-        party: p.party,
-      })
-    : `${p.name} está no cadastro do Cobra.`;
+  const who = sentence(p);
   const total = amendments.reduce(
     (s, a) => ({ committed: s.committed + a.committed, paid: s.paid + a.paid }),
     { committed: 0, paid: 0 },
@@ -175,6 +200,11 @@ async function Profile({ params }: { params: Promise<{ slug: string }> }) {
             {who}
           </p>
           <p className={styles.note}>Nome civil: {p.civilName}.</p>
+          <SharePanel
+            path={profilePath(p.id, p.name)}
+            text={`${p.name} no Cobra: mandato, partido, emendas e obras, com fonte oficial.`}
+            card={{ kind: "politico", id: p.id }}
+          />
         </div>
       </header>
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { type ReactNode, useEffect, useRef } from "react";
+import { type ReactNode, useEffect, useId, useRef } from "react";
 
 import styles from "./SidePanel.module.css";
 
@@ -23,6 +23,8 @@ export function SidePanel({ open, title, onClose, back, children }: Props) {
   const ref = useRef<HTMLDialogElement>(null);
   const opener = useRef<HTMLElement | null>(null);
   const closeBtn = useRef<HTMLButtonElement>(null);
+  // Unique per panel: a page can have more than one (e.g. the grid and "Compartilhar").
+  const titleId = useId();
 
   useEffect(() => {
     const dialog = ref.current;
@@ -53,7 +55,7 @@ export function SidePanel({ open, title, onClose, back, children }: Props) {
     <dialog
       ref={ref}
       className={styles.panel}
-      aria-labelledby="side-panel-title"
+      aria-labelledby={titleId}
       onCancel={(e) => {
         e.preventDefault();
         onClose();
@@ -70,7 +72,7 @@ export function SidePanel({ open, title, onClose, back, children }: Props) {
       <div className={styles.head}>
         <div className={styles.titles}>
           {back}
-          <h2 id="side-panel-title" className={styles.title}>
+          <h2 id={titleId} className={styles.title}>
             {title}
           </h2>
         </div>

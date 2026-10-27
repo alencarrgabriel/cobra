@@ -4,7 +4,9 @@ import { notFound } from "next/navigation";
 import { connection } from "next/server";
 
 import { Card } from "@/components/Card/Card";
+import { SharePanel } from "@/components/SharePanel/SharePanel";
 import { WorkStatus } from "@/components/WorkStatus/WorkStatus";
+import { shareMetadata } from "@/lib/cards/metadata";
 import {
   formatBRL,
   formatDate,
@@ -37,10 +39,12 @@ export async function generateMetadata({
 }: PageProps<"/obras/[codigo]">): Promise<Metadata> {
   const work = await load((await params).codigo);
   if (!work || work === "unavailable") return { title: "Obra" };
-  return {
+  return shareMetadata({
     title: work.name,
     description: `${STATUS_INFO[work.status].label}. Obra com dinheiro federal no Distrito Federal, segundo o Obrasgov.br.`,
-  };
+    path: `/obras/${encodeURIComponent(work.code)}`,
+    card: ["obra", work.code, "link"],
+  });
 }
 
 export default async function WorkPage({
@@ -76,6 +80,11 @@ export default async function WorkPage({
           <p className={styles.note}>{STATUS_INFO.registered.hint}.</p>
         ) : null}
         {work.address ? <p className={styles.lead}>{work.address}</p> : null}
+        <SharePanel
+          path={`/obras/${encodeURIComponent(work.code)}`}
+          text={`${work.name}: ${STATUS_INFO[work.status].label.toLowerCase()}, segundo o Obrasgov.br. Veja no Cobra.`}
+          card={{ kind: "obra", id: work.code }}
+        />
       </header>
 
       <Card aria-labelledby="numeros">
