@@ -24,12 +24,19 @@ Cada senador em exercício SHALL ter um mandato de senador no Senado Federal, pe
 - **WHEN** um suplente está em exercício desde uma data
 - **THEN** o mandato dele começa nessa data e tem situação suplente
 
-### Requirement: Afastamento e saída de exercício
-Um titular afastado SHALL manter o mandato aberto com situação licenciado e SHALL voltar a titular ao reassumir. Um suplente que deixa o exercício SHALL ter o mandato encerrado na data de fim do exercício informada pelo Senado. Registros SHALL nunca ser apagados. A coleta SHALL só mexer em mandatos depois de obter as duas listas (em exercício e afastados); se alguma falhar, nenhum mandato muda.
+### Requirement: Afastamento de titular
+Um titular afastado temporariamente (licença, cargo de ministro ou secretário) SHALL manter o mandato aberto com situação licenciado e SHALL voltar a titular ao reassumir. Um titular afastado de vez (renúncia, falecimento, cassação, perda do mandato) SHALL ter o mandato encerrado na data informada pelo Senado. Registros SHALL nunca ser apagados.
 
 #### Scenario: Titular afastado
 - **WHEN** um titular que estava em exercício aparece na lista de afastados
 - **THEN** o mandato dele continua aberto, com situação licenciado
+
+#### Scenario: Titular que renuncia
+- **WHEN** um titular que estava em exercício aparece entre os afastados por renúncia numa data
+- **THEN** o mandato dele passa a ter essa data de fim
+
+### Requirement: Saída de suplente e listas completas
+Um suplente que deixa o exercício SHALL ter o mandato encerrado na data de fim do exercício informada pelo Senado. A coleta SHALL só mexer em mandatos depois de obter as duas listas (em exercício e afastados); se alguma falhar, nenhum mandato muda.
 
 #### Scenario: Suplente que volta para a suplência
 - **WHEN** um suplente que estava em exercício aparece entre os afastados com o exercício encerrado numa data

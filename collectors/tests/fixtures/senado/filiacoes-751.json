@@ -1,0 +1,63 @@
+{
+ "FiliacaoParlamentar": {
+  "noNamespaceSchemaLocation": "https://legis.senado.leg.br/dadosabertos/dados/FiliacaoParlamentarv5.xsd",
+  "Metadados": {
+   "Versao": "26/10/2026 21:53:32",
+   "VersaoServico": "5",
+   "DataVersaoServico": "2021-09-09",
+   "DescricaoDataSet": "Retorna a relação de Filiações Partidárias do Senador informado no parâmetro."
+  },
+  "Parlamentar": {
+   "Codigo": "751",
+   "Nome": "Arolde de Oliveira",
+   "Filiacoes": {
+    "Filiacao": [
+     {
+      "Partido": {
+       "CodigoPartido": "557",
+       "SiglaPartido": "PSD",
+       "NomePartido": "Partido Social Democrático"
+      },
+      "DataFiliacao": "2018-03-26"
+     },
+     {
+      "Partido": {
+       "CodigoPartido": "88",
+       "SiglaPartido": "PSC",
+       "NomePartido": "Partido Social Cristão"
+      },
+      "DataFiliacao": "2016-03-22",
+      "DataDesfiliacao": "2018-03-25"
+     },
+     {
+      "Partido": {
+       "CodigoPartido": "557",
+       "SiglaPartido": "PSD",
+       "NomePartido": "Partido Social Democrático"
+      },
+      "DataFiliacao": "2011-10-26",
+      "DataDesfiliacao": "2016-03-21"
+     },
+     {
+      "Partido": {
+       "CodigoPartido": "554",
+       "SiglaPartido": "DEM",
+       "NomePartido": "Democratas"
+      },
+      "DataFiliacao": "2007-04-24",
+      "DataDesfiliacao": "2011-10-25"
+     },
+     {
+      "Partido": {
+       "CodigoPartido": "22",
+       "SiglaPartido": "PFL",
+       "NomePartido": "Partido da Frente Liberal"
+      },
+      "DataFiliacao": "1999-02-01",
+      "DataDesfiliacao": "2007-04-23"
+     }
+    ]
+   }
+  }
+ }
+}

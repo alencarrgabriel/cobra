@@ -4,7 +4,7 @@
 
 Mesma base do adaptador da Câmara (`ingestao-camara-deputados`): fila, cliente HTTP com limite, armazenamento bruto e as tabelas do cadastro (`politicians`, `politician_external_ids`, `parties`, `party_affiliations`, `mandates`).
 
-API conferida em 2026-10-26 (`https://legis.senado.leg.br/dadosabertos`, OpenAPI 4.1.3.106 em `/v3/api-docs`, respostas em JSON com `Accept: application/json`):
+API conferida em 2026-10-26 (`https://legis.senado.leg.br/dadosabertos`, OpenAPI 4.1.3.106 em `/v3/api-docs`, respostas em JSON pedindo o sufixo `.json` em cada endereço; sem ele, a API responde em XML):
 - `GET /senador/lista/atual`: os 81 em exercício. Cada item traz identificação (código, nome, nome completo, foto, sigla do partido, UF) e o mandato:
   - código do mandato;
   - primeira e segunda legislatura com datas;
@@ -52,7 +52,10 @@ API conferida em 2026-10-26 (`https://legis.senado.leg.br/dadosabertos`, OpenAPI
 
 ### D4. Quem não está em exercício
 Para cada mandato aberto de senador da fonte `senado` cujo código não está na lista atual:
-- se o código aparece entre os afastados como titular: o mandato continua aberto, com situação `licenciado`;
+- se o código aparece entre os afastados como titular, decide a causa do último período de exercício (`SiglaCausaAfastamento`). A lista de afastados também traz titulares que não voltam mais: em 2026-10-26, 6 por renúncia e 2 por falecimento.
+  - causas definitivas (`REN` renúncia, `FAL` falecimento, `CAS` cassação, `PER` perda de mandato): o mandato é encerrado na `DataFim` desse período;
+  - causas de afastamento temporário (`LCS` licença com convocação de suplente, `AFO` cargo de ministro ou secretário, e as demais licenças): o mandato continua aberto, com situação `licenciado`;
+  - causa desconhecida: continua `licenciado` e a tarefa registra a causa no log. Manter aberto é reversível; encerrar por engano não é;
 - se aparece como suplente: o mandato é encerrado na `DataFim` do período de exercício correspondente (o de mesmo início), ou, sem ela, na `DataFim` mais recente;
 - se não aparece em nenhuma das duas listas: o mandato é encerrado na data da coleta, e a tarefa registra que a data é aproximada.
 

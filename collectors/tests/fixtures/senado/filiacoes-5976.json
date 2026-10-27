@@ -1,0 +1,45 @@
+{
+ "FiliacaoParlamentar": {
+  "noNamespaceSchemaLocation": "https://legis.senado.leg.br/dadosabertos/dados/FiliacaoParlamentarv5.xsd",
+  "Metadados": {
+   "Versao": "26/10/2026 20:54:32",
+   "VersaoServico": "5",
+   "DataVersaoServico": "2021-09-09",
+   "DescricaoDataSet": "Retorna a relação de Filiações Partidárias do Senador informado no parâmetro."
+  },
+  "Parlamentar": {
+   "Codigo": "5976",
+   "Nome": "Eduardo Girão",
+   "Filiacoes": {
+    "Filiacao": [
+     {
+      "Partido": {
+       "CodigoPartido": "566",
+       "SiglaPartido": "NOVO",
+       "NomePartido": "Partido Novo"
+      },
+      "DataFiliacao": "2023-02-07"
+     },
+     {
+      "Partido": {
+       "CodigoPartido": "577",
+       "SiglaPartido": "PODE",
+       "NomePartido": "Podemos"
+      },
+      "DataFiliacao": "2019-02-02",
+      "DataDesfiliacao": "2023-02-06"
+     },
+     {
+      "Partido": {
+       "CodigoPartido": "562",
+       "SiglaPartido": "PROS",
+       "NomePartido": "Partido Republicano da Ordem Social"
+      },
+      "DataFiliacao": "2019-01-01",
+      "DataDesfiliacao": "2019-02-01"
+     }
+    ]
+   }
+  }
+ }
+}

@@ -1,0 +1,27 @@
+{
+ "FiliacaoParlamentar": {
+  "noNamespaceSchemaLocation": "https://legis.senado.leg.br/dadosabertos/dados/FiliacaoParlamentarv5.xsd",
+  "Metadados": {
+   "Versao": "26/10/2026 21:53:31",
+   "VersaoServico": "5",
+   "DataVersaoServico": "2021-09-09",
+   "DescricaoDataSet": "Retorna a relação de Filiações Partidárias do Senador informado no parâmetro."
+  },
+  "Parlamentar": {
+   "Codigo": "5977",
+   "Nome": "Leany Lemos",
+   "Filiacoes": {
+    "Filiacao": [
+     {
+      "Partido": {
+       "CodigoPartido": "63",
+       "SiglaPartido": "PSB",
+       "NomePartido": "Partido Socialista Brasileiro"
+      },
+      "DataFiliacao": "2026-09-25"
+     }
+    ]
+   }
+  }
+ }
+}

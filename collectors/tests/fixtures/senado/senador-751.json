@@ -1,0 +1,98 @@
+{
+ "DetalheParlamentar": {
+  "noNamespaceSchemaLocation": "https://legis.senado.leg.br/dadosabertos/dados/DetalheParlamentarv6.xsd",
+  "Metadados": {
+   "Versao": "26/10/2026 21:53:32",
+   "VersaoServico": "6",
+   "DataVersaoServico": "2021-09-09",
+   "DescricaoDataSet": "Retorna os detalhes de um Senador informado no parâmetro."
+  },
+  "Parlamentar": {
+   "IdentificacaoParlamentar": {
+    "CodigoParlamentar": "751",
+    "NomeParlamentar": "Arolde de Oliveira",
+    "NomeCompletoParlamentar": "Arolde de Oliveira",
+    "SexoParlamentar": "Masculino",
+    "UrlFotoParlamentar": "http://www.senado.leg.br/senadores/img/fotos-oficiais/senador751.jpg",
+    "UrlPaginaParlamentar": "http://www25.senado.leg.br/web/senadores/senador/-/perfil/751",
+    "EmailParlamentar": "sen.aroldedeoliveira@senado.leg.br",
+    "SiglaPartidoParlamentar": "PSD"
+   },
+   "DadosBasicosParlamentar": {
+    "DataNascimento": "1937-03-11",
+    "DataFalecimento": "2020-10-21",
+    "Naturalidade": "São Luiz Gonzaga",
+    "UfNaturalidade": "RS",
+    "EnderecoParlamentar": "Senado Federal Anexo 2   Ala Teotônio Vilela Gabinete 19"
+   },
+   "OutrasInformacoes": {
+    "Servico": [
+     {
+      "NomeServico": "ApartesParlamentar",
+      "DescricaoServico": "Apartes do parlamentar",
+      "UrlServico": "https://legis.senado.leg.br/dadosabertos/senador/751/apartes?v=5"
+     },
+     {
+      "NomeServico": "CargoParlamentar",
+      "DescricaoServico": "Cargos do parlamentar ao longo do(s) mandato(s).",
+      "UrlServico": "https://legis.senado.leg.br/dadosabertos/senador/751/cargos?v=5"
+     },
+     {
+      "NomeServico": "DiscursosParlamentar",
+      "DescricaoServico": "Discursos do parlamentar. Se não informar o período, serão retornados os discursos dos últimos 30 dias.",
+      "UrlServico": "https://legis.senado.leg.br/dadosabertos/senador/751/discursos?v=5"
+     },
+     {
+      "NomeServico": "FiliacaoParlamentar",
+      "UrlServico": "https://legis.senado.leg.br/dadosabertos/senador/751/filiacoes?v=5"
+     },
+     {
+      "NomeServico": "HistoricoAcademicoParlamentar",
+      "DescricaoServico": "Retorna o histporico acadêmico do parlamentar.",
+      "UrlServico": "https://legis.senado.leg.br/dadosabertos/senador/historicoAcademico/751/historicoAcademico?v=1"
+     },
+     {
+      "NomeServico": "LicencaParlamentar",
+      "DescricaoServico": "Licenças do parlamentar.",
+      "UrlServico": "https://legis.senado.leg.br/dadosabertos/senador/751/licencas?v=6"
+     },
+     {
+      "NomeServico": "LiderancaParlamentar",
+      "DescricaoServico": "Cargos de liderança do parlamentar ao longo do(s) mandato(s)",
+      "UrlServico": "https://legis.senado.leg.br/dadosabertos/senador/751/liderancas?v=5"
+     },
+     {
+      "NomeServico": "MandatoParlamentar",
+      "DescricaoServico": "Mandatos do parlamentar (atual e anteriores, se houver)",
+      "UrlServico": "https://legis.senado.leg.br/dadosabertos/senador/751/mandatos?v=5"
+     },
+     {
+      "NomeServico": "MateriasAutoriaParlamentar",
+      "DescricaoServico": "Matérias de autoria ou coautoria do parlamentar",
+      "UrlServico": "https://legis.senado.leg.br/dadosabertos/senador/751/autorias?v=7"
+     },
+     {
+      "NomeServico": "MateriasRelatoriaParlamentar",
+      "DescricaoServico": "Matérias de relatoria do parlamentar",
+      "UrlServico": "https://legis.senado.leg.br/dadosabertos/senador/751/relatorias?v=6"
+     },
+     {
+      "NomeServico": "MembroComissaoParlamentar",
+      "DescricaoServico": "Comissões em que o parlamentar é (ou foi) membro",
+      "UrlServico": "https://legis.senado.leg.br/dadosabertos/senador/751/comissoes?v=5"
+     },
+     {
+      "NomeServico": "ProfissaoParlamentar",
+      "DescricaoServico": "Retorna a(s) profissão(ões) do parlamentar.",
+      "UrlServico": "https://legis.senado.leg.br/dadosabertos/senador/profissao/751/profissoes?v=1"
+     },
+     {
+      "NomeServico": "VotacaoParlamentar",
+      "DescricaoServico": "Votos do parlamentar ao longo do(s) mandato(s)",
+      "UrlServico": "https://legis.senado.leg.br/dadosabertos/senador/751/votacoes?v=7"
+     }
+    ]
+   }
+  }
+ }
+}

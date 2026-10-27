@@ -31,7 +31,7 @@ Limites iniciais (conservadores; cada change de fonte confirma na documentação
 
 | Fonte | Limite oficial | Limite usado |
 |---|---|---|
-| Senado | 10 req/s | 8 req/s |
+| Senado | 10 req/s (acima disso, HTTP 429; evitar horários redondos) | 8 req/s |
 | Portal da Transparência | 400/min (06h–24h), 700/min (00h–06h) | 5 req/s |
 | Câmara | não documentado (respostas trazem `Retry-After: 30`) | 2 req/s |
 | TSE (arquivos) | — | 1 req/s |
@@ -58,6 +58,22 @@ Limites iniciais (conservadores; cada change de fonte confirma na documentação
 - Licença não encerra mandato: o titular licenciado fica com situação `licenciado` e volta a `titular` quando reassume. Suplente que sai do exercício, ou fim de mandato, encerra o mandato na data da Câmara. Se a lista falhar, nenhum mandato é encerrado.
 - Qualidade da fonte, tratada na normalização: o histórico vem desordenado e mistura legislaturas, e as linhas "Nome/Partido no início da legislatura" são ignoradas; o detalhe traz `uriPartido` nulo, então o partido vem da lista.
 - Volume: cerca de 1.030 requisições por atualização completa, ~9 minutos a 2 req/s.
+
+### Senado Federal (`senado`)
+
+- API: `https://legis.senado.leg.br/dadosabertos` (OpenAPI 4.1.3.106 em `/v3/api-docs`, verificado em 2026-10-26), sem chave; JSON pedido pelo sufixo `.json` em cada endereço (sem ele, a resposta vem em XML). A documentação pede para evitar rotinas em horários redondos (00:00, 01:15…).
+- Escopo: senadores em exercício (81 em 2026-10-26). Tarefas:
+  - `senators`: busca a lista em exercício e a de afastados, enfileira um `senator` por senador e trata quem não está em exercício;
+  - `senator`: detalhe (data de nascimento) e filiações de cada senador.
+- O que fica guardado: político e identificador do Senado, partidos e o histórico de filiações com as datas do Senado, mandato de senador pela primeira legislatura do mandato. A API não informa CPF.
+- Afastados: a causa decide.
+  - Titular afastado por licença ou cargo de ministro ou secretário fica `licenciado`.
+  - Renúncia, falecimento, cassação ou perda do mandato encerram o mandato.
+  - Suplente que volta para a suplência tem o mandato encerrado na data do fim do exercício.
+  - Se uma das listas falhar, nenhum mandato muda.
+- Mesmo político na Câmara e no Senado: ligado pelo nome civil sem acentos e pela data de nascimento, só quando há exatamente um candidato.
+- Qualidade da fonte, tratada na normalização: itens únicos vêm como objeto, não como lista; `/senador/afastados` redireciona para `/dados/AfastamentoAtual.json`.
+- Volume: cerca de 164 requisições por atualização completa, menos de 1 minuto a 8 req/s.
 
 ## Comandos
 
