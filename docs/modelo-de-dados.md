@@ -67,12 +67,13 @@ Chaves: `id bigint generated always as identity`, exceto `core.localities` (chav
 | `core.plan_themes` | Temas fixos com palavras e áreas de obra correspondentes | Curadoria do Cobra, sem IA; mudar é migração nova |
 | `core.plan_page_themes` | Temas de cada página, com a contagem de palavras | Tema atribuído com 2 ocorrências ou mais |
 
-### Trajetória eleitoral e patrimônio (changes `ingestao-tse-candidaturas` e `ingestao-tse-patrimonio`)
+### Trajetória, patrimônio e receitas (changes `ingestao-tse-candidaturas`, `ingestao-tse-patrimonio` e `ingestao-tse-doadores`)
 
 | Tabela | O que guarda | Regras |
 |---|---|---|
 | `core.candidacies` | Candidaturas em eleições ordinárias desde 1994 de políticos do cadastro, uma linha por turno, com votos somados | Ligadas pelo CPF ou por nome civil e nascimento (`match_rule`); sem CPF, e-mail, título, gênero, cor ou raça; `source_id` = `<SQ_CANDIDATO>-<turno>` |
 | `core.declared_assets` | Bens declarados ao TSE pelas candidaturas do cadastro (desde 2006): tipo, categoria e valor | Sem a descrição do bem (traz endereço); categoria por código do tipo (imóveis, veículos, dinheiro, outros); `source_id` = `<ano>-<SQ_CANDIDATO>-<ordem>` |
+| `core.campaign_receipts` | Receitas de campanha das candidaturas do cadastro (desde 2018), somadas por origem e fonte | Pessoas físicas só como quantidade e total; nome só de partido doador; nenhum CPF, CNPJ ou endereço |
 
 ## Papéis e usuários
 

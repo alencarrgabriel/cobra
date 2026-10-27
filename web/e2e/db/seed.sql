@@ -190,3 +190,15 @@ from core.politicians p,
     (2014, '990000000014', 1, 45, 'Aplicação de renda fixa', 'dinheiro', 1000000.00)
   ) as a (year, sq, ord, code, label, category, value)
 where p.source_id = '9001';
+
+-- Campaign receipts (change ingestao-tse-doadores): Senadora Teste Um, 2022.
+insert into core.campaign_receipts (politician_id, election_year, tse_candidate_id, origin,
+  fund, donor_name, receipts, donors, total, source, source_id, collected_at)
+select p.id, 2022, '990000000022', r.origin, r.fund, r.donor, r.n, r.donors, r.total, 'tse',
+       '2022-990000000022-' || r.k, now()
+from core.politicians p,
+  (values
+    (1, 'partidos', 'fefc', 'PARTIDO TESTE - DF', 1, null::int, 1000000.00),
+    (2, 'pessoas_fisicas', 'outros', null, 25, 20, 50000.00)
+  ) as r (k, origin, fund, donor, n, donors, total)
+where p.source_id = '9001';

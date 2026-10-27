@@ -79,3 +79,25 @@ def asset(  # noqa: PLR0913 - one keyword per CSV field a test may change
               f"ELEIÇÕES {year}", "02/10/2022", "DF", "DF", "DISTRITO FEDERAL", sq, str(order),
               code, label, description, value, "01/09/2022", "10:00:00"]  # fmt: skip
     return ";".join(f'"{f}"' for f in fields)
+
+
+RECEIPT_HEADER = ("DT_GERACAO;HH_GERACAO;AA_ELEICAO;CD_TIPO_ELEICAO;NM_TIPO_ELEICAO;SG_UF;"
+    "SQ_CANDIDATO;NM_CANDIDATO;CD_FONTE_RECEITA;DS_FONTE_RECEITA;CD_ORIGEM_RECEITA;"
+    "DS_ORIGEM_RECEITA;NR_CPF_CNPJ_DOADOR;NM_DOADOR;NM_DOADOR_RFB;NM_MUNICIPIO_DOADOR;"
+    "VR_RECEITA;DS_GENERO;DS_COR_RACA")  # fmt: skip
+
+
+def receipt(
+    *,
+    sq: str,
+    origin: str,
+    value: str,
+    fund: str = "1",
+    donor: str = "MARIA DE TAL",
+    document: str = "12345678901",
+    year: int = 2022,
+) -> str:
+    fields = ["27/10/2026", "10:00:00", str(year), "2", "ELEIÇÃO ORDINÁRIA", "DF", sq,
+              "CANDIDATA", fund, "FONTE", origin, "ORIGEM", document, donor, donor,
+              "CEILÂNDIA", value, "FEMININO", "PARDA"]  # fmt: skip
+    return ";".join(f'"{f}"' for f in fields)

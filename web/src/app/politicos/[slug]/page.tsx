@@ -23,10 +23,12 @@ import {
 } from "@/lib/politicians/elections";
 import {
   type AssetsData,
+  type ReceiptsData,
   type CandidacyRow,
   getAmendments,
   getAssets,
   getCandidacies,
+  getReceipts,
   getLinkedWorks,
   getPolitician,
   getRelated,
@@ -115,7 +117,6 @@ const NOT_YET: [string, string][] = [
   ["Projetos de autoria e relatoria", "vem com a coleta de proposições"],
   ["Presença nas sessões", "vem com a coleta de presença"],
   ["Gastos da cota parlamentar", "vem com a coleta de despesas"],
-  ["Doadores de campanha", "vem com a coleta das contas de campanha do TSE"],
 ];
 
 export default function ProfilePage({
@@ -136,13 +137,19 @@ async function load(id: number) {
   const current =
     politician.mandates.find((m) => m.endedOn === null) ??
     politician.mandates[0];
-  const [amendments, works, related, candidacies, assets] = await Promise.all([
-    getAmendments(id),
-    getLinkedWorks(id),
-    getRelated(id, current?.ufCode ?? null, politician.party?.acronym ?? null),
-    getCandidacies(id),
-    getAssets(id),
-  ]);
+  const [amendments, works, related, candidacies, assets, receipts] =
+    await Promise.all([
+      getAmendments(id),
+      getLinkedWorks(id),
+      getRelated(
+        id,
+        current?.ufCode ?? null,
+        politician.party?.acronym ?? null,
+      ),
+      getCandidacies(id),
+      getAssets(id),
+      getReceipts(id),
+    ]);
   return {
     politician,
     current,
@@ -151,6 +158,7 @@ async function load(id: number) {
     related,
     candidacies,
     assets,
+    receipts,
   };
 }
 
@@ -174,6 +182,7 @@ async function Profile({ params }: { params: Promise<{ slug: string }> }) {
     related,
     candidacies,
     assets,
+    receipts,
   } = data;
   const who = sentence(p);
   const total = amendments.reduce(
@@ -293,6 +302,8 @@ async function Profile({ params }: { params: Promise<{ slug: string }> }) {
       <Trajectory candidacies={candidacies} />
 
       <Assets data={assets} />
+
+      <Receipts data={receipts} />
 
       <Card aria-labelledby="emendas" data-testid="emendas">
         <h2 id="emendas" className={styles.h2}>
@@ -588,6 +599,93 @@ function Assets({ data }: { data: AssetsData }) {
         Fonte: Tribunal Superior Eleitoral (TSE), bens de candidatos
         {data.collectedAt
           ? `, coletados pelo Cobra em ${formatDate(data.collectedAt)}`
+          : ""}
+        .
+      </p>
+    </Card>
+  );
+}
+
+const ORIGIN: Record<string, string> = {
+  partidos: "Partidos",
+  pessoas_fisicas: "Pessoas físicas",
+  proprios: "Recursos próprios",
+  financiamento_coletivo: "Financiamento coletivo",
+  outros_candidatos: "Outros candidatos",
+  outras: "Outras origens",
+};
+
+function share(part: number, total: number): string {
+  return total > 0 ? ` (${Math.round((part / total) * 100)}%)` : "";
+}
+
+function Receipts({ data }: { data: ReceiptsData }) {
+  return (
+    <Card aria-labelledby="receitas" data-testid="receitas">
+      <h2 id="receitas" className={styles.h2}>
+        Receitas de campanha
+      </h2>
+      <p className={styles.note}>
+        Valores informados pelo candidato ao TSE nas eleições desde 2018,
+        incluindo doações estimáveis em dinheiro (bens e serviços). Doadores
+        pessoas físicas aparecem só somados.
+      </p>
+      {data.years.length ? (
+        data.years.map((y) => (
+          <section key={y.year} aria-labelledby={`receitas-${y.year}`}>
+            <h3 id={`receitas-${y.year}`} className={styles.h3}>
+              {y.year}: {formatBRLCompact(y.total)}
+            </h3>
+            <ul className={styles.list}>
+              {Object.keys(ORIGIN)
+                .map((key) => y.byOrigin.find((o) => o.origin === key))
+                .filter((o) => o !== undefined)
+                .map((o) => (
+                  <li key={o.origin}>
+                    {ORIGIN[o.origin]}: {formatBRLCompact(o.total)}
+                    {share(o.total, y.total)}
+                  </li>
+                ))}
+            </ul>
+            <p>
+              Do Fundo Especial de Financiamento de Campanha:{" "}
+              {formatBRLCompact(y.fefc)}. Do Fundo Partidário:{" "}
+              {formatBRLCompact(y.partyFund)}.
+            </p>
+            {y.privateDonors ? (
+              <p data-testid={`pessoas-fisicas-${y.year}`}>
+                {y.privateDonors === 1
+                  ? "1 pessoa física doou"
+                  : `${formatInteger(y.privateDonors)} pessoas físicas doaram`}{" "}
+                {formatBRLCompact(y.privateTotal)}.
+              </p>
+            ) : null}
+            {y.parties.length ? (
+              <>
+                <p className={styles.note}>
+                  Partidos doadores, em ordem alfabética:
+                </p>
+                <ul className={styles.list}>
+                  {y.parties.map((p) => (
+                    <li key={p.name}>
+                      {p.name}: {formatBRLCompact(p.total)}
+                    </li>
+                  ))}
+                </ul>
+              </>
+            ) : null}
+          </section>
+        ))
+      ) : (
+        <p>
+          O Cobra não tem receitas de campanha deste político: elas são
+          coletadas a partir da eleição de 2018.
+        </p>
+      )}
+      <p className={styles.source}>
+        Fonte: Tribunal Superior Eleitoral (TSE), prestação de contas eleitorais
+        {data.collectedAt
+          ? `, coletada pelo Cobra em ${formatDate(data.collectedAt)}`
           : ""}
         .
       </p>

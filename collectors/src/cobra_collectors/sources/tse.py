@@ -24,6 +24,13 @@ from cobra_collectors.sources.tse_candidaturas_model import (
     votes_url,
 )
 from cobra_collectors.sources.tse_planos import SOURCE, TsePlanosSource
+from cobra_collectors.sources.tse_receitas_model import (
+    RECEIPT_YEARS,
+    Summary,
+    receipts_url,
+    rows_of,
+    summarize,
+)
 
 # Recent general elections must link at least this many candidacies (about 600 congress
 # members were elected in them), or the file or the matching is wrong.
@@ -31,6 +38,8 @@ RECENT_GENERAL = (2018, 2022)
 MIN_RECENT = 400
 # Recent general elections must have the assets of at least this many candidacies.
 MIN_RECENT_ASSETS = 300
+# ... and the campaign receipts of at least this many.
+MIN_RECENT_RECEIPTS = 300
 
 
 class TseSource:
@@ -39,17 +48,22 @@ class TseSource:
     burst = 1
 
     def __init__(
-        self, min_recent: int = MIN_RECENT, min_recent_assets: int = MIN_RECENT_ASSETS
+        self,
+        min_recent: int = MIN_RECENT,
+        min_recent_assets: int = MIN_RECENT_ASSETS,
+        min_recent_receipts: int = MIN_RECENT_RECEIPTS,
     ) -> None:
         self._plans = TsePlanosSource()
         self._min_recent = min_recent
         self._min_recent_assets = min_recent_assets
+        self._min_recent_receipts = min_recent_receipts
 
     def plan(self) -> Iterable[JobSpec]:
         return [
             *self._plans.plan(),
             *(JobSpec("candidacies", str(y), {"year": y}) for y in ELECTION_YEARS),
             *(JobSpec("assets", str(y), {"year": y}) for y in ASSET_YEARS),
+            *(JobSpec("receipts", str(y), {"year": y}) for y in RECEIPT_YEARS),
         ]
 
     def handle(self, ctx: Context) -> None:
@@ -62,6 +76,8 @@ class TseSource:
             self._votes(ctx, int(ctx.job.payload["year"]))
         elif kind == "assets":
             self._assets(ctx, int(ctx.job.payload["year"]))
+        elif kind == "receipts":
+            self._receipts(ctx, int(ctx.job.payload["year"]))
         else:
             raise ValueError(f"unknown job kind {kind!r}")
 
@@ -162,6 +178,57 @@ class TseSource:
                 len(with_assets) >= self._min_recent_assets,
                 f"bens de só {len(with_assets)} candidaturas do cadastro em {year}",
             )
+
+    def _receipts(self, ctx: Context, year: int) -> None:
+        """Receipts summed by origin and fund; private persons only counted (doadores, D2)."""
+        owners = {
+            str(r[0]): int(r[1])
+            for r in ctx.db.execute(
+                """
+                select distinct tse_candidate_id, politician_id from core.candidacies
+                where election_year = %s
+                """,
+                (year,),
+            )
+        }
+        if not owners:
+            return  # candidacies of the year not collected yet
+        url = receipts_url(year)
+        saved = ctx.fetch_file(url)
+        if saved.file_path is None:  # pragma: no cover - fetch_file always writes a file
+            raise RuntimeError("download without a file")
+        try:
+            with zipfile.ZipFile(saved.file_path) as archive:
+                summaries = summarize(rows_of(archive, year), year, set(owners))
+        except (MissingColumnsError, ValueError) as error:
+            ctx.validate(False, str(error))
+        if year in RECENT_GENERAL:
+            with_receipts = len({s.tse_id for s in summaries})
+            ctx.validate(
+                with_receipts >= self._min_recent_receipts,
+                f"receitas de só {with_receipts} candidaturas do cadastro em {year}",
+            )
+        ctx.db.execute(
+            "delete from core.campaign_receipts where source = 'tse' and election_year = %s",
+            (year,),
+        )
+        for n, summary in enumerate(summaries, start=1):
+            _save_receipts(ctx.db, year, summary, owners[summary.tse_id], n, url)
+
+
+def _save_receipts(
+    db: psycopg.Connection, year: int, s: Summary, politician_id: int, n: int, url: str
+) -> None:
+    db.execute(
+        """
+        insert into core.campaign_receipts (politician_id, election_year, tse_candidate_id,
+          origin, fund, donor_name, receipts, donors, total, source, source_id, source_url,
+          collected_at)
+        values (%s, %s, %s, %s, %s, %s, %s, %s, %s, 'tse', %s, %s, now())
+        """,
+        (politician_id, year, s.tse_id, s.origin, s.fund, s.donor_name, s.receipts, s.donors,
+         s.total, f"{year}-{s.tse_id}-{s.origin}-{s.fund}-{n}", url),
+    )  # fmt: skip
 
 
 def _save_asset(db: psycopg.Connection, a: Asset, politician_id: int, url: str) -> None:

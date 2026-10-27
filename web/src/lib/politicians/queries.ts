@@ -413,3 +413,93 @@ async function cachedAssets(id: number): Promise<DbResult<AssetsData>> {
 export async function getAssets(id: number): Promise<AssetsData> {
   return unwrap(await cachedAssets(id));
 }
+
+export type ReceiptsYear = {
+  year: number;
+  total: number;
+  byOrigin: { origin: string; total: number }[];
+  fefc: number;
+  partyFund: number;
+  privateDonors: number;
+  privateTotal: number;
+  parties: { name: string; total: number }[];
+};
+
+export type ReceiptsData = {
+  years: ReceiptsYear[];
+  collectedAt: string | null;
+};
+
+async function cachedReceipts(id: number): Promise<DbResult<ReceiptsData>> {
+  "use cache";
+  const result = await tryDb(async (sql) => {
+    const rows = await sql<
+      {
+        year: number;
+        origin: string;
+        fund: string;
+        donor_name: string | null;
+        donors: number | null;
+        total: string;
+        collected: string;
+      }[]
+    >`
+      select election_year as year, origin, fund, donor_name, donors, total,
+             to_char(collected_at at time zone 'America/Sao_Paulo', 'YYYY-MM-DD') as collected
+      from core.campaign_receipts
+      where politician_id = ${id}`;
+    const byYear = new Map<number, ReceiptsYear>();
+    for (const r of rows) {
+      const year = Number(r.year);
+      const total = Number(r.total);
+      const y = byYear.get(year) ?? {
+        year,
+        total: 0,
+        byOrigin: [],
+        fefc: 0,
+        partyFund: 0,
+        privateDonors: 0,
+        privateTotal: 0,
+        parties: [],
+      };
+      y.total += total;
+      const origin = y.byOrigin.find((o) => o.origin === r.origin);
+      if (origin) origin.total += total;
+      else y.byOrigin.push({ origin: r.origin, total });
+      if (r.fund === "fefc") y.fefc += total;
+      if (r.fund === "fundo_partidario") y.partyFund += total;
+      if (r.origin === "pessoas_fisicas") {
+        y.privateDonors += r.donors ?? 0;
+        y.privateTotal += total;
+      }
+      if (r.origin === "partidos" && r.donor_name) {
+        const party = y.parties.find((p) => p.name === r.donor_name);
+        if (party) party.total += total;
+        else y.parties.push({ name: r.donor_name, total });
+      }
+      byYear.set(year, y);
+    }
+    const collator = new Intl.Collator("pt-BR");
+    const years = [...byYear.values()]
+      .map((y) => ({
+        ...y,
+        parties: y.parties.sort((a, b) => collator.compare(a.name, b.name)),
+      }))
+      .sort((a, b) => b.year - a.year);
+    return {
+      years,
+      collectedAt:
+        rows
+          .map((r) => r.collected)
+          .sort()
+          .at(-1) ?? null,
+    };
+  });
+  cache(result.ok);
+  return result;
+}
+
+/** Campaign receipts since 2018 (change ingestao-tse-doadores, D4). */
+export async function getReceipts(id: number): Promise<ReceiptsData> {
+  return unwrap(await cachedReceipts(id));
+}

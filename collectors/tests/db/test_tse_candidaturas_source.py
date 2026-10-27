@@ -12,9 +12,11 @@ from cobra_collectors.sources.tse import TseSource
 from tests.tse_files import (
     ASSET_HEADER,
     CANDIDACY_HEADER,
+    RECEIPT_HEADER,
     VOTE_HEADER,
     asset,
     candidacy,
+    receipt,
     tse_zip,
     vote,
 )
@@ -62,12 +64,29 @@ ASSETS = tse_zip(
 )  # fmt: skip
 
 
+RECEIPTS = tse_zip(
+    "receitas_candidatos_2022",
+    RECEIPT_HEADER,
+    {
+        "BRASIL": [
+            receipt(sq="70001", origin="10010200", value="300,00", document="11111111111"),
+            receipt(sq="70001", origin="10010200", value="200,00", document="22222222222",
+                    donor="JOSE DE TAL"),
+            receipt(sq="70001", origin="10020000", fund="2", value="100000,00",
+                    donor="PARTIDO TESTE - DF", document="00000000000100"),
+            receipt(sq="70003", origin="10010200", value="9,00"),
+        ],
+    },
+)  # fmt: skip
+
+
 def handler(request: httpx.Request) -> httpx.Response:
     name = request.url.path.rsplit("/", 1)[-1]
     files = {
         "consulta_cand_2022.zip": CANDIDACIES,
         "votacao_candidato_munzona_2022.zip": VOTES,
         "bem_candidato_2022.zip": ASSETS,
+        "prestacao_de_contas_eleitorais_candidatos_2022.zip": RECEIPTS,
     }
     if name in files:
         return httpx.Response(200, content=files[name], headers={"content-type": "application/zip"})
@@ -82,6 +101,7 @@ def clean(autocommit_conn: psycopg.Connection) -> Iterator[psycopg.Connection]:
             "delete from ops.jobs",
             "delete from ops.runs",
             "delete from core.declared_assets",
+            "delete from core.campaign_receipts",
             "delete from core.candidacies",
             "delete from restricted.politician_private_ids where source_id like 'tse-test-%'",
             "delete from core.politicians where source_id like 'tse-test-%'",
@@ -225,5 +245,39 @@ def test_assets_keep_type_and_value_but_not_the_description(
     ]
     leaks = clean.execute(
         "select count(*) from core.declared_assets a where row_to_json(a)::text like '%QL 14%'"
+    ).fetchone()
+    assert leaks == (0,)
+
+
+def test_receipts_sum_private_persons_without_keeping_them(
+    clean: psycopg.Connection, test_database_url: str, tmp_path: Path
+) -> None:
+    collect(clean, test_database_url, tmp_path)
+
+    def make() -> TseSource:
+        source = TseSource(min_recent=1, min_recent_assets=1, min_recent_receipts=1)
+        source.rate_per_second, source.burst = 1000.0, 1000
+        return source
+
+    queue.enqueue(clean, "tse", "receipts", "2022", {"year": 2022})
+    summary = runner.work(
+        test_database_url, {"tse": make}, tmp_path, transport=httpx.MockTransport(handler)
+    )
+    assert summary.failed == 0
+    rows = clean.execute(
+        """
+        select origin, fund, donor_name, receipts, donors, total::text
+        from core.campaign_receipts order by origin
+        """
+    ).fetchall()
+    assert rows == [
+        ("partidos", "fefc", "PARTIDO TESTE - DF", 1, None, "100000.00"),
+        ("pessoas_fisicas", "outros", None, 2, 2, "500.00"),
+    ]
+    leaks = clean.execute(
+        """
+        select count(*) from core.campaign_receipts r
+        where row_to_json(r)::text ~ '(MARIA|JOSE|11111111111|22222222222|CEIL)'
+        """
     ).fetchone()
     assert leaks == (0,)

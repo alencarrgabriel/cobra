@@ -135,6 +135,11 @@ Limites iniciais (conservadores; cada change de fonte confirma na documentação
   - guarda só tipo e valor de cada bem das candidaturas do cadastro em `core.declared_assets`; a descrição do bem (que traz endereço) não é lida;
   - categoria pela tabela fixa de códigos (imóveis 1–19, veículos 21–23, dinheiro e aplicações 41–49 e 61–79, outros); em 2006 todos os bens vêm com o código 99;
   - valor como a fonte informa (há registro negativo em 2020); em 2018 e 2022, exige bens de ao menos 300 candidaturas.
+- Tarefa `receipts`, uma por eleição de 2018 a 2024 (`prestacao_contas/prestacao_de_contas_eleitorais_candidatos_<ano>.zip`, 0,3 a 1,3 GB):
+  - lê só `receitas_candidatos_<ano>_BRASIL.csv`, que soma as UFs;
+  - soma as receitas das candidaturas do cadastro por origem e fonte em `core.campaign_receipts`;
+  - pessoas físicas só como quantidade de doadores e total: o CPF serve para contar, em memória, e não é guardado; nome só de partido doador (decisão de 2026-10-27);
+  - antes de 2018 o TSE usa outros arquivos e leiautes, ainda não lidos.
 
 ### IBGE, municípios (`ibge`)
 

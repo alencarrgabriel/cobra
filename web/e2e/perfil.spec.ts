@@ -80,6 +80,24 @@ test("patrimônio declarado com composição e variação", async ({ page }) => 
   await expect(block).toContainText("sem correção pela inflação");
 });
 
+test("receitas de campanha com pessoas físicas só somadas", async ({
+  page,
+}) => {
+  await openProfile(page);
+  const block = page.getByTestId("receitas");
+  await expect(
+    block.getByRole("heading", { name: "2022: R$ 1,1 mi" }),
+  ).toBeVisible();
+  await expect(block).toContainText("Partidos: R$ 1 mi (95%)");
+  await expect(page.getByTestId("pessoas-fisicas-2022")).toHaveText(
+    "20 pessoas físicas doaram R$ 50 mil.",
+  );
+  await expect(block).toContainText("PARTIDO TESTE - DF: R$ 1 mi");
+  await expect(block).toContainText(
+    "Doadores pessoas físicas aparecem só somados",
+  );
+});
+
 test("o que ainda não foi coletado aparece com traço, nunca zero", async ({
   page,
 }) => {
