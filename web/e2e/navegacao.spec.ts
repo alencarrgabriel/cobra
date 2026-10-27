@@ -20,10 +20,16 @@ test.describe("celular (360 px)", () => {
     ]) {
       await expect(bar.locator("li", { hasText: label })).toBeVisible();
     }
-    // Five sections fit the width without scrolling sideways.
+    // Five sections fit the width in a single row, without scrolling sideways.
     expect(await bar.evaluate((el) => el.scrollWidth <= el.clientWidth)).toBe(
       true,
     );
+    const tops = await bar
+      .locator("li")
+      .evaluateAll((items) =>
+        items.map((li) => Math.round(li.getBoundingClientRect().top)),
+      );
+    expect(new Set(tops).size).toBe(1);
     await expect(
       page.getByRole("navigation", { name: "Seções", exact: true }),
     ).toBeHidden();

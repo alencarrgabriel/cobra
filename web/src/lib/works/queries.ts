@@ -346,3 +346,23 @@ function toListItem(r: Record<string, unknown>): WorkListItem {
     stoppedSince: (r.stopped_since as string | null) ?? null,
   };
 }
+
+async function cachedLatestWork(uf: string): Promise<DbResult<string | null>> {
+  "use cache";
+  const result = await tryDb(async (sql) => {
+    const [row] = await sql<{ code: string }[]>`
+      select source_id as code from core.works
+      where uf_code = ${uf}
+      order by source_updated_at desc nulls last, source_id
+      limit 1`;
+    return row?.code ?? null;
+  });
+  if (result.ok) cacheLife("hours");
+  else cacheLife("seconds");
+  return result;
+}
+
+/** The work most recently updated by the source: the home page example (mapa-do-brasil D4). */
+export async function getLatestWorkCode(uf: string): Promise<string | null> {
+  return unwrap(await cachedLatestWork(uf));
+}

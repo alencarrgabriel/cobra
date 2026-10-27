@@ -217,6 +217,16 @@ async function Content({
           </p>
         </Card>
       )}
+      <Card aria-labelledby="placar" data-testid="placar">
+        <h2 id="placar" className={styles.h2}>
+          Placar das votações recentes {ufOf(place)}
+        </h2>
+        <p>
+          <span aria-hidden="true">—</span>
+          <span className="sr-only">Sem dado.</span> Ainda não está no Cobra:
+          vem com a coleta das votações da Câmara e do Senado.
+        </p>
+      </Card>
       <Card aria-labelledby="outro-lugar">
         <h2 id="outro-lugar" className={styles.h2}>
           Ver outro lugar

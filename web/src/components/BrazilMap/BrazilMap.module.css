@@ -1,0 +1,68 @@
+.wrap {
+  display: grid;
+  gap: var(--space-5);
+}
+
+@media (min-width: 1080px) {
+  .wrap {
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    align-items: start;
+  }
+}
+
+.figure {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.map {
+  width: 100%;
+  height: auto;
+  max-height: 70vh;
+}
+
+.state path {
+  fill: var(--bg);
+  stroke: var(--muted);
+  stroke-width: 1;
+  stroke-linejoin: round;
+  transition: fill 120ms ease;
+}
+
+.state:hover path,
+.state:focus-visible path {
+  fill: var(--accent);
+}
+
+.state:focus-visible {
+  outline: none;
+}
+
+.state:focus-visible path {
+  stroke: var(--fg);
+  stroke-width: 3;
+}
+
+.source {
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: var(--space-1) var(--space-3);
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 6px 0;
+  color: var(--fg);
+}
