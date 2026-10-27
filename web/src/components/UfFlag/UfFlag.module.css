@@ -1,0 +1,17 @@
+.flag {
+  display: inline-block;
+  object-fit: cover;
+  border-radius: 3px;
+  box-shadow: 0 0 0 1px var(--line);
+  flex: none;
+}
+
+.sm {
+  width: 24px;
+  height: 17px;
+}
+
+.md {
+  width: 40px;
+  height: 28px;
+}

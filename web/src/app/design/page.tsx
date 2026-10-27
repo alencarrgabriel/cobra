@@ -6,7 +6,9 @@ import { FilterChip } from "@/components/FilterChip/FilterChip";
 import { Kpi } from "@/components/Kpi/Kpi";
 import { PartyBadge } from "@/components/PartyBadge/PartyBadge";
 import { Tabs } from "@/components/Tabs/Tabs";
+import { UfFlag } from "@/components/UfFlag/UfFlag";
 import { VoteBadge, VoteSplitBar } from "@/components/Vote/Vote";
+import { flagAlt, UF_ABBRS } from "@/lib/geo/flags";
 
 import styles from "./design.module.css";
 import { DesignDemos } from "./DesignDemos";
@@ -184,6 +186,24 @@ export default function DesignPage() {
         <p className={styles.hint}>
           Mesma forma e tamanho para todo partido; a cor do texto se ajusta para
           manter o contraste.
+        </p>
+      </Card>
+
+      <Card aria-labelledby="bandeiras">
+        <h2 id="bandeiras" className={styles.h2}>
+          Bandeiras das UFs
+        </h2>
+        <ul className={styles.flags}>
+          {UF_ABBRS.map((uf) => (
+            <li key={uf} title={flagAlt(uf)}>
+              <UfFlag uf={uf} size="md" />
+              <span>{uf}</span>
+            </li>
+          ))}
+        </ul>
+        <p className={styles.hint}>
+          Servidas pelo próprio site. Origem: Wikimedia Commons, domínio
+          público.
         </p>
       </Card>
 

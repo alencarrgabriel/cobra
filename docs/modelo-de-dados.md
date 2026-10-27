@@ -34,6 +34,7 @@ O teste `collectors/tests/db/test_provenance.py` reprova qualquer tabela desses 
 | `core.localities` | UFs (código IBGE de 2 dígitos) e municípios (7 dígitos) | As 27 UFs e Brasília (5300108) vêm nas migrações; o código do município começa pelo da UF |
 | `core.legislative_houses` | Câmara, Senado e CLDF | `slug` único; a CLDF é `district` e ligada à UF `53` |
 | `core.parties` | Partidos | `acronym` único; `electoral_number` pode repetir (números são reaproveitados) |
+| `core.party_colors` | Cor de identificação de cada partido em atividade, curada pelo Cobra | Chave = sigla, ligada a `parties` pela sigla; `basis` registra se a cor vem do `theme-color` do site oficial, do CSS do site ou de identidade conhecida a confirmar; partido sem linha usa a cor neutra |
 | `core.politicians` | Uma linha por pessoa, qualquer que seja o número de fontes | — |
 | `core.politician_external_ids` | IDs de cada político na Câmara, Senado, TSE e CLDF | `unique (system, external_id)`; o TSE gera um sequencial por eleição, então pode haver vários |
 | `restricted.politician_private_ids` | CPF do político, para cruzar fontes | 11 dígitos; o site não tem acesso |

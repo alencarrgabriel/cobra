@@ -1,0 +1,272 @@
+{
+  "AC": {
+    "name": "Acre",
+    "preposition": "do",
+    "file": "AC.svg",
+    "commonsTitle": "File:Bandeira do Acre.svg",
+    "commonsPage": "https://commons.wikimedia.org/wiki/File:Bandeira_do_Acre.svg",
+    "license": "Public domain",
+    "sha256": "e13c97760f7a364109ccc518a88fff96830ab44f415524d18777b42e814fa5bd",
+    "retrievedAt": "2026-10-26"
+  },
+  "AL": {
+    "name": "Alagoas",
+    "preposition": "de",
+    "file": "AL.svg",
+    "commonsTitle": "File:Bandeira de Alagoas.svg",
+    "commonsPage": "https://commons.wikimedia.org/wiki/File:Bandeira_de_Alagoas.svg",
+    "license": "Public domain",
+    "sha256": "ec486b6bf984c6e75b60ecc61dc295f28d934eb1ded9e95691337c1af91547d2",
+    "retrievedAt": "2026-10-26"
+  },
+  "AM": {
+    "name": "Amazonas",
+    "preposition": "do",
+    "file": "AM.svg",
+    "commonsTitle": "File:Bandeira do Amazonas.svg",
+    "commonsPage": "https://commons.wikimedia.org/wiki/File:Bandeira_do_Amazonas.svg",
+    "license": "Public domain",
+    "sha256": "a12bb44b79b1958cac4fabbed6771a33338ebdec5779e51b74df5af91b28d58b",
+    "retrievedAt": "2026-10-26"
+  },
+  "AP": {
+    "name": "Amapá",
+    "preposition": "do",
+    "file": "AP.svg",
+    "commonsTitle": "File:Bandeira do Amapá.svg",
+    "commonsPage": "https://commons.wikimedia.org/wiki/File:Bandeira_do_Amap%C3%A1.svg",
+    "license": "Public domain",
+    "sha256": "6b61a18f1d3c10b8091e9542e8424143f0bc13034a7f18cf1da5f3661470466b",
+    "retrievedAt": "2026-10-26"
+  },
+  "BA": {
+    "name": "Bahia",
+    "preposition": "da",
+    "file": "BA.svg",
+    "commonsTitle": "File:Bandeira da Bahia.svg",
+    "commonsPage": "https://commons.wikimedia.org/wiki/File:Bandeira_da_Bahia.svg",
+    "license": "Public domain",
+    "sha256": "c03e9c3a86cd33ffd45ec6873541f77415a36eab5d3705a0db14216cc98e3a8e",
+    "retrievedAt": "2026-10-26"
+  },
+  "CE": {
+    "name": "Ceará",
+    "preposition": "do",
+    "file": "CE.svg",
+    "commonsTitle": "File:Bandeira do Ceará.svg",
+    "commonsPage": "https://commons.wikimedia.org/wiki/File:Bandeira_do_Cear%C3%A1.svg",
+    "license": "Public domain",
+    "sha256": "42bed9652fd66bfce94bf632d29893bf7ffb51d055fa34515d33396209538adc",
+    "retrievedAt": "2026-10-26"
+  },
+  "DF": {
+    "name": "Distrito Federal",
+    "preposition": "do",
+    "file": "DF.svg",
+    "commonsTitle": "File:Bandeira do Distrito Federal (Brasil).svg",
+    "commonsPage": "https://commons.wikimedia.org/wiki/File:Bandeira_do_Distrito_Federal_(Brasil).svg",
+    "license": "Public domain",
+    "sha256": "8de53e895617ecb586a60f556a1af2092e6da64d7ac57771a6fae81dab1e33fa",
+    "retrievedAt": "2026-10-26"
+  },
+  "ES": {
+    "name": "Espírito Santo",
+    "preposition": "do",
+    "file": "ES.svg",
+    "commonsTitle": "File:Bandeira do Espírito Santo.svg",
+    "commonsPage": "https://commons.wikimedia.org/wiki/File:Bandeira_do_Esp%C3%ADrito_Santo.svg",
+    "license": "Public domain",
+    "sha256": "bfe8617835aec54661ad5bc15ae132a93ee24468b045c1e1eaabc8bf5950fa51",
+    "retrievedAt": "2026-10-26"
+  },
+  "GO": {
+    "name": "Goiás",
+    "preposition": "de",
+    "file": "GO.svg",
+    "commonsTitle": "File:Flag of Goiás.svg",
+    "commonsPage": "https://commons.wikimedia.org/wiki/File:Flag_of_Goi%C3%A1s.svg",
+    "license": "Public domain",
+    "sha256": "bba981314b5391b7692e24252ab8e41a53bdade459c51e9e841d846af6febf8d",
+    "retrievedAt": "2026-10-26"
+  },
+  "MA": {
+    "name": "Maranhão",
+    "preposition": "do",
+    "file": "MA.svg",
+    "commonsTitle": "File:Bandeira do Maranhão.svg",
+    "commonsPage": "https://commons.wikimedia.org/wiki/File:Bandeira_do_Maranh%C3%A3o.svg",
+    "license": "Public domain",
+    "sha256": "8548ac727d338e908f86ef7bd4b8a28d6d414200c345ce591d15db836b44ac2d",
+    "retrievedAt": "2026-10-26"
+  },
+  "MG": {
+    "name": "Minas Gerais",
+    "preposition": "de",
+    "file": "MG.svg",
+    "commonsTitle": "File:Bandeira de Minas Gerais.svg",
+    "commonsPage": "https://commons.wikimedia.org/wiki/File:Bandeira_de_Minas_Gerais.svg",
+    "license": "Public domain",
+    "sha256": "c6438a34442099cd316786edd6b9f6b99f72136dcff17e6a291686edee890d4f",
+    "retrievedAt": "2026-10-26"
+  },
+  "MS": {
+    "name": "Mato Grosso do Sul",
+    "preposition": "de",
+    "file": "MS.svg",
+    "commonsTitle": "File:Bandeira de Mato Grosso do Sul.svg",
+    "commonsPage": "https://commons.wikimedia.org/wiki/File:Bandeira_de_Mato_Grosso_do_Sul.svg",
+    "license": "Public domain",
+    "sha256": "338e7cdca4dd195c90811391bc5d423bafb7db65e5257cc5719538564e9992d9",
+    "retrievedAt": "2026-10-26"
+  },
+  "MT": {
+    "name": "Mato Grosso",
+    "preposition": "de",
+    "file": "MT.svg",
+    "commonsTitle": "File:Bandeira de Mato Grosso.svg",
+    "commonsPage": "https://commons.wikimedia.org/wiki/File:Bandeira_de_Mato_Grosso.svg",
+    "license": "Public domain",
+    "sha256": "256dcd5a7b6310e20badae29438c4a32826f6c91ba66cbaa6e2e79eea1eeed54",
+    "retrievedAt": "2026-10-26"
+  },
+  "PA": {
+    "name": "Pará",
+    "preposition": "do",
+    "file": "PA.svg",
+    "commonsTitle": "File:Bandeira do Pará.svg",
+    "commonsPage": "https://commons.wikimedia.org/wiki/File:Bandeira_do_Par%C3%A1.svg",
+    "license": "Public domain",
+    "sha256": "d54cd819d084ac19f65d285fab9b874d587354286e9e9bc5ccb4c049ae72ffe6",
+    "retrievedAt": "2026-10-26"
+  },
+  "PB": {
+    "name": "Paraíba",
+    "preposition": "da",
+    "file": "PB.svg",
+    "commonsTitle": "File:Bandeira da Paraíba.svg",
+    "commonsPage": "https://commons.wikimedia.org/wiki/File:Bandeira_da_Para%C3%ADba.svg",
+    "license": "Public domain",
+    "sha256": "8e80b64b2465194810b0c4ee4efb9256d43bbce5aca5030ced7c18f17511298f",
+    "retrievedAt": "2026-10-26"
+  },
+  "PE": {
+    "name": "Pernambuco",
+    "preposition": "de",
+    "file": "PE.svg",
+    "commonsTitle": "File:Bandeira de Pernambuco.svg",
+    "commonsPage": "https://commons.wikimedia.org/wiki/File:Bandeira_de_Pernambuco.svg",
+    "license": "Public domain",
+    "sha256": "5a23d62b36b0f382ce1375dfd049d23a44b58ed5cd91a426ba07af28697b9ac4",
+    "retrievedAt": "2026-10-26"
+  },
+  "PI": {
+    "name": "Piauí",
+    "preposition": "do",
+    "file": "PI.svg",
+    "commonsTitle": "File:Bandeira do Piauí.svg",
+    "commonsPage": "https://commons.wikimedia.org/wiki/File:Bandeira_do_Piau%C3%AD.svg",
+    "license": "Public domain",
+    "sha256": "717574a16b84fd4e176018f7de9d8ab07c0bfd07fcd6e961b776e6f864e672c3",
+    "retrievedAt": "2026-10-26"
+  },
+  "PR": {
+    "name": "Paraná",
+    "preposition": "do",
+    "file": "PR.svg",
+    "commonsTitle": "File:Bandeira do Paraná.svg",
+    "commonsPage": "https://commons.wikimedia.org/wiki/File:Bandeira_do_Paran%C3%A1.svg",
+    "license": "Public domain",
+    "sha256": "5e8af88a27c4ed17df7fcc80351fdb37281f4ce9333640533ce8943dd6b626a9",
+    "retrievedAt": "2026-10-26"
+  },
+  "RJ": {
+    "name": "Rio de Janeiro",
+    "preposition": "do",
+    "file": "RJ.svg",
+    "commonsTitle": "File:Bandeira do estado do Rio de Janeiro.svg",
+    "commonsPage": "https://commons.wikimedia.org/wiki/File:Bandeira_do_estado_do_Rio_de_Janeiro.svg",
+    "license": "Public domain",
+    "sha256": "38179ad124165e3f9f5b4b17d7181a43c675cc11a7cea183b4b7681cfcaa87f4",
+    "retrievedAt": "2026-10-26"
+  },
+  "RN": {
+    "name": "Rio Grande do Norte",
+    "preposition": "do",
+    "file": "RN.svg",
+    "commonsTitle": "File:Bandeira do Rio Grande do Norte.svg",
+    "commonsPage": "https://commons.wikimedia.org/wiki/File:Bandeira_do_Rio_Grande_do_Norte.svg",
+    "license": "Public domain",
+    "sha256": "306a285d591da6303b42f30a95511ed0a6f7923c949c339f896d4a155d4e3ed5",
+    "retrievedAt": "2026-10-26"
+  },
+  "RO": {
+    "name": "Rondônia",
+    "preposition": "de",
+    "file": "RO.svg",
+    "commonsTitle": "File:Bandeira de Rondônia.svg",
+    "commonsPage": "https://commons.wikimedia.org/wiki/File:Bandeira_de_Rond%C3%B4nia.svg",
+    "license": "Public domain",
+    "sha256": "1385fe7ea2cb961b5946bc61a7c1180ca9426d51b72c78f0303f94f9e5351822",
+    "retrievedAt": "2026-10-26"
+  },
+  "RR": {
+    "name": "Roraima",
+    "preposition": "de",
+    "file": "RR.svg",
+    "commonsTitle": "File:Bandeira de Roraima.svg",
+    "commonsPage": "https://commons.wikimedia.org/wiki/File:Bandeira_de_Roraima.svg",
+    "license": "Public domain",
+    "sha256": "25c676bedc9f33d3dcd6f2b9b1bcdb21d1525d895d155af5cf6c86a2ddd8b549",
+    "retrievedAt": "2026-10-26"
+  },
+  "RS": {
+    "name": "Rio Grande do Sul",
+    "preposition": "do",
+    "file": "RS.svg",
+    "commonsTitle": "File:Bandeira do Rio Grande do Sul.svg",
+    "commonsPage": "https://commons.wikimedia.org/wiki/File:Bandeira_do_Rio_Grande_do_Sul.svg",
+    "license": "Public domain",
+    "sha256": "c0920ea4b4d06e0e41b332aebfbaa584f927eec9cdb9eeac52dbf7dfbcaa4a74",
+    "retrievedAt": "2026-10-26"
+  },
+  "SC": {
+    "name": "Santa Catarina",
+    "preposition": "de",
+    "file": "SC.svg",
+    "commonsTitle": "File:Bandeira de Santa Catarina.svg",
+    "commonsPage": "https://commons.wikimedia.org/wiki/File:Bandeira_de_Santa_Catarina.svg",
+    "license": "Public domain",
+    "sha256": "61c62ffd342d1edac466f20db099bb0e6ffc6bd5832d0c2d43114400e4ea6eec",
+    "retrievedAt": "2026-10-26"
+  },
+  "SE": {
+    "name": "Sergipe",
+    "preposition": "de",
+    "file": "SE.svg",
+    "commonsTitle": "File:Bandeira de Sergipe.svg",
+    "commonsPage": "https://commons.wikimedia.org/wiki/File:Bandeira_de_Sergipe.svg",
+    "license": "Public domain",
+    "sha256": "510bd2bfab672cef382a11d6fa24d7cdd711c91c945e1fd082f53161c2c7ecee",
+    "retrievedAt": "2026-10-26"
+  },
+  "SP": {
+    "name": "São Paulo",
+    "preposition": "de",
+    "file": "SP.svg",
+    "commonsTitle": "File:Bandeira do estado de São Paulo.svg",
+    "commonsPage": "https://commons.wikimedia.org/wiki/File:Bandeira_do_estado_de_S%C3%A3o_Paulo.svg",
+    "license": "Public domain",
+    "sha256": "101ce857fe1cb3f023c776d58735a511a4a7cf1843c0e5bdf800903a69031a55",
+    "retrievedAt": "2026-10-26"
+  },
+  "TO": {
+    "name": "Tocantins",
+    "preposition": "do",
+    "file": "TO.svg",
+    "commonsTitle": "File:Bandeira do Tocantins.svg",
+    "commonsPage": "https://commons.wikimedia.org/wiki/File:Bandeira_do_Tocantins.svg",
+    "license": "Public domain",
+    "sha256": "48bfdb6ebff0322b91572dd3b155551e9708d53bb237f8c89f648ee9cc4b3a40",
+    "retrievedAt": "2026-10-26"
+  }
+}
