@@ -76,3 +76,10 @@ Um titular que está na lista de afastados por afastamento temporário (licença
 #### Scenario: Senadora licenciada
 - **WHEN** a lista de afastados traz uma titular licenciada que não estava no cadastro
 - **THEN** ela passa a existir no cadastro com mandato aberto em situação licenciado e fica fora da bancada em exercício da UF
+
+### Requirement: Foto oficial em endereço seguro
+A foto oficial de cada senador SHALL ser guardada no endereço `https://legis.senado.leg.br/senadores/fotos-oficiais/<código>`, para onde o endereço informado na lista do Senado redireciona, de modo que o site possa servi-la sem conexão insegura.
+
+#### Scenario: Foto da senadora do DF
+- **WHEN** a senadora de código 6335 é coletada
+- **THEN** a foto dela fica em `https://legis.senado.leg.br/senadores/fotos-oficiais/6335`

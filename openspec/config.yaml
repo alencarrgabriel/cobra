@@ -96,7 +96,7 @@ context: |
   6 ingestao-senado-senadores; 7 ingestao-cldf-distritais; 8 identidade-de-partidos-e-ufs
   (cores e bandeiras; logotipos aguardam o parecer jurídico); 10 ingestao-emendas (vínculo
   direto emenda–obra; por convênio adiado); 11 ingestao-planos-de-governo (presidente e
-  governador do DF, 2022).
+  governador do DF, 2022); 12a municipios-ibge.
   Próximas:
   12 busca-geografica (CEP → cidade, representantes e obras);
   14 compartilhamento;
