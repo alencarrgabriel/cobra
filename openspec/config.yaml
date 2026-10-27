@@ -103,9 +103,10 @@ context: |
   16 plano-de-governo (por tema, trecho literal, página do PDF, obras da mesma área, busca);
   17 mapa-do-brasil (malha do IBGE, bancada por estado, placar com "—" até as votações, RF-69);
   18a ingestao-tse-candidaturas (trajetória 1994–2024 com votos, no perfil);
-  18b ingestao-tse-patrimonio (bens por tipo e variação desde 2006, sem descrição do bem).
+  18b ingestao-tse-patrimonio (bens por tipo e variação desde 2006, sem descrição do bem);
+  18c ingestao-tse-doadores (receitas 2018–2024 por origem e fonte; pessoas físicas só
+  somadas, decisão de 2026-10-27).
   Próximas:
-  18c ingestao-tse-doadores (receitas de campanha, sem busca por nome de doador, RF-26);
   19 ingestao-camara-votacoes; 20 ingestao-senado-votacoes; 21 ingestao-despesas-presenca;
   22 relevancia-e-eventos; 23 painel-editorial; 24 feed-e-pagina-votacao; 25 alertas-email;
   26 seguir-politicos; 27 metodologia-e-reporte-de-erro (com "É você nesta página?");
@@ -113,6 +114,7 @@ context: |
   Fase 2: obras e emendas em todo o Brasil; planos dos prefeitos (2024); comparador de políticos;
   economia-em-numeros; trilhas-educativas. Fase 3: comparador de planos de candidatos (2028, após parecer).
   Decisões pendentes: base de CEP (licença/custo) decidida em busca-geografica.
+  Decidido em 2026-10-27: doadores pessoas físicas só somados; nenhum CPF/CNPJ guardado.
 
 rules:
   proposal:

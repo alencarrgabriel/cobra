@@ -46,7 +46,7 @@ O perfil SHALL listar as emendas de autoria do político guardadas pelo Cobra (n
 - **THEN** o perfil diz que não há emendas com destino ao DF guardadas, sem mostrar zero como se fosse total
 
 ### Requirement: Dado ainda não coletado
-Blocos que dependem de dados ainda não coletados (votos, projetos, presença, gastos da cota e doadores) SHALL aparecer com "—" e a explicação do motivo, nunca com zero.
+Blocos que dependem de dados ainda não coletados (votos, projetos, presença e gastos da cota) SHALL aparecer com "—" e a explicação do motivo, nunca com zero.
 
 #### Scenario: Gastos ainda não coletados
 - **WHEN** o perfil é aberto antes da coleta de gastos
