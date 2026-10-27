@@ -20,13 +20,23 @@ export const serverEnvSchema = z.object({
   // Public address of the site, used in link previews and on share cards (change
   // compartilhamento). Optional: defaults to http://localhost:3000.
   SITE_URL: z.url({ protocol: /^https?$/ }).optional(),
+  // Connection of the editorial panel (role cobra_editor), server only. Optional: without it
+  // the panel says it is unavailable (change painel-editorial).
+  EDITOR_DATABASE_URL: z
+    .string()
+    .regex(/^postgres(ql)?:\/\//, "must be a postgres:// URL")
+    .optional(),
 });
 
 /**
  * Variables inlined into the browser bundle at build time. Only `NEXT_PUBLIC_*`.
- * Empty for now.
+ * The Supabase address and publishable key are public by design; they only let the editorial
+ * panel sign editors in (change painel-editorial). Optional: without them the panel is off.
  */
-export const publicEnvSchema = z.object({});
+export const publicEnvSchema = z.object({
+  NEXT_PUBLIC_SUPABASE_URL: z.url({ protocol: /^https?$/ }).optional(),
+  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: z.string().min(20).optional(),
+});
 
 export type ServerEnv = z.infer<typeof serverEnvSchema>;
 

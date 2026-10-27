@@ -1,5 +1,7 @@
+import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
 
+import { authConfig } from "@/lib/editorial/supabase";
 import { placeExists } from "@/lib/places/exists";
 import { planExists } from "@/lib/plans/exists";
 import { politicianName } from "@/lib/politicians/exists";
@@ -46,8 +48,50 @@ async function profile(request: NextRequest, slug: string) {
   return NextResponse.next();
 }
 
+// Editorial panel (change painel-editorial, design D1): refreshes the editor's session and
+// sends to the missing step. Pages and actions check the editor again; this is only the door.
+const PANEL_OPEN = new Set(["/painel/entrar", "/painel/indisponivel"]);
+
+async function panel(request: NextRequest) {
+  const path = request.nextUrl.pathname;
+  const config = authConfig();
+  if (!config) {
+    return path === "/painel/indisponivel"
+      ? NextResponse.next()
+      : NextResponse.redirect(new URL("/painel/indisponivel", request.url));
+  }
+  let response = NextResponse.next({ request });
+  const supabase = createServerClient(config.url, config.key, {
+    cookies: {
+      getAll: () => request.cookies.getAll(),
+      setAll: (list) => {
+        for (const { name, value } of list) request.cookies.set(name, value);
+        response = NextResponse.next({ request });
+        for (const { name, value, options } of list)
+          response.cookies.set(name, value, options);
+      },
+    },
+  });
+  const { data } = await supabase.auth.getUser();
+  const go = (to: string) => {
+    const redirect = NextResponse.redirect(new URL(to, request.url));
+    for (const cookie of response.cookies.getAll())
+      redirect.cookies.set(cookie);
+    return redirect;
+  };
+  if (PANEL_OPEN.has(path)) return response;
+  if (!data.user) return go("/painel/entrar");
+  if (path !== "/painel/codigo" && path !== "/painel/sem-acesso") {
+    const { data: level } =
+      await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+    if (level?.currentLevel !== "aal2") return go("/painel/codigo");
+  }
+  return response;
+}
+
 export async function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname;
+  if (path === "/painel" || path.startsWith("/painel/")) return panel(request);
   if (path.startsWith("/politicos/")) {
     return profile(request, decoded(path, "/politicos/"));
   }
@@ -64,5 +108,7 @@ export const config = {
     "/representantes/:codigo",
     "/politicos/:slug",
     "/planos/:plano",
+    "/painel",
+    "/painel/:path*",
   ],
 };

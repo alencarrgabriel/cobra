@@ -727,6 +727,19 @@ function HowVoted({
                     {relevanceText(b.criteria, b.propositionType)}.
                   </span>
                 ) : null}
+                {b.summary ? (
+                  <span className={styles.summary} data-testid="resumo">
+                    {b.summary.text}{" "}
+                    <span className={styles.note}>
+                      Resumo revisado por pessoas em{" "}
+                      {formatDate(b.summary.approvedAt)}
+                      {b.summary.aiModel
+                        ? ", a partir de um rascunho feito com IA"
+                        : ""}
+                      .
+                    </span>
+                  </span>
+                ) : null}
               </li>
             ))}
           </ul>

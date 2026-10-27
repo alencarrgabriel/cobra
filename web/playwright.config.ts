@@ -35,6 +35,11 @@ export default defineConfig({
     command: `pnpm start --port ${port}`,
     url: `http://localhost:${port}/api/health`,
     reuseExistingServer: !process.env.CI,
-    env: { APP_ENV: "test", WEB_DATABASE_URL: e2eUrl() },
+    // The editorial panel writes to the same throwaway database (change painel-editorial).
+    env: {
+      APP_ENV: "test",
+      WEB_DATABASE_URL: e2eUrl(),
+      EDITOR_DATABASE_URL: e2eUrl(),
+    },
   },
 });

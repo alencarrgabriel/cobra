@@ -99,6 +99,15 @@ Chaves: `id bigint generated always as identity`, exceto `core.localities` (chav
 | `core.sessions` | Sessões deliberativas encerradas do Plenário da Câmara desde 2023 | Solenes, canceladas e comissões ficam fora |
 | `core.session_attendance` | Deputados com presença registrada em cada sessão | Ligados ao cadastro pelo id da Câmara; no Senado, o comparecimento vem de `core.vote_ballots` |
 
+### Painel editorial (change `painel-editorial`)
+
+| Tabela | O que guarda | Regras |
+|---|---|---|
+| `editorial.editors` | E-mails que podem usar o painel | Além do segundo fator; o site não lê o schema `editorial` |
+| `editorial.vote_summaries` | Versões dos resumos de votação: rascunho, publicado, substituído | Uma publicada por votação; aprovação com quem e quando |
+| `editorial.log` | Trilha de auditoria: rascunho, aprovação, curadoria, retirada | Só inserção para `cobra_editor` |
+| `core.published_summaries` (visão) | Resumos aprovados, o que o site lê | Ver docs/painel-editorial.md |
+
 ## Papéis e usuários
 
 As migrações criam os papéis `cobra_web_reader` e `cobra_collector` sem login e sem senha, e dão a eles os privilégios, inclusive para tabelas futuras (`alter default privileges`).

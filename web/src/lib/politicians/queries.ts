@@ -1,6 +1,6 @@
 import "server-only";
 
-import { cacheLife } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 
 import { type DbResult, tryDb, unwrap } from "@/lib/db";
 import { NEUTRAL_PARTY_COLOR } from "@/lib/party-color";
@@ -516,6 +516,8 @@ export type BallotRow = {
   optionDetail: string | null;
   propositionType: string | null;
   criteria: string[];
+  /** Approved editorial summary, if any (change painel-editorial, D4). */
+  summary: { text: string; approvedAt: string; aiModel: string | null } | null;
   propositionUrl: string | null;
   sourceUrl: string | null;
   collectedAt: string;
@@ -523,6 +525,8 @@ export type BallotRow = {
 
 async function cachedBallots(id: number): Promise<DbResult<BallotRow[]>> {
   "use cache";
+  // Expired by the editorial panel when a summary is approved (change painel-editorial).
+  cacheTag("summaries");
   const result = await tryDb(async (sql) => {
     const rows = await sql<
       {
@@ -536,6 +540,9 @@ async function cachedBallots(id: number): Promise<DbResult<BallotRow[]>> {
         option_detail: string | null;
         proposition_type: string | null;
         criteria: string[] | null;
+        summary_text: string | null;
+        summary_approved: string | null;
+        summary_ai: string | null;
         proposition_url: string | null;
         source_url: string | null;
         collected: string;
@@ -543,11 +550,13 @@ async function cachedBallots(id: number): Promise<DbResult<BallotRow[]>> {
     >`
       select v.source_id as vote_id, v.occurred_on::text, v.description, v.approved,
              v.proposition_label, v.proposition_summary, b.option, b.option_detail, v.proposition_type,
-             r.criteria, v.proposition_url,
+             r.criteria, ps.text as summary_text, ps.approved_at::text as summary_approved,
+             ps.ai_model as summary_ai, v.proposition_url,
              v.source_url,
              to_char(b.collected_at at time zone 'America/Sao_Paulo', 'YYYY-MM-DD') as collected
       from core.vote_ballots b join core.votes v on v.id = b.vote_id
       left join core.vote_relevance r on r.vote_id = v.id
+      left join core.published_summaries ps on ps.vote_id = v.id
       where b.politician_id = ${id} and v.nominal
       order by v.occurred_on desc, v.registered_at desc nulls last, v.source_id desc
       limit 10`;
@@ -562,6 +571,14 @@ async function cachedBallots(id: number): Promise<DbResult<BallotRow[]>> {
       optionDetail: r.option_detail,
       propositionType: r.proposition_type,
       criteria: r.criteria ?? [],
+      summary:
+        r.summary_text && r.summary_approved
+          ? {
+              text: r.summary_text,
+              approvedAt: r.summary_approved,
+              aiModel: r.summary_ai,
+            }
+          : null,
       propositionUrl: r.proposition_url,
       sourceUrl: r.source_url,
       collectedAt: r.collected,
