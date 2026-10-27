@@ -34,7 +34,7 @@ async function cachedMunicipalities(
       select ibge_code as code, name, uf_abbr as uf from core.localities
       where kind = 'municipality'
         and ${prefix ? sql`search_name like ${`${key}%`}` : sql`search_name = ${key}`}
-      order by name, uf_abbr limit 10`;
+      order by name collate "und-x-icu", uf_abbr limit 10`;
     return rows.map(toPlace);
   });
   if (result.ok) cacheLife("days");

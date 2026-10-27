@@ -70,7 +70,7 @@ async function cachedRepresentatives(
       where m.locality_code = ${ufCode} and m.ended_on is null
         and m.status in ('titular', 'suplente')
         and h.slug in ('senado', 'camara', 'cldf')
-      order by p.parliamentary_name`;
+      order by p.parliamentary_name collate "und-x-icu"`;
     return rows.map((r): Representative => ({
       id: Number(r.id),
       name: r.name,

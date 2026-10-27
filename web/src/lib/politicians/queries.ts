@@ -225,13 +225,15 @@ async function cachedWorks(id: number): Promise<DbResult<LinkedWork[]>> {
         confidence: string;
       }[]
     >`
-      select distinct w.source_id as code, w.name, w.status::text as status,
-             a.source_id as amendment, l.confidence
-      from core.work_amendment_links l
-      join core.works w on w.id = l.work_id
-      join core.amendments a on a.id = l.amendment_id
-      where l.politician_id = ${id}
-      order by w.name, a.source_id`;
+      select * from (
+        select distinct w.source_id as code, w.name, w.status::text as status,
+               a.source_id as amendment, l.confidence
+        from core.work_amendment_links l
+        join core.works w on w.id = l.work_id
+        join core.amendments a on a.id = l.amendment_id
+        where l.politician_id = ${id}
+      ) linked
+      order by name collate "und-x-icu", amendment`;
     return rows.map((r) => ({ ...r }));
   });
   cache(result.ok);
@@ -249,10 +251,11 @@ async function cachedRelated(
 ): Promise<DbResult<{ sameUf: Related[]; sameParty: Related[] }>> {
   "use cache";
   const result = await tryDb(async (sql) => {
+    // ICU collation: the same alphabetical order on every host (libc collations differ).
     const base = (where: ReturnType<typeof sql>) => sql<
       { id: string; name: string; uf: string; party: string | null }[]
     >`
-      select distinct on (p.parliamentary_name, p.id) p.id::text, p.parliamentary_name as name,
+      select distinct on (p.parliamentary_name collate "und-x-icu", p.id) p.id::text, p.parliamentary_name as name,
              l.uf_abbr as uf, pa.acronym as party
       from core.politicians p
       join core.mandates m on m.politician_id = p.id and m.ended_on is null
@@ -260,7 +263,7 @@ async function cachedRelated(
       left join core.party_affiliations a on a.politician_id = p.id and a.ended_on is null
       left join core.parties pa on pa.id = a.party_id
       where p.id <> ${id} and ${where}
-      order by p.parliamentary_name, p.id
+      order by p.parliamentary_name collate "und-x-icu", p.id
       limit 12`;
     const map = (
       rows: { id: string; name: string; uf: string; party: string | null }[],
