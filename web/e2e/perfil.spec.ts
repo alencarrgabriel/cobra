@@ -98,7 +98,7 @@ test("receitas de campanha com pessoas físicas só somadas", async ({
   );
 });
 
-test("como votou: deputado com votos nominais e senadora com traço", async ({
+test("como votou: deputado e senadora com votos, distrital com traço", async ({
   page,
 }) => {
   await page.goto("/representantes/5300108");
@@ -118,8 +118,20 @@ test("como votou: deputado com votos nominais e senadora com traço", async ({
   await expect(block).not.toContainText("requerimento simbólico");
 
   await openProfile(page);
+  const senate = page.getByTestId("como-votou");
+  await expect(senate.getByTestId("voto")).toHaveText(
+    "Voto: Ausente: Licença saúde",
+  );
+  await expect(senate).toContainText("Votações secretas e simbólicas");
+
+  await page.goto("/representantes/5300108");
+  await page
+    .getByTestId("secao-cldf")
+    .getByRole("button", { name: /Distrital Teste C/ })
+    .click();
+  await page.getByRole("link", { name: "Ver perfil completo" }).click();
   await expect(page.getByTestId("como-votou")).toContainText(
-    "vem com a coleta das votações do Senado",
+    "as votações da Câmara Legislativa não são coletadas",
   );
 });
 

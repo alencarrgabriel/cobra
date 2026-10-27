@@ -95,7 +95,7 @@ def clean(autocommit_conn: psycopg.Connection) -> Iterator[psycopg.Connection]:
 
 def factory() -> Callable[[], SenadoSource]:
     def make() -> SenadoSource:
-        source = SenadoSource()
+        source = SenadoSource(vote_years=())
         # The fake API needs no politeness; the real limit is checked below.
         source.rate_per_second, source.burst = 1000.0, 1000
         return source
@@ -336,5 +336,5 @@ def test_unknown_uf_blocks_only_that_senator(
 
 
 def test_rate_limit_stays_below_the_official_ten_per_second() -> None:
-    source = SenadoSource()
+    source = SenadoSource(vote_years=())
     assert (source.rate_per_second, source.burst) == (8.0, 4)

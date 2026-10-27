@@ -75,12 +75,12 @@ Chaves: `id bigint generated always as identity`, exceto `core.localities` (chav
 | `core.declared_assets` | Bens declarados ao TSE pelas candidaturas do cadastro (desde 2006): tipo, categoria e valor | Sem a descrição do bem (traz endereço); categoria por código do tipo (imóveis, veículos, dinheiro, outros); `source_id` = `<ano>-<SQ_CANDIDATO>-<ordem>` |
 | `core.campaign_receipts` | Receitas de campanha das candidaturas do cadastro (desde 2018), somadas por origem e fonte | Pessoas físicas só como quantidade e total; nome só de partido doador; nenhum CPF, CNPJ ou endereço |
 
-### Votações (change `ingestao-camara-votacoes`)
+### Votações (changes `ingestao-camara-votacoes` e `ingestao-senado-votacoes`)
 
 | Tabela | O que guarda | Regras |
 |---|---|---|
-| `core.votes` | Votações do Plenário: data, descrição, resultado, contagem oficial, proposição principal | `nominal = false` para simbólica (nunca tem voto individual); `quality_notes` quando os votos não conferem |
-| `core.vote_ballots` | Voto de cada parlamentar em votação nominal, com partido e UF na data | Inclui quem não está no cadastro (`politician_id` nulo), para o placar; opção `sim`, `nao`, `abstencao`, `obstrucao`, `art17`, `nao_informado` |
+| `core.votes` | Votações do Plenário da Câmara e do Senado: data, descrição, resultado, contagem oficial, proposição principal | `nominal = false` para simbólica; `secret = true` para secreta do Senado (só totais); nenhuma das duas tem voto individual; `quality_notes` quando os votos não conferem |
+| `core.vote_ballots` | Voto de cada parlamentar em votação nominal, com partido e UF na data | Inclui quem não está no cadastro (`politician_id` nulo), para o placar; opção `sim`, `nao`, `abstencao`, `obstrucao`, `art17`, `presidente`, `presente_sem_voto`, `ausente` (motivo do Senado em `option_detail`), `nao_informado` |
 | `core.vote_orientations` | Orientação de cada liderança ou bancada | Como a casa escreve o nome da bancada |
 
 ## Papéis e usuários

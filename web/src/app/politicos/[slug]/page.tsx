@@ -621,12 +621,27 @@ const OPTION: Record<string, string> = {
   abstencao: "Abstenção",
   obstrucao: "Obstrução",
   art17: "Art. 17",
+  presidente: "Presidente da sessão (não vota)",
+  presente_sem_voto: "Presente, sem registrar voto",
+  ausente: "Ausente",
   nao_informado: "Não informado",
 };
 
-const NO_VOTES: Partial<Record<HouseSlug, string>> = {
-  senado: "vem com a coleta das votações do Senado",
-  cldf: "as votações da Câmara Legislativa ainda não estão no Cobra",
+/** The option, with the reason the house gives for an absence (e.g. "Ausente: Licença saúde"). */
+function optionText(b: BallotRow): string {
+  const label = OPTION[b.option] ?? b.option;
+  return b.optionDetail ? `${label}: ${b.optionDetail}` : label;
+}
+
+const VOTES_OF: Partial<Record<HouseSlug, { house: string; note: string }>> = {
+  camara: {
+    house: "Câmara dos Deputados",
+    note: "Votações simbólicas não têm voto individual.",
+  },
+  senado: {
+    house: "Senado Federal",
+    note: "Votações secretas e simbólicas não têm voto individual.",
+  },
 };
 
 function HowVoted({
@@ -645,17 +660,18 @@ function HowVoted({
       <h2 id="como-votou" className={styles.h2}>
         Como votou
       </h2>
-      {house !== "camara" ? (
+      {!house || !VOTES_OF[house] ? (
         <p>
           <span aria-hidden="true">—</span>
-          <span className="sr-only">Sem dado.</span> Ainda não está no Cobra:{" "}
-          {NO_VOTES[house ?? "senado"] ?? "vem com a coleta das votações"}.
+          <span className="sr-only">Sem dado.</span> Ainda não está no Cobra: as
+          votações da Câmara Legislativa não são coletadas.
         </p>
       ) : ballots.length ? (
         <>
           <p className={styles.note}>
-            As 10 votações nominais mais recentes do Plenário da Câmara em que
-            registrou voto. Votações simbólicas não têm voto individual.
+            As 10 votações nominais mais recentes do Plenário (
+            {VOTES_OF[house]!.house}) com voto ou ausência registrados.{" "}
+            {VOTES_OF[house]!.note}
           </p>
           <ul className={styles.list}>
             {ballots.map((b) => (
@@ -682,21 +698,20 @@ function HowVoted({
                       : ""}
                   )
                 </span>{" "}
-                <span data-testid="voto">
-                  Voto: {OPTION[b.option] ?? b.option}
-                </span>
+                <span data-testid="voto">Voto: {optionText(b)}</span>
               </li>
             ))}
           </ul>
         </>
       ) : (
         <p>
-          O Cobra não tem votos nominais deste deputado no Plenário desde 2023.
+          O Cobra não tem votos nominais deste parlamentar no Plenário desde
+          2023.
         </p>
       )}
-      {house === "camara" ? (
+      {house && VOTES_OF[house] ? (
         <p className={styles.source}>
-          Fonte: Câmara dos Deputados, dados abertos de votações
+          Fonte: {VOTES_OF[house]!.house}, dados abertos de votações
           {collected
             ? `, coletados pelo Cobra em ${formatDate(collected)}`
             : ""}

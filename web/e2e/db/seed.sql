@@ -223,3 +223,23 @@ select v.id, '8001', 'Deputado Teste A', 'PL', 'DF', 'nao', now(), p.id, 'camara
        '9100-1:8001', now()
 from core.votes v, core.politicians p
 where v.source_id = '9100-1' and p.source_id = '8001';
+
+-- Senate plenary votes (change ingestao-senado-votacoes): Senadora Teste Um on sick leave in a
+-- nominal vote; a secret vote has no ballot.
+insert into core.votes (house_id, occurred_on, organ, description, approved, yes, no, other,
+  nominal, secret, proposition_label, source, source_id, collected_at)
+select h.id, v.day::date, 'PLEN', v.descr, true, v.yes, v.no, 0, v.nominal, v.secret,
+       'PLP 55/2026', 'senado', v.sid, now()
+from core.legislative_houses h,
+  (values
+    ('97001', '2026-06-09', 'Votação nominal do projeto de teste.', 58, 1, true, false),
+    ('97002', '2026-06-10', 'Votação secreta de autoridade de teste.', 41, 1, false, true)
+  ) as v (sid, day, descr, yes, no, nominal, secret)
+where h.slug = 'senado';
+
+insert into core.vote_ballots (vote_id, external_id, name, party_acronym, uf, option,
+  option_detail, politician_id, source, source_id, collected_at)
+select v.id, '9001', 'Senadora Teste Um', 'PL', 'DF', 'ausente', 'Licença saúde', p.id, 'senado',
+       '97001:9001', now()
+from core.votes v, core.politicians p
+where v.source_id = '97001' and v.source = 'senado' and p.source_id = '9001';

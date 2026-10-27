@@ -87,6 +87,16 @@ Limites iniciais (conservadores; cada change de fonte confirma na documentação
 - Qualidade da fonte, tratada na normalização: itens únicos vêm como objeto, não como lista; `/senador/afastados` redireciona para `/dados/AfastamentoAtual.json`.
 - Volume: cerca de 164 requisições por atualização completa, menos de 1 minuto a 8 req/s.
 
+### Senado Federal, votações do Plenário (`senado`, tarefa `votes`)
+
+- API (OpenAPI em `legis.senado.leg.br/dadosabertos/v3/api-docs`, conferida em 2026-10-27), dois pedidos por ano com o sufixo `.json`:
+  - `/dadosabertos/votacao.json?dataInicio&dataFim` (até um ano): votações e votos individuais das nominais;
+  - `/dadosabertos/plenario/votacao/orientacaoBancada/{inicio}/{fim}.json`: orientações e a contagem oficial, ligadas por `sequencialVotacao`.
+- Votação secreta: só os totais; o "Votou" não é guardado. Votação nominal: voto de cada senador, inclusive presidente (art. 51), presente sem voto e ausente, com o motivo na descrição oficial do Senado (`descricaoVotoParlamentar`).
+- Código de voto desconhecido falha a tarefa (em 2026 apareceu `LAP`, "Licença paternidade ou ao adotante").
+- Contagem conferida com `qtdVotosSim`/`qtdVotosNao` das orientações, com a mesma regra da Câmara.
+- Volume em 2026-10-27: 426 votações (186 nominais, 240 secretas), 13 mil votos, nenhuma divergência.
+
 ### Câmara Legislativa do DF (`cldf`)
 
 - A CLDF não tem API de deputados. O portal `dados.cl.df.gov.br` (CKAN, conferido em 2026-10-26) só traz os deputados misturados à lista nominal de cerca de 2.400 servidores, sem partido. Essa lista não é coletada (coleta mínima).

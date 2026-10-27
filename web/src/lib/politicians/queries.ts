@@ -512,6 +512,7 @@ export type BallotRow = {
   propositionLabel: string | null;
   propositionSummary: string | null;
   option: string;
+  optionDetail: string | null;
   propositionUrl: string | null;
   sourceUrl: string | null;
   collectedAt: string;
@@ -529,13 +530,14 @@ async function cachedBallots(id: number): Promise<DbResult<BallotRow[]>> {
         proposition_label: string | null;
         proposition_summary: string | null;
         option: string;
+        option_detail: string | null;
         proposition_url: string | null;
         source_url: string | null;
         collected: string;
       }[]
     >`
       select v.source_id as vote_id, v.occurred_on::text, v.description, v.approved,
-             v.proposition_label, v.proposition_summary, b.option, v.proposition_url,
+             v.proposition_label, v.proposition_summary, b.option, b.option_detail, v.proposition_url,
              v.source_url,
              to_char(b.collected_at at time zone 'America/Sao_Paulo', 'YYYY-MM-DD') as collected
       from core.vote_ballots b join core.votes v on v.id = b.vote_id
@@ -550,6 +552,7 @@ async function cachedBallots(id: number): Promise<DbResult<BallotRow[]>> {
       propositionLabel: r.proposition_label,
       propositionSummary: r.proposition_summary,
       option: r.option,
+      optionDetail: r.option_detail,
       propositionUrl: r.proposition_url,
       sourceUrl: r.source_url,
       collectedAt: r.collected,

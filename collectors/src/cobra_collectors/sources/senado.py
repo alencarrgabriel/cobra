@@ -11,6 +11,7 @@ import psycopg
 import structlog
 
 from cobra_collectors.pipeline import Context, JobSpec, ValidationError
+from cobra_collectors.sources.camara_votacoes_model import MAX_MISMATCH_SHARE, UnknownValueError
 from cobra_collectors.sources.identity import same_person
 from cobra_collectors.sources.senado_model import (
     API_BASE,
@@ -25,6 +26,14 @@ from cobra_collectors.sources.senado_model import (
     senator_url,
     validate_senator,
 )
+from cobra_collectors.sources.senado_votacoes_model import (
+    FIRST_YEAR,
+    mismatch_share,
+    orientations_url,
+    read,
+    votes_url,
+)
+from cobra_collectors.sources.votes_store import save_year
 
 SOURCE = "senado"
 log = structlog.get_logger()
@@ -45,8 +54,19 @@ class SenadoSource:
     rate_per_second = 8.0
     burst = 4
 
+    def __init__(self, vote_years: Iterable[int] | None = None) -> None:
+        # Years of plenary votes to collect; by default the legislature up to this year.
+        self.vote_years = (
+            tuple(vote_years)
+            if vote_years is not None
+            else tuple(range(FIRST_YEAR, today().year + 1))
+        )
+
     def plan(self) -> Iterable[JobSpec]:
-        return [JobSpec("senators", "run", {})]
+        return [
+            JobSpec("senators", "run", {}),
+            *(JobSpec("votes", str(year), {"year": year}) for year in self.vote_years),
+        ]
 
     def handle(self, ctx: Context) -> None:
         kind = ctx.job.kind
@@ -54,6 +74,8 @@ class SenadoSource:
             self._senators(ctx)
         elif kind == "senator":
             self._senator(ctx)
+        elif kind == "votes":
+            self._votes(ctx, int(ctx.job.payload["year"]))
         else:
             raise ValueError(f"unknown job kind {kind!r}")
 
@@ -64,6 +86,29 @@ class SenadoSource:
         return response.json()
 
     # -- jobs ----------------------------------------------------------------------
+
+    def _votes(self, ctx: Context, year: int) -> None:
+        """Plenary votes of a year (openspec change `ingestao-senado-votacoes`, D1 to D4)."""
+        response = ctx.fetch(
+            votes_url(), {"dataInicio": f"{year}-01-01", "dataFim": f"{year}-12-31"}
+        )
+        response.raise_for_status()
+        items = response.json()
+        response = ctx.fetch(orientations_url(year))
+        response.raise_for_status()
+        orientation_items = (response.json() or {}).get("votacoes") or []
+        try:
+            votes, ballots, orientations = read(items or [], orientation_items)
+        except UnknownValueError as error:
+            ctx.validate(False, str(error))
+        if not votes:
+            return
+        share = mismatch_share(votes)
+        ctx.validate(
+            share <= MAX_MISMATCH_SHARE,
+            f"{share:.0%} das votações nominais de {year} não conferem com o placar",
+        )
+        save_year(ctx.db, "senado", year, votes, ballots, orientations)
 
     def _senators(self, ctx: Context) -> None:
         # Both lists before any write: a missing list must change no mandate (design D1, D4).
