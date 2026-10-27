@@ -110,14 +110,16 @@ context: |
   desde 2023; secretas só com totais; ausências com o motivo oficial); 21a ingestao-despesas
   (cota da Câmara e do Senado; fornecedor pessoa física sem nome nem CPF); 21b ingestao-presenca
   (sessões da Câmara; comparecimento às votações do Senado; mediana da casa); 22
-  relevancia-e-eventos (critérios do §9.2 em visão; eventos para o feed).
-  Próximas: 23 painel-editorial; 24 feed-e-pagina-votacao; 25 alertas-email;
+  relevancia-e-eventos (critérios do §9.2 em visão; eventos para o feed); 23a painel-editorial
+  (Supabase Auth + TOTP, fila, rascunho, aprovação registrada, curadoria, trilha).
+  Próximas: 23b rascunho-ia (Claude API, só publica com aprovação); 24 feed-e-pagina-votacao; 25 alertas-email;
   26 seguir-politicos; 27 metodologia-e-reporte-de-erro (com "É você nesta página?");
   28 saude-integracoes.
   Fase 2: obras e emendas em todo o Brasil; planos dos prefeitos (2024); comparador de políticos;
   economia-em-numeros; trilhas-educativas. Fase 3: comparador de planos de candidatos (2028, após parecer).
   Decisões pendentes: base de CEP (licença/custo) decidida em busca-geografica.
-  Decidido em 2026-10-27: doadores pessoas físicas só somados; nenhum CPF/CNPJ guardado.
+  Decidido em 2026-10-27: doadores pessoas físicas só somados; nenhum CPF/CNPJ guardado;
+  painel com Supabase Auth + TOTP; rascunho de resumo pela Claude API com aprovação humana.
 
 rules:
   proposal:
