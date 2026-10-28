@@ -118,7 +118,9 @@ context: |
   separado; meus dados; cifra AES-256-GCM; decisão de 2026-10-27).
   25b resumo-semanal (rota diária com CRON_SECRET; votos do estado e dos seguidos; uma vez por
   semana; histórico em meus dados).
-  Próximas: 27 metodologia-e-reporte-de-erro (com "É você nesta página?");
+  27a metodologia (fontes com última coleta, critérios, regras, temas).
+  Próximas: 27b reporte-de-erro (com "É você nesta página?"; prazo de 5 dias úteis; e-mail
+  opcional cifrado, apagado 90 dias após o fechamento);
   28 saude-integracoes.
   Fase 2: obras e emendas em todo o Brasil; planos dos prefeitos (2024); comparador de políticos;
   economia-em-numeros; trilhas-educativas. Fase 3: comparador de planos de candidatos (2028, após parecer).
