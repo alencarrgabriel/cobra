@@ -8,6 +8,7 @@ from typing import Any
 import httpx
 import psycopg
 import structlog
+from psycopg import sql
 from psycopg.rows import dict_row
 
 from cobra_collectors import queue
@@ -103,8 +104,27 @@ def work(
                 "jobs_failed = %s where id = %s",
                 (status, done, failed, run_id),
             )
+            if done:
+                refresh_statistics(ops_conn)
     log.info("run.finished", run=run_id, done=done, failed=failed, status=status)
     return RunSummary(run_id, done, failed, status)
+
+
+def refresh_statistics(conn: psycopg.Connection) -> None:
+    """ANALYZE the public schema after a run that wrote data.
+
+    Bulk loads (COPY of votes, attendance, expenses) leave the planner with stale row counts
+    until autovacuum catches up; with them, the profile's attendance query took 8 s instead of
+    0.3 s and hit the site's statement timeout.
+    """
+    try:
+        tables = conn.execute(
+            "select tablename from pg_tables where schemaname = 'core' order by tablename"
+        ).fetchall()
+        for (table,) in tables:
+            conn.execute(sql.SQL("analyze {}").format(sql.Identifier("core", table)))
+    except psycopg.Error as error:
+        log.warning("run.analyze_failed", error=str(error))
 
 
 def status(conn: psycopg.Connection) -> dict[str, Any]:
