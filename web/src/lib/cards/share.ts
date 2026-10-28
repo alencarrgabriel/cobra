@@ -13,7 +13,7 @@ export function xUrl(text: string, url: string): string {
 
 /** "/cartao/politico/42/feed" for the card of a page. */
 export function cardPath(
-  kind: "politico" | "representantes" | "obra",
+  kind: "politico" | "representantes" | "obra" | "votacao",
   id: string | number,
   format: string,
 ): string {

@@ -183,3 +183,46 @@ export function workCard(work: WorkForCard, today: Date): CardContent {
     updatedOn: work.sourceUpdatedAt ?? work.collectedAt,
   };
 }
+
+export type VoteForCard = {
+  house: string;
+  occurredOn: string;
+  label: string | null;
+  description: string;
+  approved: boolean | null;
+  yes: number;
+  no: number;
+  other: number;
+  collectedAt: string;
+};
+
+const VOTE_HOUSE: Record<string, string> = {
+  camara: "Câmara dos Deputados",
+  senado: "Senado Federal",
+};
+
+/** Vote card (change feed-e-pagina-votacao, design D4): the official count, no judgment. */
+export function voteCard(v: VoteForCard): CardContent {
+  return {
+    kicker: `${VOTE_HOUSE[v.house] ?? v.house} · ${formatDateBr(v.occurredOn)}`,
+    title: clip(v.label ?? "Votação"),
+    badge: null,
+    status:
+      v.approved === null
+        ? null
+        : { text: v.approved ? "Aprovado" : "Rejeitado", color: "#5c5e58" },
+    lines: [
+      `Sim ${formatInteger(v.yes)} · Não ${formatInteger(v.no)} · outros ${formatInteger(v.other)}`,
+      clip(v.description, 140),
+    ],
+    photo: null,
+    flagUf: null,
+    source: VOTE_HOUSE[v.house] ?? v.house,
+    updatedOn: v.collectedAt,
+  };
+}
+
+function formatDateBr(iso: string): string {
+  const [y, m, d] = iso.slice(0, 10).split("-");
+  return `${d}/${m}/${y}`;
+}

@@ -83,16 +83,14 @@ test.describe("computador (1440 px)", () => {
   });
 });
 
-test("seções ainda não entregues aparecem como em breve e não são links", async ({
+test("Votações é um link e nenhuma seção aparece como em breve", async ({
   page,
 }) => {
   await page.goto("/");
-  for (const label of ["Votações"]) {
-    await expect(
-      page.getByRole("link", { name: new RegExp(label) }),
-    ).toHaveCount(0);
-  }
-  await expect(page.getByText("em breve").first()).toBeAttached();
+  await expect(
+    page.getByRole("link", { name: /Votações/ }).first(),
+  ).toBeAttached();
+  await expect(page.getByText("em breve")).toHaveCount(0);
 });
 
 test("Obras é um link e fica marcada também na ficha de uma obra", async ({

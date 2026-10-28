@@ -18,6 +18,7 @@ import { FLAGS } from "@/lib/geo/flags";
 import { formatPercent, withVariation } from "@/lib/politicians/assets";
 import { percent } from "@/lib/politicians/attendance";
 import { relevanceText } from "@/lib/politicians/relevance";
+import { optionText } from "@/lib/votes/options";
 import {
   officeLabel,
   partyTimeline,
@@ -637,24 +638,6 @@ function Assets({ data }: { data: AssetsData }) {
   );
 }
 
-const OPTION: Record<string, string> = {
-  sim: "Sim",
-  nao: "Não",
-  abstencao: "Abstenção",
-  obstrucao: "Obstrução",
-  art17: "Art. 17",
-  presidente: "Presidente da sessão (não vota)",
-  presente_sem_voto: "Presente, sem registrar voto",
-  ausente: "Ausente",
-  nao_informado: "Não informado",
-};
-
-/** The option, with the reason the house gives for an absence (e.g. "Ausente: Licença saúde"). */
-function optionText(b: BallotRow): string {
-  const label = OPTION[b.option] ?? b.option;
-  return b.optionDetail ? `${label}: ${b.optionDetail}` : label;
-}
-
 const VOTES_OF: Partial<Record<HouseSlug, { house: string; note: string }>> = {
   camara: {
     house: "Câmara dos Deputados",
@@ -720,7 +703,9 @@ function HowVoted({
                       : ""}
                   )
                 </span>{" "}
-                <span data-testid="voto">Voto: {optionText(b)}</span>
+                <span data-testid="voto">
+                  Voto: {optionText(b.option, b.optionDetail)}
+                </span>
                 {relevanceText(b.criteria, b.propositionType) ? (
                   <span className={styles.note} data-testid="relevancia">
                     {" "}

@@ -6,6 +6,7 @@ import { placeExists } from "@/lib/places/exists";
 import { planExists } from "@/lib/plans/exists";
 import { politicianName } from "@/lib/politicians/exists";
 import { profilePath } from "@/lib/politicians/who";
+import { voteExists } from "@/lib/votes/exists";
 import { workExists } from "@/lib/works/exists";
 
 // Pages with a code in the address stream after a static shell, so `notFound()` there can no
@@ -19,6 +20,7 @@ const CHECKS: [
   ["/obras/", workExists],
   ["/representantes/", placeExists],
   ["/planos/", planExists],
+  ["/votacoes/", voteExists],
 ];
 
 const notFound = (request: NextRequest) =>
@@ -108,6 +110,7 @@ export const config = {
     "/representantes/:codigo",
     "/politicos/:slug",
     "/planos/:plano",
+    "/votacoes/:id",
     "/painel",
     "/painel/:path*",
   ],

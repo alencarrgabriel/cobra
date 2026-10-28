@@ -227,9 +227,9 @@ where v.source_id = '9100-1' and p.source_id = '8001';
 -- Senate plenary votes (change ingestao-senado-votacoes): Senadora Teste Um on sick leave in a
 -- nominal vote; a secret vote has no ballot.
 insert into core.votes (house_id, occurred_on, organ, description, approved, yes, no, other,
-  nominal, secret, proposition_label, source, source_id, collected_at)
+  nominal, secret, proposition_label, proposition_type, source, source_id, collected_at)
 select h.id, v.day::date, 'PLEN', v.descr, true, v.yes, v.no, 0, v.nominal, v.secret,
-       'PLP 55/2026', 'senado', v.sid, now()
+       'PLP 55/2026', 'PLP', 'senado', v.sid, now()
 from core.legislative_houses h,
   (values
     ('97001', '2026-06-09', 'Votação nominal do projeto de teste.', 58, 1, true, false),

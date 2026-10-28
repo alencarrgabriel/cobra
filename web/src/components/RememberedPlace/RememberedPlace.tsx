@@ -11,7 +11,8 @@ const KEY = "cobra:lugar";
 
 type Saved = { codigo: string; nome: string };
 
-function read(): Saved | null {
+/** The remembered place, or null (no storage, nothing saved or an invalid value). */
+export function readRememberedPlace(): Saved | null {
   try {
     const value = JSON.parse(
       localStorage.getItem(KEY) ?? "null",
@@ -41,7 +42,7 @@ export function RememberedPlace() {
   const [saved, setSaved] = useState<Saved | null>(null);
   // Read after mounting: the server has no access to this device's storage.
   // eslint-disable-next-line react-hooks/set-state-in-effect
-  useEffect(() => setSaved(read()), []);
+  useEffect(() => setSaved(readRememberedPlace()), []);
   if (!saved) return null;
   return (
     <p className={styles.remembered} data-testid="lugar-lembrado">

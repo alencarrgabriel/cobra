@@ -7,12 +7,14 @@ import {
   getRepresentatives,
   type House,
 } from "@/lib/representatives/queries";
+import { getVote } from "@/lib/votes/queries";
 import { getWork } from "@/lib/works/queries";
 
 import {
   type CardContent,
   placeCard,
   politicianCard,
+  voteCard,
   workCard,
 } from "./content";
 
@@ -49,6 +51,12 @@ export async function placeCardContent(
     .map((u) => u.collectedAt!)
     .sort();
   return placeCard(place, counts, dates.at(-1) ?? null);
+}
+
+export async function voteCardContent(id: string): Promise<CardContent | null> {
+  if (!/^\d{1,12}$/.test(id)) return null;
+  const vote = await getVote(Number(id));
+  return vote ? voteCard(vote) : null;
 }
 
 export async function workCardContent(
