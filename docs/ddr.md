@@ -2,6 +2,8 @@
 
 > Convertido de `Cobra — Documento de Definição de Requisitos (DDR).docx` em 2026-10-20. Este arquivo passa a ser a fonte da verdade; os diagramas foram transcritos em texto.
 >
+> **Versão 4.0 (2026-10-28).** Escopo ampliado por decisão do responsável: o Cobra passa a cobrir tudo o que o Politicômetro oferece, com identidade, código e textos próprios. Entram, a partir da fase 2: todos os eleitos do país, de vereador a presidente, com perfil básico pelo TSE; "Me representa" com todos os níveis de governo da cidade; salário (subsídio e remuneração oficiais) nos perfis; Executivo (presidente, governadores, prefeitos e ministros); STF; arrecadação de impostos com fonte oficial (no lugar do placar estimado do Impostômetro); comparador de políticos sem ranking; planos de governo lado a lado; e canal no WhatsApp. Obras, emendas e planos de quem governa continuam como diferencial. A regra de neutralidade (§9) não muda, e o comparador de planos de candidatos durante a campanha continua dependendo de parecer jurídico.
+>
 > **Versão 3.0 (2026-10-26).** Mudança de foco: com o Politicômetro (no ar desde 22/10/2026, cobrindo 70 mil eleitos) e o Apuração Brasil já entregando perfis e votações, o Cobra passa a se concentrar em **"dinheiro e promessas na sua cidade"**: obras com recurso federal, emendas e de onde veio cada real, e os planos de governo de quem governa. Obras e emendas entram no MVP; o perfil de parlamentar fica mais enxuto e ganha trajetória eleitoral, patrimônio por composição e perguntas frequentes. Planos de governo entram no MVP (presidente e governadores em exercício); o comparador de candidatos fica para 2028, depois de parecer jurídico.
 >
 > **Versão 2.2 (2026-10-26).** Perfil completo detalhado por seções e módulo de obras revisto com a API pública do Obrasgov verificada: resumo da cidade, mapa com pinos já na fase 2, filtros e card de obra.
@@ -14,7 +16,7 @@
 
 O Cobra (nome provisório) é uma plataforma cívica que mostra a qualquer brasileiro, a partir de onde ele mora, o que fazem os políticos que o representam: como votam, o que propõem, quanto gastam e que obras financiam. O princípio que guia todas as decisões é mostrar fatos, nunca notas, rankings ou opinião.
 
-**Foco (versão 3.0): dinheiro e promessas na sua cidade.** O centro do produto é o que chega ao lugar onde a pessoa mora: as obras pagas com dinheiro federal, as emendas que as financiaram e quem as indicou, e o que quem governa prometeu no plano de governo registrado no TSE. Perfis e votações continuam, como contexto e de forma enxuta, porque já são bem cobertos por outras iniciativas.
+**Foco (versão 4.0): cobertura completa, com dinheiro e promessas na sua cidade como diferencial.** O Cobra cobre todos os eleitos e os Três Poderes no nível federal, como o Politicômetro, e mantém no centro o que chega ao lugar onde a pessoa mora: as obras pagas com dinheiro federal, as emendas que as financiaram e quem as indicou, e o que quem governa prometeu no plano de governo registrado no TSE. Funcionalidades inspiradas em outras iniciativas são reimplementadas com dados oficiais próprios, sem copiar código, textos, imagens ou marca (§13).
 
 Problema. Os dados sobre a atuação de políticos são públicos, mas estão espalhados em portais técnicos (Câmara, Senado, TSE, Portal da Transparência, Obrasgov) que poucos cidadãos conseguem usar. As iniciativas existentes cobrem quase só o Congresso, exigem que o usuário vá até elas e, em vários casos, embutem critérios próprios de avaliação.
 
@@ -102,6 +104,8 @@ Fora do produto em qualquer fase: cotação de ações individuais, análise ou 
 
 Exceção prevista à regra de candidaturas: o comparador literal de planos de governo de candidatos (RF-84), a partir das eleições de 2028 e só depois de parecer jurídico.
 
+Escopo ampliado (versão 4.0, 2026-10-28): depois do MVP, a cobertura passa a ser a de todos os eleitos do país e dos Três Poderes no nível federal (RF-85 a RF-94). Cada nova fonte só entra depois de conferida a documentação oficial atual (§6) e respeitando os limites de cada uma; dado sem fonte oficial (como estimativas privadas de impostos pagos) não entra.
+
 | Funcionalidade | MVP (fase 1) | Fase 2 | Fase 3 | Fase 4 |
 |---|---|---|---|---|
 | Busca por CEP, cidade ou UF | Sim |  |  |  |
@@ -109,8 +113,16 @@ Exceção prevista à regra de candidaturas: o comparador literal de planos de g
 | Mapa do Brasil clicável (bancada e placar por estado) | Sim |  |  |  |
 | Senadores e deputados federais | Perfil completo |  |  |  |
 | Deputados distritais (CLDF) | Perfil básico | Perfil completo |  |  |
-| Governador e deputados estaduais |  |  | Estados com API de alta maturidade (MG, PR, PE, MT) | Demais estados |
-| Prefeitos e vereadores |  |  | Perfil básico via TSE | Câmaras com dados abertos |
+| Governador e deputados estaduais |  | Perfil básico via TSE | Estados com API de alta maturidade (MG, PR, PE, MT) | Demais estados |
+| Prefeitos e vereadores |  | Perfil básico via TSE (todos os eleitos) | Câmaras com dados abertos |  |
+| Todos os eleitos do país, de vereador a presidente (perfil básico) |  | Sim (TSE) |  |  |
+| "Me representa": todos os níveis de governo da cidade |  | Sim |  |  |
+| Salário (subsídio e remuneração oficiais) no perfil |  | Congresso e Executivo federal | Estados e municípios com dados abertos |  |
+| Executivo: presidente, governadores, prefeitos e ministros |  | Sim |  |  |
+| STF: ministros, composição e decisões do plenário |  | Sim |  |  |
+| Arrecadação de impostos com fonte oficial |  | Sim |  |  |
+| Planos de governo de quem governa lado a lado |  | Sim |  |  |
+| Canal no WhatsApp (publicações abertas) |  | Sim |  |  |
 | Feed "O que aconteceu" | Votações relevantes e projetos | Presença e gastos |  |  |
 | Votações explicadas em linguagem simples | Sim, com revisão humana |  |  |  |
 | Perfil: votos, projetos, presença, gastos | Sim |  |  |  |
@@ -176,7 +188,7 @@ Os requisitos estão agrupados em seis módulos. Prioridade: Alta = necessário 
 | RF-26 | Patrimônio declarado em cada eleição e doadores de campanha (TSE) | Alta | 1 |
 | RF-27 | Histórico de partidos e cargos | Média | 1 |
 | RF-28 | Emendas parlamentares enviadas, por município e situação | Alta | 1 |
-| RF-29 | Comparar 2 ou 3 políticos lado a lado, só com fatos | Baixa | 2 |
+| RF-29 | Comparar 2 ou 3 políticos lado a lado, só com fatos (ampliado pelo RF-91) | Média | 2 |
 | RF-30 | Botão "Seguir" (exige conta ou contato verificado) | Alta | 1 |
 | RF-59 | Link "É você nesta página?" em todo perfil, levando ao canal de contestação e direito de resposta (§10.5) | Alta | 1 |
 | RF-35 | Texto "Quem é" no topo do perfil, montado só com dados oficiais por um modelo de frase fixo (sem IA): cargo, partido, desde quando, eleições vencidas e votos | Média | 1 |
@@ -226,6 +238,21 @@ A classificação por tema usa uma regra pública e igual para todos os document
 | RF-72 | Ligar cada indicador às votações e projetos sobre o mesmo tema, por assunto, sem afirmar causa e efeito | Média | 2 |
 | RF-73 | Trilhas educativas curtas: como uma lei é feita, o que faz cada cargo, como funcionam juros, inflação, impostos e a bolsa de valores | Média | 2 |
 | RF-74 | Ibovespa diário como termômetro, sem cotação de ações individuais, condicionado a licença de dados da B3 | Baixa | 3 |
+
+### 4.4d Cobertura completa (versão 4.0)
+
+| ID | Requisito | Prioridade | Fase |
+|---|---|---|---|
+| RF-85 | Perfil básico de todos os eleitos do país (vereador, prefeito e vice, deputado estadual e distrital, governador e vice, deputado federal, senador, presidente e vice) pelo TSE: cargo, partido, município ou UF, votos e trajetória | Alta | 2 |
+| RF-86 | "Me representa": a partir da cidade, todos os níveis de governo (vereadores, prefeito, deputados estaduais, governador, deputados federais, senadores, presidente), em ordem fixa e alfabética dentro de cada nível | Alta | 2 |
+| RF-87 | Salário no perfil: subsídio ou remuneração oficial do cargo, com fonte e data; no Congresso e no Executivo federal na fase 2, e em estados e municípios com dados abertos depois | Alta | 2 |
+| RF-88 | Executivo: perfis do presidente, do vice, dos ministros, dos governadores e dos prefeitos, com cargo, partido, período e, quando houver, o plano de governo | Alta | 2 |
+| RF-89 | STF: perfil de cada ministro (quem indicou, posse, trajetória oficial) e a composição atual, com fonte oficial; decisões do plenário só com dados oficiais e sem classificação de "a favor" ou "contra" | Média | 2 |
+| RF-90 | Arrecadação de impostos com dados oficiais (Receita Federal e Tesouro), por tributo e por mês, explicada em linguagem simples; nenhuma estimativa privada de "impostos pagos" | Média | 2 |
+| RF-91 | Comparar 2 ou 3 políticos do mesmo cargo lado a lado, só com fatos e com os mesmos campos (substitui e amplia o RF-29) | Média | 2 |
+| RF-92 | Planos de governo de quem governa lado a lado (ex.: governadores de estados diferentes), por tema e com trecho literal, pela mesma regra fixa de temas | Média | 2 |
+| RF-93 | Canal no WhatsApp com publicações abertas (votações relevantes e resumos revisados), sem coleta de dados de quem segue o canal | Média | 2 |
+| RF-94 | Busca única por CEP, cidade, UF ou nome de qualquer político coberto, com sugestões enquanto a pessoa digita | Alta | 2 |
 
 ### 4.5 Alertas
 
@@ -562,8 +589,8 @@ O MVP é um sucesso se, em 3 meses, as pessoas voltarem sozinhas: a métrica pri
 | Fase | Período | Entregas |
 |---|---|---|
 | 1. Dinheiro e promessas no DF | Meses 1 a 3 | Obras e emendas no DF; planos de governo do presidente e do governador; representantes do DF e perfis enxutos dos congressistas; votações relevantes; alertas por e-mail |
-| 2. Brasil e economia | Meses 4 a 6 | Obras e emendas em todo o Brasil; planos dos prefeitos; resumo no WhatsApp; distritais completos; comparador de políticos; economia em números e trilhas educativas |
-| 3. Estados | Meses 7 a 12 | ALs de MG, PR, PE, MT; prefeitos e vereadores; emendas Pix; relatos de obras; Ibovespa diário se houver licença |
+| 2. Brasil completo e economia | Meses 4 a 9 | Todos os eleitos pelo TSE (RF-85) e "Me representa" por cidade (RF-86); salários (RF-87); Executivo (RF-88) e STF (RF-89); arrecadação oficial (RF-90); comparador (RF-91) e planos lado a lado (RF-92); busca por nome (RF-94); obras e emendas em todo o Brasil; planos dos prefeitos; resumo e canal no WhatsApp (RF-93); distritais completos; economia em números e trilhas educativas |
+| 3. Estados | Meses 10 a 15 | ALs de MG, PR, PE, MT (votos e gastos); salários de estados e municípios com dados abertos; emendas Pix; relatos de obras; Ibovespa diário se houver licença |
 | 4. Escala nacional | Ano 2 | Demais estados; câmaras municipais; API pública; exportação de dados |
 
 - Meta 1 (libera fase 2): 5 mil visitantes por mês e 1 mil inscritos no resumo.
@@ -628,6 +655,7 @@ As decisões abaixo já têm uma recomendação para não travar o desenvolvimen
 | Economia e bolsa (decidido em 2026-10-26) | Economia em números e trilhas educativas na fase 2; Ibovespa diário na fase 3, se houver licença; nunca ações individuais | Fontes oficiais gratuitas para indicadores; licença da B3 e regras da CVM para ações |
 | Referência visual (decidido em 2026-10-26) | seuimposto.com (Pandora), com identidade própria | Melhor experiência visual entre as referências pesquisadas |
 | Compartilhamento (decidido em 2026-10-26) | Cards e painel de compartilhar no MVP, com prioridade Alta, desde o design system | Distribuição por WhatsApp e redes é o principal canal de crescimento (cap. 11, risco de pouca adoção) |
+| Escopo ampliado (decidido em 2026-10-28) | Cobrir tudo o que o Politicômetro oferece (RF-85 a RF-94), com identidade, código e textos próprios, só com fontes oficiais e sem nota nem ranking | Pedido do responsável: é a iniciativa mais parecida com a ideia do Cobra; copiar layout, textos ou marca teria risco de direito autoral e de confusão com o concorrente, e o §13 já exige identidade própria |
 | Teste "Quem vota como você?" (em aberto) | Avaliar na fase 2 ou 3, após parecer jurídico; respostas ficariam só no aparelho e no link | Gera engajamento como o 12axes, mas é comparação de afinidade política, que o cap. 3 exclui do MVP, e as respostas são dado sensível (§10.2) |
 
 ### Pontos a verificar
@@ -652,6 +680,8 @@ As decisões abaixo já têm uma recomendação para não travar o desenvolvimen
 
 - ☐ Parecer jurídico sobre LGPD, legislação eleitoral e direito de resposta
 
+- ☐ Fontes do escopo ampliado (versão 4.0), a conferir na documentação oficial antes de cada change: TSE (eleitos de 2022 e 2024 por cargo e município), subsídios do Congresso (portais da Câmara e do Senado), remuneração do Executivo federal (Portal da Transparência, servidores e cargos), ministros do STF (portal do STF e dados abertos, se houver), arrecadação federal (Receita Federal e Tesouro Nacional) e a política da Meta para canais do WhatsApp
+
 - ☑ Situação atual dos concorrentes (verificado em 2026-10-26): Apuração Brasil ativo e concorrente direto; Excelências aparenta estar desativado; Radar do Congresso ativo
 
 - ☐ Licença de uso e crédito exigido para as fotos oficiais da Câmara, do Senado e da CLDF
@@ -667,6 +697,7 @@ As decisões abaixo já têm uma recomendação para não travar o desenvolvimen
 | Versão | Data | Mudanças |
 |---|---|---|
 | 1 | 2026-10-20 | Conversão do documento original (.docx) |
+| 4.0 | 2026-10-28 | Escopo ampliado para cobrir o que o Politicômetro oferece: RF-85 a RF-94 (todos os eleitos, "Me representa", salários, Executivo, STF, arrecadação oficial, comparador, planos lado a lado, canal no WhatsApp, busca por nome); RF-29 ampliado; matriz, roadmap das fases 2 e 3, decisões e pontos a verificar |
 | 3.0 | 2026-10-26 | Foco "dinheiro e promessas na sua cidade"; Politicômetro e Sólon nos concorrentes; obras e emendas (RF-28, RF-34, RF-39 a RF-44, RF-46, RF-48, RF-49) no MVP; planos de governo (RF-80 a RF-84); perfil com RF-35 a RF-38; RF-59 (direito de resposta); regra do "—"; fonte TSE de planos de governo; roadmap e riscos |
 | 2.2 | 2026-10-26 | RF-33 e RF-34 (perfil por seções e obras no perfil); RF-46 passa para a fase 2; RF-48, RF-49 e RF-39 (resumo, filtros e ficha da obra); fonte Obrasgov detalhada com a API verificada |
 | 2.1 | 2026-10-26 | Compartilhamento: RF-60 e RF-61 revistos (RF-61 passa a Alta), RF-67 a RF-69, jornada de compartilhamento, §13.3; decisão em aberto sobre o teste "Quem vota como você?" |
