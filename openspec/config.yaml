@@ -113,7 +113,8 @@ context: |
   relevancia-e-eventos (critérios do §9.2 em visão; eventos para o feed); 23a painel-editorial
   (Supabase Auth + TOTP, fila, rascunho, aprovação registrada, curadoria, trilha).
   23b rascunho-ia (Claude Haiku 5.5, só publica com aprovação; liga com ANTHROPIC_API_KEY).
-  Próximas: 24 feed-e-pagina-votacao; 25 alertas-email;
+  24 feed-e-pagina-votacao (feed com votos do lugar, página permanente, card).
+  Próximas: 25 alertas-email;
   26 seguir-politicos; 27 metodologia-e-reporte-de-erro (com "É você nesta página?");
   28 saude-integracoes.
   Fase 2: obras e emendas em todo o Brasil; planos dos prefeitos (2024); comparador de políticos;
