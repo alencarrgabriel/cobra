@@ -113,6 +113,11 @@ async function Vote({ params }: { params: Promise<{ id: string }> }) {
           text={`${vote.label ?? "Votação"} (${HOUSE_NAME[vote.house]}, ${formatDate(vote.occurredOn)}): Sim ${vote.yes}, Não ${vote.no}. Veja no Cobra.`}
           card={{ kind: "votacao", id: vote.id }}
         />
+        <p className={styles.note}>
+          <Link href={`/reportar?pagina=/votacoes/${vote.id}`}>
+            Reportar erro nesta página
+          </Link>
+        </p>
       </header>
 
       <Card aria-labelledby="placar">

@@ -43,6 +43,8 @@ export function AppShell({ children }: { children: ReactNode }) {
           <Link href="/metodologia">Metodologia</Link>
           <Link href="/alertas">Alertas por e-mail</Link>
           <Link href="/privacidade">Privacidade</Link>
+          <Link href="/correcoes">Correções</Link>
+          <Link href="/reportar">Reportar erro</Link>
         </footer>
       </div>
       <Suspense fallback={<NavList variant="bottom" pathname={null} />}>

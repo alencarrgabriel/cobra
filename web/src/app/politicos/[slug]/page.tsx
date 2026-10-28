@@ -270,6 +270,18 @@ async function Profile({ params }: { params: Promise<{ slug: string }> }) {
             text={`${p.name} no Cobra: mandato, partido, emendas e obras, com fonte oficial.`}
             card={{ kind: "politico", id: p.id }}
           />
+          <p className={styles.note}>
+            <Link
+              href={`/reportar?pagina=/politicos/${p.id}&tipo=contestacao`}
+              data-testid="e-voce"
+            >
+              É você nesta página?
+            </Link>{" "}
+            ·{" "}
+            <Link href={`/reportar?pagina=/politicos/${p.id}`}>
+              Reportar erro nesta página
+            </Link>
+          </p>
         </div>
       </header>
 

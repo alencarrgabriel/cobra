@@ -32,6 +32,9 @@ async function Queue() {
           <Button type="submit">Sair ({editor.name})</Button>
         </form>
       </header>
+      <p>
+        <Link href="/painel/reportes">Reportes de erro e contestações</Link>
+      </p>
       <p className={styles.note}>
         Votações relevantes das duas casas sem resumo publicado, da mais recente
         para a mais antiga.

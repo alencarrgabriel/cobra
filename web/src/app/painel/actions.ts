@@ -8,6 +8,8 @@ import { draftSummary } from "@/lib/editorial/draft";
 import { voteForEditing } from "@/lib/editorial/queries";
 import { requireEditor } from "@/lib/editorial/session";
 import { authClient } from "@/lib/editorial/supabase";
+import { triage } from "@/lib/reports/queries";
+import { isClosed } from "@/lib/reports/rules";
 
 // Server actions of the editorial panel (change painel-editorial). Every action that writes
 // checks the editor again: the Proxy alone is not a barrier (design D1).
@@ -148,4 +150,37 @@ export async function uncurate(form: FormData): Promise<void> {
       values (${editor.email}, 'retirada_curadoria', ${id})`;
   });
   redirect(`/painel/votacoes/${id}?ok=retirada`);
+}
+
+const REPORT_STATUSES = [
+  "recebido",
+  "em_analise",
+  "corrigido",
+  "sem_alteracao",
+] as const;
+
+/** Triage of an error report (change reporte-de-erro, design D5). */
+export async function triageReport(form: FormData): Promise<void> {
+  const editor = await requireEditor();
+  const id = Number(form.get("report"));
+  if (!Number.isSafeInteger(id) || id <= 0) throw new Error("invalid report");
+  const back = `/painel/reportes/${id}`;
+  const status = REPORT_STATUSES.find((s) => s === form.get("status"));
+  if (!status) redirect(`${back}?erro=situacao`);
+  const note = String(form.get("note") ?? "").trim() || null;
+  const reply = String(form.get("reply") ?? "").trim() || null;
+  if (note && (note.length < 20 || note.length > 2000)) {
+    redirect(`${back}?erro=nota`);
+  }
+  if (isClosed(status) && !note) redirect(`${back}?erro=nota`);
+  const saved = await triage({
+    id,
+    editor: editor.email,
+    status,
+    publicNote: note,
+    reply,
+  });
+  if (!saved) redirect("/painel/reportes");
+  updateTag("reports");
+  redirect(`${back}?ok=1`);
 }

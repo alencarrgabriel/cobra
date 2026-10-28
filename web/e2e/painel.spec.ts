@@ -155,6 +155,71 @@ test.describe("com o Supabase Auth local", () => {
       "Resumo revisado por pessoas em",
     );
   });
+
+  // Change reporte-de-erro, design D5: triage with a public note, history and an e-mail reply.
+  test("reporte: triagem com nota pública, histórico e resposta por e-mail", async ({
+    page,
+  }) => {
+    test.setTimeout(90_000);
+    const reporter = `quem-reportou-${Date.now()}@exemplo.org`;
+    await page.goto("/reportar?pagina=/votacoes");
+    await page
+      .getByLabel("O que está errado")
+      .fill("A data desta votação não bate com a da Câmara.");
+    await page.getByLabel("E-mail para resposta (opcional)").fill(reporter);
+    await page.getByRole("button", { name: "Enviar reporte" }).click();
+    const protocol = await page.getByTestId("protocolo").textContent({
+      timeout: 15_000,
+    });
+    const id = /nº (\d+)/.exec(protocol!)![1]!;
+
+    const email = `editora-reportes-${Date.now()}@cobra.test`;
+    await user(email, true);
+    await signIn(page, email);
+    await expect(page).toHaveURL(/\/painel$/, { timeout: 15_000 });
+    await page
+      .getByRole("link", { name: "Reportes de erro e contestações" })
+      .click();
+    await page.getByRole("link", { name: `Analisar o nº ${id}` }).click();
+    await expect(page.getByTestId("descricao")).toContainText(
+      "não bate com a da Câmara",
+      { timeout: 15_000 },
+    );
+
+    // Closing needs a public note.
+    await page.locator('select[name="status"]').selectOption("corrigido");
+    await page.getByRole("button", { name: "Salvar" }).click();
+    await expect(page.getByTestId("erro-reporte")).toContainText(
+      "obrigatória para fechar",
+      {
+        timeout: 15_000,
+      },
+    );
+
+    const note =
+      "Data corrigida em 28/10/2026 conforme a Câmara dos Deputados.";
+    await page.locator('select[name="status"]').selectOption("corrigido");
+    await page.getByLabel(/Nota pública/).fill(note);
+    await page.getByLabel(/Resposta por e-mail/).fill("Obrigado pelo aviso.");
+    await page.getByRole("button", { name: "Salvar" }).click();
+    await expect(page.getByTestId("reporte-salvo")).toBeVisible({
+      timeout: 15_000,
+    });
+    await expect(page.getByTestId("historico-reporte")).toContainText(
+      `${email} · Corrigido · respondido por e-mail`,
+    );
+
+    const sql = postgres(e2eUrl(), { max: 1 });
+    const [reply] = await sql<{ subject: string; body: string }[]>`
+      select subject, body from alerts.outbox_local where recipient = ${reporter}`;
+    await sql.end();
+    expect(reply!.subject).toBe(`Cobra: resposta ao reporte nº ${id}`);
+    expect(reply!.body).toContain(note);
+
+    await page.goto(`/correcoes/${id}`);
+    await expect(page.getByTestId("situacao")).toContainText("Corrigido, em");
+    await expect(page.getByTestId("nota-publica")).toHaveText(note);
+  });
 });
 
 test("página de entrada sem violações WCAG 2.1 A/AA", async ({ page }) => {

@@ -6,6 +6,7 @@ import { placeExists } from "@/lib/places/exists";
 import { planExists } from "@/lib/plans/exists";
 import { politicianName } from "@/lib/politicians/exists";
 import { profilePath } from "@/lib/politicians/who";
+import { reportExists } from "@/lib/reports/exists";
 import { voteExists } from "@/lib/votes/exists";
 import { workExists } from "@/lib/works/exists";
 
@@ -21,6 +22,7 @@ const CHECKS: [
   ["/representantes/", placeExists],
   ["/planos/", planExists],
   ["/votacoes/", voteExists],
+  ["/correcoes/", reportExists],
 ];
 
 const notFound = (request: NextRequest) =>
@@ -111,6 +113,7 @@ export const config = {
     "/politicos/:slug",
     "/planos/:plano",
     "/votacoes/:id",
+    "/correcoes/:protocolo",
     "/painel",
     "/painel/:path*",
   ],

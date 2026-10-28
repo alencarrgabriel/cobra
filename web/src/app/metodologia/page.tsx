@@ -97,6 +97,9 @@ export default function MethodologyPage() {
             <li>
               <a href="#emendas">Obras e emendas</a>
             </li>
+            <li>
+              <a href="#correcoes">Correções</a>
+            </li>
           </ul>
         </nav>
       </header>
@@ -242,6 +245,34 @@ export default function MethodologyPage() {
           parlamentar de exatamente um deputado federal ou senador. Emendas de
           bancada, comissão ou relator ficam sem político.
         </p>
+      </section>
+
+      <section aria-labelledby="correcoes" className={styles.section}>
+        <h2 id="correcoes" className={styles.h2}>
+          Correções
+        </h2>
+        <p>
+          Qualquer pessoa pode <Link href="/reportar">reportar um erro</Link> em
+          qualquer página, sem cadastro. Quem é retratado numa página tem
+          direito de resposta pelo link “É você nesta página?” do perfil.
+        </p>
+        <ul>
+          <li>
+            Respondemos em até 5 dias úteis (segunda a sexta), e o prazo aparece
+            em cada reporte; atraso fica visível.
+          </li>
+          <li>
+            Todo reporte entra na{" "}
+            <Link href="/correcoes">fila pública de correções</Link> com a
+            situação e a nota da equipe: o que mudou e quando, ou por que o dado
+            foi mantido.
+          </li>
+          <li>
+            O texto enviado e o contato de quem reportou não são publicados. O
+            e-mail, se informado, serve só para a resposta e é apagado 90 dias
+            depois do fechamento.
+          </li>
+        </ul>
       </section>
 
       <p className={styles.note}>

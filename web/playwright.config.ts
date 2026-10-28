@@ -45,6 +45,7 @@ export default defineConfig({
       ALERTS_SECRET: E2E_ALERTS_SECRET,
       RESEND_API_KEY: "",
       CRON_SECRET: E2E_CRON_SECRET,
+      REPORTS_DATABASE_URL: e2eUrl(),
     },
   },
 });

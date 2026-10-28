@@ -119,6 +119,16 @@ Chaves: `id bigint generated always as identity`, exceto `core.localities` (chav
 
 Ver docs/alertas.md.
 
+### Reportes (change `reporte-de-erro`)
+
+| Tabela                        | O que guarda                                                                                                    | Regras                                                                                                 |
+| ----------------------------- | --------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `reports.reports`             | Reporte de erro ou contestação: página, tipo, descrição, e-mail cifrado opcional, situação, nota pública, prazo | O id é o protocolo; descrição e e-mail nunca são públicos; e-mail apagado 90 dias depois do fechamento |
+| `reports.history`             | Cada passo da triagem: editor, situação, nota, se houve resposta                                                | Só inserção para `cobra_editor`                                                                        |
+| `core.public_reports` (visão) | Fila pública: protocolo, página, tipo, situação, nota, datas                                                    | O que o site lê                                                                                        |
+
+Ver docs/correcoes.md.
+
 ## Papéis e usuários
 
 As migrações criam os papéis `cobra_web_reader` e `cobra_collector` sem login e sem senha, e dão a eles os privilégios, inclusive para tabelas futuras (`alter default privileges`).
@@ -134,6 +144,9 @@ grant cobra_collector to cobra_etl;
 
 create role cobra_alertas login password '<senha gerada>';
 grant cobra_alerts to cobra_alertas;
+
+create role cobra_reportes login password '<senha gerada>';
+grant cobra_reports to cobra_reportes;
 ```
 
 A `DATABASE_URL` de cada ambiente usa o usuário correspondente. No Supabase local, os coletores usam o superusuário `postgres`.

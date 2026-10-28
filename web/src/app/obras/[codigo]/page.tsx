@@ -85,6 +85,13 @@ export default async function WorkPage({
           text={`${work.name}: ${STATUS_INFO[work.status].label.toLowerCase()}, segundo o Obrasgov.br. Veja no Cobra.`}
           card={{ kind: "obra", id: work.code }}
         />
+        <p>
+          <Link
+            href={`/reportar?pagina=${encodeURIComponent(`/obras/${work.code}`)}`}
+          >
+            Reportar erro nesta página
+          </Link>
+        </p>
       </header>
 
       <Card aria-labelledby="numeros">
