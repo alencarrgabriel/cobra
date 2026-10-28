@@ -73,3 +73,10 @@ Todo perfil SHALL ter um botão "Seguir" que leva ao cadastro de alertas com o p
 #### Scenario: Seguir a partir do perfil
 - **WHEN** alguém clica em "Seguir" no perfil de um político
 - **THEN** abre o cadastro de alertas mostrando esse político e pedindo o consentimento específico para guardar seguidos
+
+### Requirement: É você nesta página?
+Todo perfil SHALL ter o link "É você nesta página?", que abre o formulário de contestação com o perfil já indicado, e um link para reportar erro no perfil.
+
+#### Scenario: Contestação a partir do perfil
+- **WHEN** alguém clica em "É você nesta página?" num perfil
+- **THEN** abre o formulário como contestação daquele perfil, com o direito de resposta e o prazo explicados

@@ -119,8 +119,9 @@ context: |
   25b resumo-semanal (rota diária com CRON_SECRET; votos do estado e dos seguidos; uma vez por
   semana; histórico em meus dados).
   27a metodologia (fontes com última coleta, critérios, regras, temas).
-  Próximas: 27b reporte-de-erro (com "É você nesta página?"; prazo de 5 dias úteis; e-mail
-  opcional cifrado, apagado 90 dias após o fechamento);
+  27b reporte-de-erro (protocolo, 5 dias úteis, fila pública sem dados de quem reportou, triagem
+  no painel, e-mail opcional apagado em 90 dias).
+  Próximas:
   28 saude-integracoes.
   Fase 2: obras e emendas em todo o Brasil; planos dos prefeitos (2024); comparador de políticos;
   economia-em-numeros; trilhas-educativas. Fase 3: comparador de planos de candidatos (2028, após parecer).
