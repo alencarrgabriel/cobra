@@ -154,6 +154,11 @@ async function Vote({ params }: { params: Promise<{ id: string }> }) {
                 <li key={c}>{CRITERIA_HELP[c] ?? c}</li>
               ))}
             </ul>
+            <p className={styles.note}>
+              <Link href="/metodologia#relevancia">
+                Como uma votação é considerada relevante
+              </Link>
+            </p>
           </>
         ) : null}
       </Card>

@@ -40,6 +40,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <div className={styles.content}>
         {children}
         <footer className={`${styles.footer} gutter`}>
+          <Link href="/metodologia">Metodologia</Link>
           <Link href="/alertas">Alertas por e-mail</Link>
           <Link href="/privacidade">Privacidade</Link>
         </footer>

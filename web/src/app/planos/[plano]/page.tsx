@@ -168,8 +168,9 @@ async function Content({
         <Card>
           <p>
             Escolha um tema ou busque uma palavra. Os temas são marcados por
-            palavras fixas, sem IA, e o texto aparece como está no PDF, com o
-            link para a página.
+            palavras fixas, sem IA (
+            <Link href="/metodologia#temas">veja a lista</Link>), e o texto
+            aparece como está no PDF, com o link para a página.
           </p>
         </Card>
       )}

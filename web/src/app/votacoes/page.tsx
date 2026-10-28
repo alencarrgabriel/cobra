@@ -43,7 +43,8 @@ export default function FeedPage({ searchParams }: PageProps<"/votacoes">) {
           Votações relevantes da Câmara e do Senado, da mais recente para a mais
           antiga. Uma votação é relevante por critério objetivo: Governo e
           Oposição divergiram, o placar foi disputado ou o tipo de matéria (PEC,
-          medida provisória, lei complementar, orçamento, veto).
+          medida provisória, lei complementar, orçamento, veto).{" "}
+          <Link href="/metodologia#relevancia">Veja a metodologia</Link>.
         </p>
       </header>
       <Suspense fallback={<p className={styles.note}>Carregando votações…</p>}>
