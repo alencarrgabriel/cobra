@@ -2,6 +2,8 @@
 
 > Convertido de `Cobra — Documento de Definição de Requisitos (DDR).docx` em 2026-10-20. Este arquivo passa a ser a fonte da verdade; os diagramas foram transcritos em texto.
 >
+> **Versão 4.1 (2026-10-28).** Detalhamento do escopo ampliado a partir da página pública "Como atualizamos" do Politicômetro (lida em 2026-10-28; usada só como referência de funcionalidades, sem copiar texto): Assembleias Legislativas e Câmaras Municipais com dados abertos (inclusive o sistema SAPL), discursos, comissões, viagens e missões oficiais, pauta do Congresso e do STF, julgamentos do STF, sanções do TCU e da CGU, contas de estados e municípios (Tesouro Nacional), salários de prefeitos e vereadores pelos Tribunais de Contas, página pública "Como atualizamos" com frequência e situação de cada fonte, "Quem publica e quem não publica", "Entenda os cargos", páginas de partidos, eleições e propostas, e acesso por assistentes de IA. "Mais vistos" fica de fora (ordena políticos por audiência, o que o §9.1 não permite).
+>
 > **Versão 4.0 (2026-10-28).** Escopo ampliado por decisão do responsável: o Cobra passa a cobrir tudo o que o Politicômetro oferece, com identidade, código e textos próprios. Entram, a partir da fase 2: todos os eleitos do país, de vereador a presidente, com perfil básico pelo TSE; "Me representa" com todos os níveis de governo da cidade; salário (subsídio e remuneração oficiais) nos perfis; Executivo (presidente, governadores, prefeitos e ministros); STF; arrecadação de impostos com fonte oficial (no lugar do placar estimado do Impostômetro); comparador de políticos sem ranking; planos de governo lado a lado; e canal no WhatsApp. Obras, emendas e planos de quem governa continuam como diferencial. A regra de neutralidade (§9) não muda, e o comparador de planos de candidatos durante a campanha continua dependendo de parecer jurídico.
 >
 > **Versão 3.0 (2026-10-26).** Mudança de foco: com o Politicômetro (no ar desde 22/10/2026, cobrindo 70 mil eleitos) e o Apuração Brasil já entregando perfis e votações, o Cobra passa a se concentrar em **"dinheiro e promessas na sua cidade"**: obras com recurso federal, emendas e de onde veio cada real, e os planos de governo de quem governa. Obras e emendas entram no MVP; o perfil de parlamentar fica mais enxuto e ganha trajetória eleitoral, patrimônio por composição e perguntas frequentes. Planos de governo entram no MVP (presidente e governadores em exercício); o comparador de candidatos fica para 2028, depois de parecer jurídico.
@@ -123,6 +125,15 @@ Escopo ampliado (versão 4.0, 2026-10-28): depois do MVP, a cobertura passa a se
 | Arrecadação de impostos com fonte oficial |  | Sim |  |  |
 | Planos de governo de quem governa lado a lado |  | Sim |  |  |
 | Canal no WhatsApp (publicações abertas) |  | Sim |  |  |
+| "Como atualizamos" público, com situação de cada fonte |  | Sim |  |  |
+| Assembleias Legislativas com dados abertos (presença, votos, propostas, verbas) |  | Sim |  |  |
+| Câmaras Municipais com dados abertos (SAPL primeiro) |  | Piloto | Expansão |  |
+| Discursos, comissões, viagens e missões |  | Sim |  |  |
+| Pauta do Congresso e do STF; julgamentos do STF |  | Sim |  |  |
+| Contas de estados e municípios, PIB e população |  | Sim |  |  |
+| Sanções do TCU e da CGU |  |  | Sim |  |
+| Entenda os cargos; partidos; eleições; propostas |  | Sim |  |  |
+| Acesso por assistentes de IA (MCP) |  |  | Sim |  |
 | Feed "O que aconteceu" | Votações relevantes e projetos | Presença e gastos |  |  |
 | Votações explicadas em linguagem simples | Sim, com revisão humana |  |  |  |
 | Perfil: votos, projetos, presença, gastos | Sim |  |  |  |
@@ -253,6 +264,19 @@ A classificação por tema usa uma regra pública e igual para todos os document
 | RF-92 | Planos de governo de quem governa lado a lado (ex.: governadores de estados diferentes), por tema e com trecho literal, pela mesma regra fixa de temas | Média | 2 |
 | RF-93 | Canal no WhatsApp com publicações abertas (votações relevantes e resumos revisados), sem coleta de dados de quem segue o canal | Média | 2 |
 | RF-94 | Busca única por CEP, cidade, UF ou nome de qualquer político coberto, com sugestões enquanto a pessoa digita | Alta | 2 |
+| RF-95 | Página pública "Como atualizamos": cada fonte com o que traz, a frequência, a última carga e a situação ("em dia" ou "fora do prazo previsto"), lidas do registro do coletor | Alta | 2 |
+| RF-96 | Deputados estaduais com presença, votos, propostas e verbas onde a Assembleia publica dados abertos | Alta | 2 |
+| RF-97 | Vereadores com presença, votos e propostas nas Câmaras Municipais com dados abertos (a começar pelas que usam o SAPL), lendo um site de cada vez e respeitando o intervalo que cada uma pede | Média | 2 |
+| RF-98 | "Quem publica e quem não publica": quais Assembleias e Câmaras Municipais têm dados abertos, com o que publicam, como fato e sem nota | Média | 2 |
+| RF-99 | Discursos, comissões, viagens e missões oficiais de deputados e senadores, com fonte e data | Média | 2 |
+| RF-100 | Pauta do dia da Câmara, do Senado e do STF, atualizada ao longo do dia | Média | 2 |
+| RF-101 | Julgamentos do Plenário do STF com resultado e data, só com dados oficiais | Média | 2 |
+| RF-102 | Sanções aplicadas pelo TCU e pela CGU a empresas e entes que receberam recursos (ex.: emendas), com fonte; nunca dados de pessoas físicas além do que a fonte publica como sanção oficial | Média | 3 |
+| RF-103 | Contas de estados e municípios (Tesouro Nacional), PIB e população (IBGE) na página de cada lugar | Média | 2 |
+| RF-104 | Salário de prefeitos e vereadores pelos Tribunais de Contas que publicam, e salário e verbas de cada cargo com o ato legal como fonte | Média | 3 |
+| RF-105 | "Entenda os cargos": o que faz cada cargo, quem elege, mandato, salário e verbas, com o ato legal | Média | 2 |
+| RF-106 | Páginas de partidos (eleitos por cargo e lugar, sem nota), de eleições (resultados por cargo e lugar) e de propostas (busca de proposições por tema e situação) | Média | 2 |
+| RF-107 | Acesso aos dados públicos do Cobra por assistentes de IA (servidor MCP somente leitura, com fonte e data em cada resposta) | Baixa | 3 |
 
 ### 4.5 Alertas
 
@@ -589,8 +613,8 @@ O MVP é um sucesso se, em 3 meses, as pessoas voltarem sozinhas: a métrica pri
 | Fase | Período | Entregas |
 |---|---|---|
 | 1. Dinheiro e promessas no DF | Meses 1 a 3 | Obras e emendas no DF; planos de governo do presidente e do governador; representantes do DF e perfis enxutos dos congressistas; votações relevantes; alertas por e-mail |
-| 2. Brasil completo e economia | Meses 4 a 9 | Todos os eleitos pelo TSE (RF-85) e "Me representa" por cidade (RF-86); salários (RF-87); Executivo (RF-88) e STF (RF-89); arrecadação oficial (RF-90); comparador (RF-91) e planos lado a lado (RF-92); busca por nome (RF-94); obras e emendas em todo o Brasil; planos dos prefeitos; resumo e canal no WhatsApp (RF-93); distritais completos; economia em números e trilhas educativas |
-| 3. Estados | Meses 10 a 15 | ALs de MG, PR, PE, MT (votos e gastos); salários de estados e municípios com dados abertos; emendas Pix; relatos de obras; Ibovespa diário se houver licença |
+| 2. Brasil completo e economia | Meses 4 a 9 | Assembleias com dados abertos (RF-96) e piloto das Câmaras Municipais (RF-97); "Como atualizamos" (RF-95) e "Quem publica" (RF-98); discursos, comissões e viagens (RF-99); pautas e julgamentos do STF (RF-100, RF-101); contas dos lugares (RF-103); cargos, partidos, eleições e propostas (RF-105, RF-106); Todos os eleitos pelo TSE (RF-85) e "Me representa" por cidade (RF-86); salários (RF-87); Executivo (RF-88) e STF (RF-89); arrecadação oficial (RF-90); comparador (RF-91) e planos lado a lado (RF-92); busca por nome (RF-94); obras e emendas em todo o Brasil; planos dos prefeitos; resumo e canal no WhatsApp (RF-93); distritais completos; economia em números e trilhas educativas |
+| 3. Estados e municípios | Meses 10 a 15 | Câmaras Municipais com dados abertos em escala (RF-97); salários de prefeitos e vereadores (RF-104); sanções do TCU e da CGU (RF-102); acesso por assistentes de IA (RF-107); emendas Pix; relatos de obras; Ibovespa diário se houver licença |
 | 4. Escala nacional | Ano 2 | Demais estados; câmaras municipais; API pública; exportação de dados |
 
 - Meta 1 (libera fase 2): 5 mil visitantes por mês e 1 mil inscritos no resumo.
@@ -680,6 +704,8 @@ As decisões abaixo já têm uma recomendação para não travar o desenvolvimen
 
 - ☐ Parecer jurídico sobre LGPD, legislação eleitoral e direito de resposta
 
+- ☐ Fontes da versão 4.1, a conferir antes de cada change: dados abertos de cada Assembleia Legislativa; API do SAPL (Interlegis) e o intervalo pedido por cada câmara; discursos, comissões e viagens nas APIs da Câmara e do Senado; pauta e julgamentos no portal do STF; sanções no TCU e na CGU (CEIS, CNEP); SICONFI do Tesouro Nacional; salários nos Tribunais de Contas
+
 - ☐ Fontes do escopo ampliado (versão 4.0), a conferir na documentação oficial antes de cada change: TSE (eleitos de 2022 e 2024 por cargo e município), subsídios do Congresso (portais da Câmara e do Senado), remuneração do Executivo federal (Portal da Transparência, servidores e cargos), ministros do STF (portal do STF e dados abertos, se houver), arrecadação federal (Receita Federal e Tesouro Nacional) e a política da Meta para canais do WhatsApp
 
 - ☑ Situação atual dos concorrentes (verificado em 2026-10-26): Apuração Brasil ativo e concorrente direto; Excelências aparenta estar desativado; Radar do Congresso ativo
@@ -697,6 +723,7 @@ As decisões abaixo já têm uma recomendação para não travar o desenvolvimen
 | Versão | Data | Mudanças |
 |---|---|---|
 | 1 | 2026-10-20 | Conversão do documento original (.docx) |
+| 4.1 | 2026-10-28 | RF-95 a RF-107 (Como atualizamos, Assembleias, Câmaras Municipais com SAPL, Quem publica, discursos/comissões/viagens, pautas e julgamentos do STF, sanções TCU e CGU, contas dos lugares, salários municipais, cargos, partidos/eleições/propostas, acesso por assistentes de IA); "Mais vistos" excluído; matriz, roadmap e pontos a verificar |
 | 4.0 | 2026-10-28 | Escopo ampliado para cobrir o que o Politicômetro oferece: RF-85 a RF-94 (todos os eleitos, "Me representa", salários, Executivo, STF, arrecadação oficial, comparador, planos lado a lado, canal no WhatsApp, busca por nome); RF-29 ampliado; matriz, roadmap das fases 2 e 3, decisões e pontos a verificar |
 | 3.0 | 2026-10-26 | Foco "dinheiro e promessas na sua cidade"; Politicômetro e Sólon nos concorrentes; obras e emendas (RF-28, RF-34, RF-39 a RF-44, RF-46, RF-48, RF-49) no MVP; planos de governo (RF-80 a RF-84); perfil com RF-35 a RF-38; RF-59 (direito de resposta); regra do "—"; fonte TSE de planos de governo; roadmap e riscos |
 | 2.2 | 2026-10-26 | RF-33 e RF-34 (perfil por seções e obras no perfil); RF-46 passa para a fase 2; RF-48, RF-49 e RF-39 (resumo, filtros e ficha da obra); fonte Obrasgov detalhada com a API verificada |
