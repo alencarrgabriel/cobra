@@ -8,6 +8,9 @@ export const E2E_DB = "cobra_e2e";
 
 /** Fixed secret of the alerts sign-up in tests only (change alertas-cadastro). */
 export const E2E_ALERTS_SECRET = Buffer.alloc(32, 7).toString("base64");
+
+/** Fixed secret of the weekly summary trigger in tests only (change resumo-semanal). */
+export const E2E_CRON_SECRET = Buffer.alloc(32, 9).toString("base64url");
 const ROOT = path.resolve(__dirname, "../../..");
 
 export function adminUrl(): string {

@@ -24,9 +24,9 @@ import { sendMail } from "./mail";
 // Every request that could reveal whether an address is subscribed answers the same way.
 
 /** A connection or a transaction. */
-type Db = postgres.Sql | postgres.TransactionSql;
+export type Db = postgres.Sql | postgres.TransactionSql;
 
-type Prefs = { uf: string | null; follows: number[] };
+export type Prefs = { uf: string | null; follows: number[] };
 type Pending = {
   uf: string | null;
   follow: number | null;
@@ -69,11 +69,11 @@ export function isEmail(email: string): boolean {
   return e.length <= 254 && EMAIL.test(e);
 }
 
-function seal(value: unknown): Buffer {
+export function seal(value: unknown): Buffer {
   return encrypt(alertsKeys(), JSON.stringify(value));
 }
 
-function open<T>(data: Uint8Array): T {
+export function open<T>(data: Uint8Array): T {
   return JSON.parse(decrypt(alertsKeys(), data)) as T;
 }
 
@@ -81,18 +81,26 @@ async function log(sql: Db, id: string, action: Action) {
   await sql`insert into alerts.access_log (subscription_id, action) values (${id}, ${action})`;
 }
 
-/** Below the per-address and daily limits (design D3). */
-async function canSend(sql: Db, id: string): Promise<boolean> {
-  const [row] = await sql<{ address: number; day: number }[]>`
+/** Alert e-mails in the last 24 h: sign-up and "Meus dados" links plus weekly summaries. */
+export async function emailsToday(sql: Db): Promise<number> {
+  const [row] = await sql<{ n: number }[]>`
     select
-      (select count(*)::int from alerts.links
-        where subscription_id = ${id} and created_at > now() - interval '1 hour') as address,
       (select count(*)::int from alerts.access_log
         where action in ('cadastro', 'link_meus_dados')
-          and at > now() - interval '1 day') as day`;
+          and at > now() - interval '1 day')
+      + (select count(*)::int from alerts.deliveries
+        where status = 'enviado' and sent_at > now() - interval '1 day') as n`;
+  return row!.n;
+}
+
+/** Below the per-address and daily limits (design D3). */
+async function canSend(sql: Db, id: string): Promise<boolean> {
+  const [row] = await sql<{ address: number }[]>`
+    select count(*)::int as address from alerts.links
+    where subscription_id = ${id} and created_at > now() - interval '1 hour'`;
   return (
     row!.address < PER_ADDRESS_PER_HOUR &&
-    row!.day < serverEnv().ALERTS_DAILY_CAP
+    (await emailsToday(sql)) < serverEnv().ALERTS_DAILY_CAP
   );
 }
 
@@ -267,6 +275,13 @@ export type MyData = {
   createdAt: string;
   emailConsent: { version: string; at: string } | null;
   followsConsent: { version: string; at: string } | null;
+  /** Weekly summaries (change resumo-semanal), newest first. */
+  deliveries: {
+    weekStart: string;
+    sentAt: string;
+    status: "enviado" | "falhou";
+    voteIds: number[];
+  }[];
 };
 
 type SubRow = {
@@ -298,6 +313,17 @@ async function toMyData(sub: SubRow): Promise<MyData> {
         select id::int, parliamentary_name as name from core.politicians
         where id = any(${prefs.follows}) order by parliamentary_name collate "und-x-icu"`
     : [];
+  const deliveries = await alertsDb()<
+    {
+      week_start: string;
+      sent_at: Date;
+      status: "enviado" | "falhou";
+      vote_ids: string[];
+    }[]
+  >`
+    select week_start::text, sent_at, status, vote_ids::text[]
+    from alerts.deliveries where subscription_id = ${sub.id}
+    order by week_start desc`;
   const consent = (v: string | null, at: Date | null) =>
     v && at ? { version: v, at: at.toISOString() } : null;
   return {
@@ -312,6 +338,12 @@ async function toMyData(sub: SubRow): Promise<MyData> {
       sub.follows_consent_version,
       sub.follows_consent_at,
     ),
+    deliveries: deliveries.map((d) => ({
+      weekStart: d.week_start,
+      sentAt: d.sent_at.toISOString(),
+      status: d.status,
+      voteIds: d.vote_ids.map(Number),
+    })),
   };
 }
 

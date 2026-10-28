@@ -25,13 +25,15 @@ export async function sendMail(mail: Mail): Promise<boolean> {
   const env = serverEnv();
   if (!env.RESEND_API_KEY) {
     if (env.APP_ENV === "production") return false;
-    await alertsDb()`
-      insert into alerts.outbox_local (recipient, subject, body)
-      values (${mail.to}, ${mail.subject}, ${mail.text})`;
+    const sql = alertsDb();
+    await sql`
+      insert into alerts.outbox_local (recipient, subject, body, headers)
+      values (${mail.to}, ${mail.subject}, ${mail.text},
+        ${mail.headers ? sql.json(mail.headers) : null})`;
     return true;
   }
-  try {
-    const response = await fetch(RESEND_URL, {
+  const send = () =>
+    fetch(RESEND_URL, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${env.RESEND_API_KEY}`,
@@ -47,6 +49,17 @@ export async function sendMail(mail: Mail): Promise<boolean> {
       }),
       signal: AbortSignal.timeout(10_000),
     });
+  try {
+    let response = await send();
+    if (response.status === 429) {
+      // Over 10 requests per second: wait as told (up to 5 s) and try once more.
+      const wait = Math.min(
+        5,
+        Number(response.headers.get("retry-after")) || 1,
+      );
+      await new Promise((r) => setTimeout(r, wait * 1000));
+      response = await send();
+    }
     if (response.ok) return true;
     (await logger()).error("alert e-mail rejected", {
       status: response.status,

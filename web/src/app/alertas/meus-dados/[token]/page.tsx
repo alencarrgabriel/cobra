@@ -108,6 +108,28 @@ async function MyData({
         </p>
       </section>
 
+      <section aria-labelledby="envios" className={styles.prose}>
+        <h2 id="envios" className={styles.h2}>
+          Resumos enviados
+        </h2>
+        {data.deliveries.length ? (
+          <ul className={styles.list} data-testid="envios">
+            {data.deliveries.map((d) => (
+              <li key={d.weekStart}>
+                Semana de {formatDate(d.weekStart)}:{" "}
+                {d.status === "enviado"
+                  ? `enviado em ${formatDate(d.sentAt)}`
+                  : "o envio falhou e será tentado de novo"}
+                , {d.voteIds.length}{" "}
+                {d.voteIds.length === 1 ? "votação" : "votações"}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>Nenhum ainda.</p>
+        )}
+      </section>
+
       <section aria-labelledby="seguidos" className={styles.prose}>
         <h2 id="seguidos" className={styles.h2}>
           Políticos que você segue

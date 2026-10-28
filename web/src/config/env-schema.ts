@@ -49,6 +49,9 @@ export const serverEnvSchema = z.object({
   ALERTS_FROM: z.string().min(3).default("Cobra <alertas@localhost>"),
   // Most alert e-mails per day in total; the Resend free plan sends 100 per day.
   ALERTS_DAILY_CAP: z.coerce.number().int().positive().default(80),
+  // Bearer secret of the weekly summary trigger (change resumo-semanal). Without it the
+  // trigger route answers 404.
+  CRON_SECRET: z.string().min(24).optional(),
 });
 
 /**

@@ -114,7 +114,8 @@ Chaves: `id bigint generated always as identity`, exceto `core.localities` (chav
 | `alerts.subscriptions` | Uma inscrição por e-mail: e-mail e preferências (estado, seguidos) cifrados, situação e consentimentos com versão e data | E-mail localizado por HMAC (`email_lookup`), nunca em texto; o site público e o painel não leem o schema `alerts` |
 | `alerts.links`         | Links enviados por e-mail (confirmar, meus dados)                                                                        | Só o SHA-256 do token; confirmar vale uma vez                                                                     |
 | `alerts.access_log`    | Cada ação sobre uma inscrição, sem o e-mail                                                                              | Só inserção para `cobra_alerts`; sobrevive à exclusão                                                             |
-| `alerts.outbox_local`  | Mensagens gravadas em vez de enviadas, sem `RESEND_API_KEY` fora de produção                                             | Desenvolvimento e testes                                                                                          |
+| `alerts.deliveries`    | Resumos semanais enviados ou que falharam, por inscrição e semana, com as votações incluídas                             | Um por semana; apagado com a inscrição                                                                            |
+|                        | Mensagens gravadas em vez de enviadas, sem `RESEND_API_KEY` fora de produção                                             | Desenvolvimento e testes                                                                                          |
 
 Ver docs/alertas.md.
 

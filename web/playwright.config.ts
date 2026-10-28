@@ -1,6 +1,6 @@
 import { defineConfig, devices } from "@playwright/test";
 
-import { E2E_ALERTS_SECRET, e2eUrl } from "./e2e/db/setup";
+import { E2E_ALERTS_SECRET, E2E_CRON_SECRET, e2eUrl } from "./e2e/db/setup";
 
 const port = 3100;
 
@@ -44,6 +44,7 @@ export default defineConfig({
       ALERTS_DATABASE_URL: e2eUrl(),
       ALERTS_SECRET: E2E_ALERTS_SECRET,
       RESEND_API_KEY: "",
+      CRON_SECRET: E2E_CRON_SECRET,
     },
   },
 });

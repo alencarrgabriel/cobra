@@ -1,6 +1,6 @@
 # Alertas por e-mail
 
-Cadastro, "Seguir" e direitos do titular (change `alertas-cadastro`). O envio do resumo semanal vem na change `resumo-semanal`.
+Cadastro, "Seguir" e direitos do titular (change `alertas-cadastro`). O resumo semanal vem da change `resumo-semanal`.
 
 ## Como funciona
 
@@ -10,6 +10,19 @@ Cadastro, "Seguir" e direitos do titular (change `alertas-cadastro`). O envio do
 4. Toda mensagem do resumo traz o link de saída permanente `/alertas/sair/<token>`; o one-click dos provedores faz POST em `/alertas/sair/<token>/um-clique`.
 
 A resposta a cadastro e a pedido de link é sempre a mesma, exista ou não o endereço.
+
+## Resumo semanal
+
+- `GET` ou `POST /api/alertas/resumo-semanal` com `Authorization: Bearer <CRON_SECRET>`; sem o segredo configurado, a rota responde 404.
+- Agende para rodar **todo dia** (por exemplo, às 8h de Brasília). Cada execução envia a semana anterior (segunda a domingo) a quem ainda não a recebeu e para no limite diário; o restante sai nos dias seguintes. Execuções repetidas não reenviam.
+- Conteúdo: até 15 votações relevantes da semana, com o voto dos representantes do estado e dos seguidos, link e fonte. Semana sem votação relevante não gera e-mail.
+- Toda mensagem traz o link de saída e os cabeçalhos `List-Unsubscribe` e `List-Unsubscribe-Post` (one-click).
+- `alerts.deliveries` guarda um registro por inscrição e semana (votações incluídas e resultado); aparece em "Meus dados" e some com a inscrição.
+- Fora de produção, `?semana=AAAA-MM-DD` escolhe a semana. Exemplo local:
+
+  ```sh
+  curl -H "Authorization: Bearer $CRON_SECRET" "http://localhost:3000/api/alertas/resumo-semanal?semana=2026-06-10"
+  ```
 
 ## Proteção
 
@@ -32,7 +45,8 @@ A resposta a cadastro e a pedido de link é sempre a mesma, exista ou não o end
 | `ALERTS_SECRET`       | 32 bytes aleatórios em base64                                                                  |
 | `RESEND_API_KEY`      | Chave da API do Resend; sem ela, fora de produção, as mensagens vão para `alerts.outbox_local` |
 | `ALERTS_FROM`         | Remetente num domínio verificado no Resend                                                     |
-| `ALERTS_DAILY_CAP`    | Máximo de e-mails por dia                                                                      |
+| `ALERTS_DAILY_CAP`    | Máximo de e-mails por dia (links e resumos somados)                                            |
+| `CRON_SECRET`         | Segredo do disparo do resumo semanal                                                           |
 
 Em produção sem `RESEND_API_KEY`, `/alertas` diz que o cadastro está fora do ar.
 
