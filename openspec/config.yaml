@@ -121,8 +121,8 @@ context: |
   27a metodologia (fontes com última coleta, critérios, regras, temas).
   27b reporte-de-erro (protocolo, 5 dias úteis, fila pública sem dados de quem reportou, triagem
   no painel, e-mail opcional apagado em 90 dias).
-  Próximas:
-  28 saude-integracoes.
+  28 saude-integracoes (painel por fonte; alerta diário à equipe). Fase 1 concluída em 2026-10-28;
+  falta para lançar: agendamento em produção, domínio no Resend, DPO.
   Fase 2: obras e emendas em todo o Brasil; planos dos prefeitos (2024); comparador de políticos;
   economia-em-numeros; trilhas-educativas. Fase 3: comparador de planos de candidatos (2028, após parecer).
   Decisões pendentes: base de CEP (licença/custo) decidida em busca-geografica.
