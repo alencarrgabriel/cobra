@@ -46,6 +46,7 @@ export default defineConfig({
       RESEND_API_KEY: "",
       CRON_SECRET: E2E_CRON_SECRET,
       REPORTS_DATABASE_URL: e2eUrl(),
+      OPS_ALERT_EMAIL: "equipe@cobra.test",
     },
   },
 });

@@ -103,3 +103,36 @@
 .version p {
   white-space: pre-wrap;
 }
+
+/* Integrations health table (change saude-integracoes). */
+.tableWrap {
+  overflow-x: auto;
+}
+
+.table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: var(--text-sm);
+}
+
+.table th,
+.table td {
+  text-align: left;
+  padding: var(--space-2);
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+
+.health_em_dia {
+  border-left: 4px solid var(--work-done);
+}
+
+.health_atrasada,
+.health_com_falha {
+  border-left: 4px solid var(--work-stop);
+  font-weight: 600;
+}
+
+.health_sem_coleta {
+  border-left: 4px solid var(--line);
+}

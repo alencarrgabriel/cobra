@@ -52,6 +52,9 @@ export const serverEnvSchema = z.object({
   // Bearer secret of the weekly summary trigger (change resumo-semanal). Without it the
   // trigger route answers 404.
   CRON_SECRET: z.string().min(24).optional(),
+  // Team address for the daily integrations alert (change saude-integracoes). Without it
+  // the alert only goes to the log.
+  OPS_ALERT_EMAIL: z.email().optional(),
   // Connection of the public report form (role cobra_reports, change reporte-de-erro), server
   // only. Without it the form says it is unavailable.
   REPORTS_DATABASE_URL: z

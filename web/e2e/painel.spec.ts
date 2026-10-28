@@ -156,6 +156,37 @@ test.describe("com o Supabase Auth local", () => {
     );
   });
 
+  // Change saude-integracoes, design D3.
+  test("saúde das integrações: com falha, atrasada e em dia, com o erro", async ({
+    page,
+  }) => {
+    test.setTimeout(60_000);
+    const sql = postgres(e2eUrl(), { max: 1 });
+    await sql`
+      insert into ops.runs (source, started_at, finished_at, status, jobs_done, jobs_failed)
+      values ('camara', now() - interval '1 hour', now() - interval '50 minutes', 'ok', 10, 0),
+             ('cldf', now() - interval '3 days', now() - interval '3 days', 'ok', 25, 0),
+             ('obrasgov', now() - interval '2 hours', now() - interval '1 hour', 'failed', 5, 1)`;
+    await sql`
+      insert into ops.jobs (source, kind, dedupe_key, status, attempts, last_error)
+      values ('obrasgov', 'detail', 'saude-e2e', 'failed', 5, 'HTTP 503 Service Unavailable')`;
+    await sql.end();
+
+    const email = `editora-saude-${Date.now()}@cobra.test`;
+    await user(email, true);
+    await signIn(page, email);
+    await expect(page).toHaveURL(/\/painel$/, { timeout: 15_000 });
+    await page.getByRole("link", { name: "Saúde das integrações" }).click();
+    await expect(page.getByTestId("saude-camara")).toContainText("Em dia", {
+      timeout: 15_000,
+    });
+    await expect(page.getByTestId("saude-cldf")).toContainText("Atrasada");
+    await expect(page.getByTestId("saude-obrasgov")).toContainText("Com falha");
+    await expect(page.getByTestId("falhas")).toContainText(
+      "HTTP 503 Service Unavailable",
+    );
+  });
+
   // Change reporte-de-erro, design D5: triage with a public note, history and an e-mail reply.
   test("reporte: triagem com nota pública, histórico e resposta por e-mail", async ({
     page,

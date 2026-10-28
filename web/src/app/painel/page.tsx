@@ -33,7 +33,8 @@ async function Queue() {
         </form>
       </header>
       <p>
-        <Link href="/painel/reportes">Reportes de erro e contestações</Link>
+        <Link href="/painel/reportes">Reportes de erro e contestações</Link> ·{" "}
+        <Link href="/painel/saude">Saúde das integrações</Link>
       </p>
       <p className={styles.note}>
         Votações relevantes das duas casas sem resumo publicado, da mais recente
