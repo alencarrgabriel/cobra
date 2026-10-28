@@ -17,6 +17,7 @@
     "basemap:test": "node scripts/fetch-basemap.mjs --test"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "0.133.0",
     "@next/env": "16.4.3",
     "@protomaps/basemaps": "5.7.2",
     "@supabase/ssr": "0.12.7",

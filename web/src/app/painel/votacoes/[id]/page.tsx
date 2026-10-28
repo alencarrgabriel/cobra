@@ -4,12 +4,19 @@ import { Suspense } from "react";
 
 import { Button } from "@/components/Button/Button";
 import { Card } from "@/components/Card/Card";
+import { hasDraftKey } from "@/lib/editorial/draft";
 import { voteForEditing } from "@/lib/editorial/queries";
 import { requireEditor } from "@/lib/editorial/session";
 import { relevanceText } from "@/lib/politicians/relevance";
 import { formatDate, formatInteger } from "@/lib/works/format";
 
-import { approve, curate, saveDraft, uncurate } from "../../actions";
+import {
+  approve,
+  curate,
+  draftWithAi,
+  saveDraft,
+  uncurate,
+} from "../../actions";
 import styles from "../../painel.module.css";
 
 const MESSAGES: Record<string, [string, boolean]> = {
@@ -19,6 +26,26 @@ const MESSAGES: Record<string, [string, boolean]> = {
   retirada: ["Curadoria retirada.", true],
   tamanho: ["O resumo precisa ter entre 40 e 4.000 caracteres.", false],
   justificativa: ["A justificativa precisa ter ao menos 20 caracteres.", false],
+  ia: [
+    "Rascunho gerado por IA. Revise com atenção antes de aprovar: ele não aparece no site até ser aprovado.",
+    true,
+  ],
+  "ia-recusa": [
+    "O modelo recusou gerar este rascunho. Escreva o texto à mão.",
+    false,
+  ],
+  "ia-indisponivel": [
+    "A IA está indisponível agora. Tente de novo mais tarde.",
+    false,
+  ],
+  "ia-tamanho": [
+    "A IA devolveu um texto fora do tamanho aceito. Tente de novo.",
+    false,
+  ],
+  "ia-sem-chave": [
+    "O rascunho por IA não está configurado neste servidor.",
+    false,
+  ],
 };
 
 export default function EditVotePage({
@@ -130,6 +157,16 @@ async function Edit({
             <Button type="submit">Salvar rascunho</Button>
           </div>
         </form>
+        {hasDraftKey() ? (
+          <form action={draftWithAi} className={styles.actions}>
+            <input type="hidden" name="vote" value={vote.id} />
+            <Button type="submit">Gerar rascunho com IA</Button>
+            <span className={styles.note}>
+              Usa só os dados oficiais acima; o texto entra como rascunho para
+              você revisar.
+            </span>
+          </form>
+        ) : null}
         {draft ? (
           <form action={approve} className={styles.actions}>
             <input type="hidden" name="vote" value={vote.id} />

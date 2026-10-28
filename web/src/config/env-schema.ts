@@ -26,6 +26,9 @@ export const serverEnvSchema = z.object({
     .string()
     .regex(/^postgres(ql)?:\/\//, "must be a postgres:// URL")
     .optional(),
+  // Claude API key for AI drafts of vote summaries in the editorial panel, server only.
+  // Optional: without it the panel has no "Gerar rascunho com IA" (change rascunho-ia).
+  ANTHROPIC_API_KEY: z.string().min(20).optional(),
 });
 
 /**

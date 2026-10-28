@@ -96,3 +96,25 @@ def test_one_published_version_per_vote(db: psycopg.Connection) -> None:
             """,
             (vote,),
         )
+
+
+def test_published_summary_keeps_the_ai_mark_after_an_edit(db: psycopg.Connection) -> None:
+    vote = a_vote(db)
+    db.execute(
+        """
+        insert into editorial.vote_summaries (vote_id, version, text, status, author, ai_model)
+        values (%s, 1, %s, 'rascunho', 'editora', 'claude-haiku-5-5')
+        """,
+        (vote, TEXT),
+    )
+    db.execute(
+        """
+        insert into editorial.vote_summaries (vote_id, version, text, status, author,
+          approved_by, approved_at)
+        values (%s, 2, %s, 'publicado', 'editora', 'editora', now())
+        """,
+        (vote, TEXT + " Revisado."),
+    )
+    assert db.execute(
+        "select ai_model from core.published_summaries where vote_id = %s", (vote,)
+    ).fetchone() == ("claude-haiku-5-5",)

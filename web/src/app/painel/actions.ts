@@ -4,6 +4,8 @@ import { revalidatePath, updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { editorDb } from "@/lib/editorial/db";
+import { draftSummary } from "@/lib/editorial/draft";
+import { voteForEditing } from "@/lib/editorial/queries";
 import { requireEditor } from "@/lib/editorial/session";
 import { authClient } from "@/lib/editorial/supabase";
 
@@ -71,6 +73,28 @@ export async function saveDraft(form: FormData): Promise<void> {
   });
   revalidatePath(`/painel/votacoes/${id}`);
   redirect(`/painel/votacoes/${id}?ok=rascunho`);
+}
+
+export async function draftWithAi(form: FormData): Promise<void> {
+  const editor = await requireEditor();
+  const id = voteId(form);
+  const vote = await voteForEditing(id);
+  if (!vote) redirect("/painel");
+  const result = await draftSummary(vote);
+  if (!result.ok) redirect(`/painel/votacoes/${id}?erro=ia-${result.reason}`);
+  await editorDb().begin(async (sql) => {
+    const [row] = await sql<{ version: number }[]>`
+      insert into editorial.vote_summaries (vote_id, version, text, status, author, ai_model)
+      select ${id}, coalesce(max(version), 0) + 1, ${result.text}, 'rascunho', ${editor.email},
+             ${result.model}
+      from editorial.vote_summaries where vote_id = ${id}
+      returning version`;
+    await sql`
+      insert into editorial.log (editor, action, vote_id, version, detail)
+      values (${editor.email}, 'rascunho', ${id}, ${row!.version},
+              ${`rascunho por IA (${result.model})`})`;
+  });
+  redirect(`/painel/votacoes/${id}?ok=ia`);
 }
 
 export async function approve(form: FormData): Promise<void> {

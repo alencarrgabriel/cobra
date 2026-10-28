@@ -25,6 +25,14 @@ O script usa `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SECRET_KEY` e `DATABASE_URL` 
 4. A curadoria inclui uma votação no feed com justificativa pública (ao menos 20 caracteres) ou retira a inclusão.
 5. Tudo vai para `editorial.log`, que o painel só consegue acrescentar, nunca alterar ou apagar.
 
+## Rascunho por IA (change `rascunho-ia`)
+
+- Com `ANTHROPIC_API_KEY` no `.env`, a página da votação mostra "Gerar rascunho com IA".
+- O rascunho é gerado pela Claude API (`claude-haiku-5-5`) só com os dados oficiais da votação (proposição, ementa, descrição, resultado, contagem e orientações) e com as regras do DDR §9.1 fixas nas instruções.
+- Ele entra como nova versão em rascunho, com o modelo registrado e linha na trilha. Só é publicado se um editor aprovar.
+- O resumo publicado diz "a partir de um rascunho feito com IA" sempre que alguma versão daquela votação veio da IA, mesmo depois de corrigida.
+- Recusa do modelo ou erro da API viram aviso no painel; nada é gravado. Custo por uso: centavos por rascunho.
+
 ## Banco
 
 - Schema `editorial` (editores, versões de resumo, log): o papel do site (`cobra_web_reader`) não tem acesso; ele lê só `core.published_summaries`.

@@ -108,6 +108,12 @@ test.describe("com o Supabase Auth local", () => {
       .first();
     await expect(item).toContainText("Governo e Oposição divergiram");
     await item.getByRole("link", { name: "Escrever o resumo" }).click();
+    // Without ANTHROPIC_API_KEY there is no AI draft (change rascunho-ia).
+    if (!process.env.ANTHROPIC_API_KEY) {
+      await expect(
+        page.getByRole("button", { name: "Gerar rascunho com IA" }),
+      ).toHaveCount(0);
+    }
 
     const text =
       "O projeto proíbe peças publicitárias de teste. Autores dizem que protege o público; críticos dizem que limita a publicidade.";
