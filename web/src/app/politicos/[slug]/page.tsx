@@ -10,6 +10,7 @@ import {
 import { Card } from "@/components/Card/Card";
 import { PartyBadge } from "@/components/PartyBadge/PartyBadge";
 import { Portrait } from "@/components/Portrait/Portrait";
+import { Button } from "@/components/Button/Button";
 import { SharePanel } from "@/components/SharePanel/SharePanel";
 import { UfFlag } from "@/components/UfFlag/UfFlag";
 import { WorkStatus } from "@/components/WorkStatus/WorkStatus";
@@ -258,6 +259,12 @@ async function Profile({ params }: { params: Promise<{ slug: string }> }) {
             {who}
           </p>
           <p className={styles.note}>Nome civil: {p.civilName}.</p>
+          {/* Who follows whom lives only on the server, with a verified e-mail (RF-30). */}
+          <p>
+            <Button href={`/alertas?seguir=${p.id}`} data-testid="seguir">
+              Seguir
+            </Button>
+          </p>
           <SharePanel
             path={profilePath(p.id, p.name)}
             text={`${p.name} no Cobra: mandato, partido, emendas e obras, com fonte oficial.`}

@@ -37,7 +37,13 @@ export function AppShell({ children }: { children: ReactNode }) {
           </div>
         </div>
       </header>
-      <div className={styles.content}>{children}</div>
+      <div className={styles.content}>
+        {children}
+        <footer className={`${styles.footer} gutter`}>
+          <Link href="/alertas">Alertas por e-mail</Link>
+          <Link href="/privacidade">Privacidade</Link>
+        </footer>
+      </div>
       <Suspense fallback={<NavList variant="bottom" pathname={null} />}>
         <Nav variant="bottom" />
       </Suspense>

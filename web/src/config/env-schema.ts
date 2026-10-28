@@ -29,6 +29,26 @@ export const serverEnvSchema = z.object({
   // Claude API key for AI drafts of vote summaries in the editorial panel, server only.
   // Optional: without it the panel has no "Gerar rascunho com IA" (change rascunho-ia).
   ANTHROPIC_API_KEY: z.string().min(20).optional(),
+  // E-mail alerts (change alertas-cadastro), server only. Without ALERTS_DATABASE_URL and
+  // ALERTS_SECRET the sign-up says it is unavailable.
+  ALERTS_DATABASE_URL: z
+    .string()
+    .regex(/^postgres(ql)?:\/\//, "must be a postgres:// URL")
+    .optional(),
+  // 32 random bytes in base64: encrypts e-mails and preferences and signs tokens.
+  ALERTS_SECRET: z
+    .string()
+    .refine(
+      (v) => Buffer.from(v, "base64").length === 32,
+      "must be 32 bytes in base64",
+    )
+    .optional(),
+  // Resend API key. Without it, outside production, messages go to alerts.outbox_local.
+  RESEND_API_KEY: z.string().startsWith("re_").optional(),
+  // Sender of the alert messages, e.g. "Cobra <alertas@example.org>" (verified domain).
+  ALERTS_FROM: z.string().min(3).default("Cobra <alertas@localhost>"),
+  // Most alert e-mails per day in total; the Resend free plan sends 100 per day.
+  ALERTS_DAILY_CAP: z.coerce.number().int().positive().default(80),
 });
 
 /**

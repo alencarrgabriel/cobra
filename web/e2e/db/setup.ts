@@ -5,6 +5,9 @@ import postgres from "postgres";
 
 // Throwaway database for browser tests: recreated with every migration and the seed.
 export const E2E_DB = "cobra_e2e";
+
+/** Fixed secret of the alerts sign-up in tests only (change alertas-cadastro). */
+export const E2E_ALERTS_SECRET = Buffer.alloc(32, 7).toString("base64");
 const ROOT = path.resolve(__dirname, "../../..");
 
 export function adminUrl(): string {

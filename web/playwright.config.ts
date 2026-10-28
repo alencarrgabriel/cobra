@@ -1,6 +1,6 @@
 import { defineConfig, devices } from "@playwright/test";
 
-import { e2eUrl } from "./e2e/db/setup";
+import { E2E_ALERTS_SECRET, e2eUrl } from "./e2e/db/setup";
 
 const port = 3100;
 
@@ -40,6 +40,10 @@ export default defineConfig({
       APP_ENV: "test",
       WEB_DATABASE_URL: e2eUrl(),
       EDITOR_DATABASE_URL: e2eUrl(),
+      // Without RESEND_API_KEY, messages go to alerts.outbox_local, where the tests read them.
+      ALERTS_DATABASE_URL: e2eUrl(),
+      ALERTS_SECRET: E2E_ALERTS_SECRET,
+      RESEND_API_KEY: "",
     },
   },
 });

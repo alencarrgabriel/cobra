@@ -13,7 +13,12 @@ import {
 describe("parseEnv", () => {
   it("accepts a valid configuration and applies defaults", () => {
     const env = parseEnv(serverEnvSchema, { APP_ENV: "production" });
-    expect(env).toEqual({ APP_ENV: "production", LOG_LEVEL: "info" });
+    expect(env).toEqual({
+      APP_ENV: "production",
+      LOG_LEVEL: "info",
+      ALERTS_FROM: "Cobra <alertas@localhost>",
+      ALERTS_DAILY_CAP: 80,
+    });
   });
 
   it("names a missing required variable", () => {
