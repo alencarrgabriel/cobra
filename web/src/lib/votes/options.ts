@@ -53,3 +53,8 @@ export function tally(ballots: Ballot[], by: "party" | "uf"): TallyRow[] {
   }
   return [...rows.values()].sort((a, b) => collator.compare(a.key, b.key));
 }
+
+/** The color family of a vote: only "sim" and "nao" are colored; everything else is neutral. */
+export function voteTone(option: string | null): "yes" | "no" | "other" {
+  return option === "sim" ? "yes" : option === "nao" ? "no" : "other";
+}

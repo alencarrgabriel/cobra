@@ -132,7 +132,9 @@ test.describe("com o Supabase Auth local", () => {
       .click();
     await page.getByRole("link", { name: "Ver perfil completo" }).click();
     await expect(page).toHaveURL(/\/politicos\/\d+-deputado-teste-a$/);
-    const profileUrl = page.url();
+    // The votes are in the profile's own tab (change perfil-em-abas-e-jornada).
+    const profileUrl = `${page.url()}/votos`;
+    await page.goto(profileUrl);
     await expect(page.getByTestId("como-votou")).toBeVisible({
       timeout: 15_000,
     });

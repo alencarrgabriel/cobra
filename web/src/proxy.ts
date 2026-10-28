@@ -37,14 +37,30 @@ function decoded(path: string, prefix: string): string {
   }
 }
 
-async function profile(request: NextRequest, slug: string) {
+const PROFILE_TABS = new Set([
+  "votos",
+  "presenca",
+  "gastos",
+  "emendas",
+  "trajetoria",
+  "patrimonio",
+]);
+
+async function profile(request: NextRequest, path: string) {
+  // `<id>-<name>` or `<id>-<name>/<tab>` (change perfil-em-abas-e-jornada).
+  const [slug = "", tab, ...rest] = path.split("/");
+  if (rest.length || (tab !== undefined && !PROFILE_TABS.has(tab))) {
+    return notFound(request);
+  }
   const match = /^(\d{1,12})(?:-|$)/.exec(slug);
   if (!match) return notFound(request);
   const id = Number(match[1]);
   const name = await politicianName(id);
   if (name === undefined) return NextResponse.next(); // database down: the page explains
   if (name === null) return notFound(request);
-  const canonical = profilePath(id, name);
+  const canonical = tab
+    ? `${profilePath(id, name)}/${tab}`
+    : profilePath(id, name);
   if (request.nextUrl.pathname !== canonical) {
     // The id decides; an old or wrong name in the address goes to the current one (D1).
     return NextResponse.redirect(new URL(canonical, request.url), 308);
@@ -111,6 +127,7 @@ export const config = {
     "/obras/:codigo",
     "/representantes/:codigo",
     "/politicos/:slug",
+    "/politicos/:slug/:aba",
     "/planos/:plano",
     "/votacoes/:id",
     "/correcoes/:protocolo",

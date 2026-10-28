@@ -9,19 +9,35 @@
 
 .header {
   display: grid;
-  grid-template-columns: minmax(120px, 200px) 1fr;
-  gap: var(--space-5);
-  align-items: start;
+  grid-template-columns: 96px 1fr;
+  gap: var(--space-4);
+  align-items: center;
 }
 
-@media (max-width: 560px) {
+@media (min-width: 720px) {
   .header {
-    grid-template-columns: 1fr;
+    grid-template-columns: 136px 1fr;
+    gap: var(--space-5);
   }
+}
 
-  .portrait {
-    max-width: 180px;
-  }
+.portrait {
+  width: 100%;
+}
+
+.role {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
 }
 
 .identity {
@@ -142,4 +158,89 @@
   margin-top: var(--space-1);
   padding-left: var(--space-3);
   border-left: 3px solid var(--line);
+}
+
+/* Votes as rows: the vote first, then what was voted (change perfil-em-abas-e-jornada, D3). */
+.votes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.voteRow {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-2);
+  padding-block: var(--space-3);
+  border-top: 1px solid var(--line);
+}
+
+.voteRow:first-child {
+  border-top: 0;
+}
+
+@media (min-width: 720px) {
+  .voteRow {
+    grid-template-columns: 120px minmax(0, 1fr) 110px;
+    gap: var(--space-4);
+  }
+}
+
+.voteMain {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.voteTitle {
+  font-weight: 700;
+}
+
+.voteText {
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.voteMeta {
+  margin: 0;
+  display: flex;
+  gap: var(--space-3);
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+
+@media (min-width: 720px) {
+  .voteMeta {
+    flex-direction: column;
+    gap: var(--space-1);
+    text-align: right;
+  }
+}
+
+.voteDetails summary {
+  cursor: pointer;
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+
+.tabContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.more {
+  font-weight: 600;
+}
+
+.footerLinks {
+  font-size: var(--text-sm);
+  color: var(--muted);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
 }

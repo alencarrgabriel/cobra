@@ -2,12 +2,12 @@
 
 ## 1. Protótipo (aprovação do usuário)
 
-- [ ] 1.1 Cabeçalho, barra de abas e Resumo com `StatStrip` e `VoteRow` (D1 a D3), em celular e computador; capturas para aprovação
+- [x] 1.1 Cabeçalho, barra de abas e Resumo com `StatStrip` e `VoteRow` (D1 a D3), em celular e computador; capturas para aprovação
 
 ## 2. Perfil
 
-- [ ] 2.0 Espaço do salário na faixa de números, com "—" e o motivo (D8)
-- [ ] 2.1 Rotas por aba, layout compartilhado e Proxy com o sufixo da aba (D1)
+- [x] 2.0 Espaço do salário na faixa de números, com "—" e o motivo (D8)
+- [x] 2.1 Rotas por aba, layout compartilhado e Proxy com o sufixo da aba (D1)
 - [ ] 2.2 Abas Votos (filtros e paginação), Presença, Gastos, Emendas e obras, Trajetória, Patrimônio e campanha (D1, D3)
 
 ## 3. Jornada

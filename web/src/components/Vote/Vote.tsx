@@ -24,6 +24,24 @@ export function VoteBadge({ option }: { option: VoteOption }) {
   );
 }
 
+/** A vote as the house recorded it, in the vote tokens: "Sim" and "Não" colored, the rest neutral. */
+export function VoteChip({
+  tone,
+  children,
+}: {
+  tone: "yes" | "no" | "other";
+  children: React.ReactNode;
+}) {
+  return (
+    <span
+      className={`${styles.badge} ${tone === "yes" ? styles.yes : tone === "no" ? styles.no : styles.other}`}
+      data-testid="voto"
+    >
+      {children}
+    </span>
+  );
+}
+
 type SplitProps = {
   yes: number;
   no: number;

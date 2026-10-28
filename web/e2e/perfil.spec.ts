@@ -17,6 +17,19 @@ async function openProfile(page: Page) {
   });
 }
 
+/** Opens a tab of the profile through the tab bar, as a person would. */
+async function goTab(page: Page, name: string) {
+  await page
+    .getByRole("navigation", { name: "Seções do perfil" })
+    .getByRole("link", { name })
+    .click();
+  await expect(
+    page
+      .getByRole("navigation", { name: "Seções do perfil" })
+      .getByRole("link", { name }),
+  ).toHaveAttribute("aria-current", "page", { timeout: 15_000 });
+}
+
 test("o painel da grade leva ao perfil, com a frase Quem é", async ({
   page,
 }) => {
@@ -31,6 +44,7 @@ test("o painel da grade leva ao perfil, com a frase Quem é", async ({
 
 test("emendas com a soma e obra com vínculo direto", async ({ page }) => {
   await openProfile(page);
+  await goTab(page, "Emendas e obras");
   await expect(page.getByTestId("emendas-total")).toContainText("1 emenda");
   await expect(page.getByTestId("emendas-total")).toContainText(
     "R$ 1.500.000,00 empenhados",
@@ -46,6 +60,7 @@ test("trajetória eleitoral do TSE, da mais recente à mais antiga", async ({
   page,
 }) => {
   await openProfile(page);
+  await goTab(page, "Trajetória");
   const block = page.getByTestId("trajetoria");
   await expect(block.locator("tbody tr td:first-child")).toHaveText([
     "2022",
@@ -61,13 +76,11 @@ test("trajetória eleitoral do TSE, da mais recente à mais antiga", async ({
     "PSB (2010 a 2014) → PL (2022)",
   );
   await expect(block).toContainText("Fonte: Tribunal Superior Eleitoral");
-  await expect(page.getByTestId("ainda-nao")).not.toContainText(
-    "Trajetória eleitoral",
-  );
 });
 
 test("patrimônio declarado com composição e variação", async ({ page }) => {
   await openProfile(page);
+  await goTab(page, "Patrimônio e campanha");
   const block = page.getByTestId("patrimonio");
   const rows = block.locator("tbody tr");
   await expect(rows.locator("td:first-child")).toHaveText([
@@ -88,6 +101,7 @@ test("receitas de campanha com pessoas físicas só somadas", async ({
   page,
 }) => {
   await openProfile(page);
+  await goTab(page, "Patrimônio e campanha");
   const block = page.getByTestId("receitas");
   await expect(
     block.getByRole("heading", { name: "2022: R$ 1,1 mi" }),
@@ -111,24 +125,25 @@ test("como votou: deputado e senadora com votos, distrital com traço", async ({
     .getByRole("button", { name: /Deputado Teste A/ })
     .click();
   await page.getByRole("link", { name: "Ver perfil completo" }).click();
+  await goTab(page, "Votos");
   const block = page.getByTestId("como-votou");
   await expect(block.getByRole("listitem")).toHaveCount(1);
   await expect(block).toContainText("10/06/2026");
   await expect(block.getByRole("link", { name: "PL 11/2003" })).toHaveAttribute(
     "href",
-    "https://www.camara.leg.br/propostas-legislativas/555",
+    /\/votacoes\/\d+$/,
   );
-  await expect(block.getByTestId("voto")).toHaveText("Voto: Não");
+  await expect(block.getByTestId("voto")).toHaveText("Não");
+  await block.getByText("Mais sobre esta votação").click();
   await expect(block.getByTestId("relevancia")).toHaveText(
     "Votação relevante: Governo e Oposição divergiram.",
   );
   await expect(block).not.toContainText("requerimento simbólico");
 
   await openProfile(page);
+  await goTab(page, "Votos");
   const senate = page.getByTestId("como-votou");
-  await expect(senate.getByTestId("voto")).toHaveText(
-    "Voto: Ausente: Licença saúde",
-  );
+  await expect(senate.getByTestId("voto")).toHaveText("Ausente: Licença saúde");
   await expect(senate).toContainText("Votações secretas e simbólicas");
 
   await page.goto("/representantes/5300108");
@@ -137,6 +152,7 @@ test("como votou: deputado e senadora com votos, distrital com traço", async ({
     .getByRole("button", { name: /Distrital Teste C/ })
     .click();
   await page.getByRole("link", { name: "Ver perfil completo" }).click();
+  await goTab(page, "Votos");
   await expect(page.getByTestId("como-votou")).toContainText(
     "as votações da Câmara Legislativa não são coletadas",
   );
@@ -151,6 +167,7 @@ test("gastos da cota por tipo, sem fornecedor pessoa física", async ({
     .getByRole("button", { name: /Deputado Teste A/ })
     .click();
   await page.getByRole("link", { name: "Ver perfil completo" }).click();
+  await goTab(page, "Gastos");
   const block = page.getByTestId("gastos");
   await expect(
     block.getByRole("heading", { name: "2026: R$ 40 mil" }),
@@ -173,6 +190,7 @@ test("presença com a mediana da casa", async ({ page }) => {
     .getByRole("button", { name: /Deputado Teste A/ })
     .click();
   await page.getByRole("link", { name: "Ver perfil completo" }).click();
+  await goTab(page, "Presença");
   await expect(page.getByTestId("presenca-2026")).toHaveText(
     "2026: presente em 10 de 12 sessões deliberativas do Plenário (83%). Mediana dos deputados: 83%.",
   );
@@ -181,6 +199,7 @@ test("presença com a mediana da casa", async ({ page }) => {
   );
 
   await openProfile(page);
+  await goTab(page, "Presença");
   await expect(page.getByTestId("presenca-2026")).toContainText(
     "compareceu a 0 de 1 votações nominais do Plenário (0%). Ausências: Licença saúde: 1.",
   );
@@ -210,6 +229,55 @@ test("relacionados em ordem alfabética e dados estruturados", async ({
     .textContent();
   expect(ld).toContain('"@type":"FAQPage"');
   expect(ld).toContain('"@type":"Person"');
+});
+
+test("resumo: faixa de números na mesma ordem, com traço e motivo onde falta", async ({
+  page,
+}) => {
+  await openProfile(page);
+  const strip = page.getByTestId("faixa");
+  await expect(strip.getByRole("listitem")).toHaveCount(5);
+  await expect(strip.locator("li a > span:first-child")).toHaveText([
+    "Comparecimento",
+    "Salário",
+    "Cota parlamentar",
+    "Emendas ao DF",
+    "Patrimônio declarado",
+  ]);
+  // The salary is not collected yet: a dash and why, never zero.
+  const salary = strip.getByRole("listitem").nth(1);
+  await expect(salary).toContainText("Ainda não coletado");
+  await expect(salary).not.toContainText("R$ 0");
+  // Each number leads to its tab.
+  await strip.getByRole("link", { name: /Patrimônio declarado/ }).click();
+  await expect(page).toHaveURL(/\/patrimonio$/, { timeout: 15_000 });
+});
+
+test("abas têm endereço próprio, marcam a atual e as desconhecidas dão 404", async ({
+  page,
+}) => {
+  await openProfile(page);
+  const base = new URL(page.url()).pathname;
+  const tabs = page.getByRole("navigation", { name: "Seções do perfil" });
+  await expect(tabs.getByRole("link")).toHaveText([
+    "Resumo",
+    "Votos",
+    "Presença",
+    "Gastos",
+    "Emendas e obras",
+    "Trajetória",
+    "Patrimônio e campanha",
+  ]);
+  await expect(tabs.getByRole("link", { name: "Resumo" })).toHaveAttribute(
+    "aria-current",
+    "page",
+  );
+  await goTab(page, "Gastos");
+  await expect(page).toHaveURL(new RegExp(`${base}/gastos$`));
+  const id = /\/politicos\/(\d+)-/.exec(base)![1];
+  await page.goto(`/politicos/${id}-nome-antigo/votos`);
+  await expect(page).toHaveURL(new RegExp(`${base}/votos$`));
+  expect((await page.goto(`${base}/inexistente`))?.status()).toBe(404);
 });
 
 test("nome antigo no endereço leva ao atual e id inexistente dá 404", async ({

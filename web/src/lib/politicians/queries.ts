@@ -548,7 +548,7 @@ async function cachedBallots(id: number): Promise<DbResult<BallotRow[]>> {
         collected: string;
       }[]
     >`
-      select v.source_id as vote_id, v.occurred_on::text, v.description, v.approved,
+      select v.id::text as vote_id, v.occurred_on::text, v.description, v.approved,
              v.proposition_label, v.proposition_summary, b.option, b.option_detail, v.proposition_type,
              r.criteria, ps.text as summary_text, ps.approved_at::text as summary_approved,
              ps.ai_model as summary_ai, v.proposition_url,
