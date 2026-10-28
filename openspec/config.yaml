@@ -116,7 +116,9 @@ context: |
   24 feed-e-pagina-votacao (feed com votos do lugar, página permanente, card).
   25a alertas-cadastro (Resend; opt-in duplo; "Seguir" pelo e-mail verificado, com consentimento
   separado; meus dados; cifra AES-256-GCM; decisão de 2026-10-27).
-  Próximas: 25b resumo-semanal; 27 metodologia-e-reporte-de-erro (com "É você nesta página?");
+  25b resumo-semanal (rota diária com CRON_SECRET; votos do estado e dos seguidos; uma vez por
+  semana; histórico em meus dados).
+  Próximas: 27 metodologia-e-reporte-de-erro (com "É você nesta página?");
   28 saude-integracoes.
   Fase 2: obras e emendas em todo o Brasil; planos dos prefeitos (2024); comparador de políticos;
   economia-em-numeros; trilhas-educativas. Fase 3: comparador de planos de candidatos (2028, após parecer).
