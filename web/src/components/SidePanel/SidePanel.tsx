@@ -37,6 +37,11 @@ export function SidePanel({ open, title, onClose, back, children }: Props) {
     } else if (!open && dialog.open) {
       dialog.close();
     }
+    // Navigating away keeps the page hidden (React Activity) instead of removing it; a modal
+    // left open there would stay in the top layer and block every click on the new page.
+    return () => {
+      if (dialog.open) dialog.close();
+    };
   }, [open]);
 
   // Return focus to whatever opened the panel, however it was closed.
